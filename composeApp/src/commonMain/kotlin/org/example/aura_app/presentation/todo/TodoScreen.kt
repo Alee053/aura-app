@@ -7,14 +7,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -40,7 +37,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import org.example.aura_app.domain.model.Todo
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,7 +68,7 @@ fun TodoScreen(viewModel: TodoViewModel) {
                 viewModel.addTodo(newTodoTitle)
                 newTodoTitle = ""
             }) {
-                Icon(Icons.Default.Add, contentDescription = "Add todo")
+                Text("+", fontSize = 24.sp)
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -149,10 +148,10 @@ private fun TodoItem(
                 modifier = Modifier.weight(1f)
             )
             IconButton(onClick = onDelete) {
-                Icon(
-                    Icons.Default.Delete,
-                    contentDescription = "Delete",
-                    tint = MaterialTheme.colorScheme.error
+                Text(
+                    "X",
+                    color = MaterialTheme.colorScheme.error,
+                    fontSize = 16.sp
                 )
             }
         }

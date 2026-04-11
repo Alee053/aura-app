@@ -310,18 +310,14 @@ git add composeApp/src/commonMain/kotlin/org/example/aura_app/data/repository/To
 **Files:**
 - Create: `composeApp/src/commonMain/kotlin/org/example/aura_app/presentation/auth/AuthViewModel.kt`
 
-- [ ] **Step 1: Write AuthViewModel**
+- [ ] **Step 1: Write AuthViewModel (common Main, platform-agnostic)**
 
 ```kotlin
 package org.example.aura_app.presentation.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -340,16 +336,6 @@ class AuthViewModel : ViewModel() {
     private val _authState = MutableStateFlow<AuthState>(AuthState.Loading)
     val authState: StateFlow<AuthState> = _authState
 
-    private var googleSignInClient: GoogleSignInClient? = null
-
-    fun buildGoogleSignInClient(): GoogleSignInClient {
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken("623141386052-gpn8fq0c03i0khmt3nn9bj0h92fprnfh.apps.googleusercontent.com")
-            .requestEmail()
-            .build()
-        return GoogleSignIn.getClient(android.app.Application(), gso)
-    }
-
     init {
         checkAuthState()
     }
@@ -362,12 +348,14 @@ class AuthViewModel : ViewModel() {
         }
     }
 
-    fun handleSignInResult(data: android.content.Intent?) {
+    fun handleSignInResult(idToken: String?) {
+        if (idToken == null) {
+            _authState.value = AuthState.Error("Sign-in failed: no token")
+            return
+        }
         viewModelScope.launch {
             try {
-                val task = GoogleSignIn.getSignedInFormIntent(data)
-                val account = task?.await()
-                val credential = GoogleAuthProvider.getCredential(account?.idToken, null)
+                val credential = GoogleAuthProvider.getCredential(idToken, null)
                 FirebaseConfig.auth.signInWithCredential(credential).await()
                 _authState.value = AuthState.SignedIn
             } catch (e: ApiException) {
@@ -380,13 +368,12 @@ class AuthViewModel : ViewModel() {
 
     fun signOut() {
         FirebaseConfig.auth.signOut()
-        googleSignInClient?.signOut()
         _authState.value = AuthState.SignedOut
     }
 }
 ```
 
-**Note:** `android.app.Application()` as context placeholder — KOIN will provide the actual application context via `androidContext()`.
+**Note:** `handleSignInResult(idToken: String?)` takes only the ID token — the `GoogleSignInClient` creation (which needs Android `Context`) is handled in `MainActivity` where `Context` is naturally available. This keeps `AuthViewModel` platform-agnostic (commonMain).
 
 - [ ] **Step 2: Commit**
 
@@ -756,8 +743,14 @@ Replace the entire contents of `App.kt` with:
 ```kotlin
 package org.example.aura_app
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -765,10 +758,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import org.example.aura_app.presentation.auth.AuthViewModel
-import org.example.aura_app.presentation.navigation.AppNavHost
 import org.example.aura_app.presentation.todo.TodoScreen
+import org.example.aura_app.MainActivity
 import org.koin.compose.koinInject
 
 @Composable
@@ -778,7 +775,7 @@ fun App() {
         val authViewModel: AuthViewModel = koinInject()
         val authState by authViewModel.authState.collectAsState()
 
-        when (authState) {
+        when (val state = authState) {
             is AuthViewModel.AuthState.Loading -> {
                 Box(fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
@@ -789,16 +786,53 @@ fun App() {
             }
             is AuthViewModel.AuthState.SignedOut,
             is AuthViewModel.AuthState.Error -> {
-                SignInScreen(authViewModel = authViewModel)
+                SignInScreen(
+                    errorMessage = if (state is AuthViewModel.AuthState.Error) state.message else null,
+                    onSignInClick = {
+                        val activity = LocalContext.current as? MainActivity
+                        activity?.triggerGoogleSignIn()
+                    }
+                )
             }
         }
     }
 }
 
 @Composable
-fun SignInScreen(authViewModel: AuthViewModel) {
-    Box(fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text("Please sign in to continue")
+fun SignInScreen(
+    errorMessage: String?,
+    onSignInClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            "Aura",
+            style = MaterialTheme.typography.headlineLarge
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            "Sign in to sync your todos",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(32.dp))
+        Button(onClick = onSignInClick) {
+            Text("Sign in with Google")
+        }
+        errorMessage?.let {
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                it,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(horizontal = 32.dp)
+            )
+        }
     }
 }
 ```
@@ -811,7 +845,7 @@ git add composeApp/src/commonMain/kotlin/org/example/aura_app/App.kt && git comm
 
 ---
 
-### Task 13: Update `MainActivity.kt` to handle Google Sign-In result
+### Task 13: Update `MainActivity.kt` with Google Sign-In client
 
 **Files:**
 - Modify: `composeApp/src/androidMain/kotlin/org/example/aura_app/MainActivity.kt`
@@ -822,7 +856,7 @@ git add composeApp/src/commonMain/kotlin/org/example/aura_app/App.kt && git comm
 cat /home/ale/Dev/University/aura-app/composeApp/src/androidMain/kotlin/org/example/aura_app/MainActivity.kt
 ```
 
-- [ ] **Step 2: Update MainActivity to handle sign-in result**
+- [ ] **Step 2: Update MainActivity with Google Sign-In flow**
 
 Replace the entire contents of `MainActivity.kt` with:
 
@@ -835,33 +869,55 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import org.example.aura_app.presentation.auth.AuthViewModel
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 
 class MainActivity : ComponentActivity() {
 
     private lateinit var authViewModel: AuthViewModel
+    private var googleSignInClient: com.google.android.gms.auth.api.signin.GoogleSignInClient? = null
+
+    private val signInLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            try {
+                val account = task.getResult(ApiException::class.java)
+                authViewModel.handleSignInResult(account.idToken)
+            } catch (e: ApiException) {
+                authViewModel.handleSignInResult(null)
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         authViewModel = getViewModel()
+        googleSignInClient = buildGoogleSignInClient()
 
         setContent {
             App()
         }
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == RC_SIGN_IN) {
-            authViewModel.handleSignInResult(data)
-        }
+    fun triggerGoogleSignIn() {
+        val signInIntent = googleSignInClient?.signInIntent ?: return
+        signInLauncher.launch(signInIntent)
     }
 
-    companion object {
-        private const val RC_SIGN_IN = 9001
+    private fun buildGoogleSignInClient(): com.google.android.gms.auth.api.signin.GoogleSignInClient {
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken("623141386052-gpn8fq0c03i0khmt3nn9bj0h92fprnfh.apps.googleusercontent.com")
+            .requestEmail()
+            .build()
+        return GoogleSignIn.getClient(this, gso)
     }
 }
 ```
@@ -869,7 +925,7 @@ class MainActivity : ComponentActivity() {
 - [ ] **Step 3: Commit**
 
 ```bash
-git add composeApp/src/androidMain/kotlin/org/example/aura_app/MainActivity.kt && git commit -m "chore: wire onActivityResult to AuthViewModel for Google Sign-In"
+git add composeApp/src/androidMain/kotlin/org/example/aura_app/MainActivity.kt && git commit -m "chore: add Google Sign-In client and ActivityResult launcher to MainActivity"
 ```
 
 ---

@@ -1,4 +1,4 @@
-package org.example.aura_app
+package com.programovil.aura
 
 import android.app.Activity
 import android.content.Intent
@@ -10,7 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import org.example.aura_app.presentation.auth.AuthViewModel
+import com.programovil.aura.presentation.auth.AuthViewModel
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 
 class MainActivity : ComponentActivity() {

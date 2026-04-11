@@ -1,8 +1,8 @@
-package org.example.aura_app
+package com.programovil.aura
 
 import android.app.Application
-import org.example.aura_app.data.remote.FirebaseConfig
-import org.example.aura_app.di.getModules
+import com.programovil.aura.data.remote.FirebaseConfig
+import com.programovil.aura.di.getModules
 import org.koin.android.ext.koin.androidLogger
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin

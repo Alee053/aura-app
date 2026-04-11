@@ -1,4 +1,4 @@
-package org.example.aura_app.data.remote
+package com.programovil.aura.data.remote
 
 import android.content.Context
 import com.google.firebase.Firebase

@@ -1,4 +1,4 @@
-package org.example.aura_app.domain.model
+package com.programovil.aura.domain.model
 
 data class Todo(
     val id: String,

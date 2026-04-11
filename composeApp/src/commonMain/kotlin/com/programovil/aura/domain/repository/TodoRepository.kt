@@ -1,7 +1,7 @@
-package org.example.aura_app.domain.repository
+package com.programovil.aura.domain.repository
 
 import kotlinx.coroutines.flow.Flow
-import org.example.aura_app.domain.model.Todo
+import com.programovil.aura.domain.model.Todo
 
 interface TodoRepository {
     fun getTodos(): Flow<Result<List<Todo>>>

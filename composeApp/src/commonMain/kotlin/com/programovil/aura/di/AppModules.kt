@@ -1,9 +1,9 @@
-package org.example.aura_app.di
+package com.programovil.aura.di
 
-import org.example.aura_app.data.repository.TodoRepositoryImpl
-import org.example.aura_app.domain.repository.TodoRepository
-import org.example.aura_app.presentation.auth.AuthViewModel
-import org.example.aura_app.presentation.todo.TodoViewModel
+import com.programovil.aura.data.repository.TodoRepositoryImpl
+import com.programovil.aura.domain.repository.TodoRepository
+import com.programovil.aura.presentation.auth.AuthViewModel
+import com.programovil.aura.presentation.todo.TodoViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 

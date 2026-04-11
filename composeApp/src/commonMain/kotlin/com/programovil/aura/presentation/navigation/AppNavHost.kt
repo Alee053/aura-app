@@ -1,11 +1,11 @@
-package org.example.aura_app.presentation.navigation
+package com.programovil.aura.presentation.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import org.example.aura_app.presentation.todo.TodoScreen
-import org.example.aura_app.presentation.todo.TodoViewModel
+import com.programovil.aura.presentation.todo.TodoScreen
+import com.programovil.aura.presentation.todo.TodoViewModel
 import org.koin.compose.koinInject
 
 @Composable

@@ -1,4 +1,4 @@
-package org.example.aura_app.data.repository
+package com.programovil.aura.data.repository
 
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.firestore
@@ -6,9 +6,9 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
-import org.example.aura_app.data.remote.FirebaseConfig
-import org.example.aura_app.domain.model.Todo
-import org.example.aura_app.domain.repository.TodoRepository
+import com.programovil.aura.data.remote.FirebaseConfig
+import com.programovil.aura.domain.model.Todo
+import com.programovil.aura.domain.repository.TodoRepository
 
 class TodoRepositoryImpl : TodoRepository {
 

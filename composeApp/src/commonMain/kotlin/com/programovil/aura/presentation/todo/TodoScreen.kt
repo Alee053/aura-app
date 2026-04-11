@@ -1,4 +1,4 @@
-package org.example.aura_app.presentation.todo
+package com.programovil.aura.presentation.todo
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -40,7 +40,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.example.aura_app.domain.model.Todo
+import com.programovil.aura.domain.model.Todo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

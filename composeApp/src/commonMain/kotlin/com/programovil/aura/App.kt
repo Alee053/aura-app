@@ -1,4 +1,4 @@
-package org.example.aura_app
+package com.programovil.aura
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,9 +19,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import org.example.aura_app.presentation.auth.AuthViewModel
-import org.example.aura_app.presentation.todo.TodoScreen
-import org.example.aura_app.presentation.todo.TodoViewModel
+import com.programovil.aura.presentation.auth.AuthViewModel
+import com.programovil.aura.presentation.todo.TodoScreen
+import com.programovil.aura.presentation.todo.TodoViewModel
 import org.koin.compose.koinInject
 
 @Composable

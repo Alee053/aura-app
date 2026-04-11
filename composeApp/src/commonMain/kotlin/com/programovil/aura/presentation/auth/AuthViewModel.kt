@@ -1,4 +1,4 @@
-package org.example.aura_app.presentation.auth
+package com.programovil.aura.presentation.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import org.example.aura_app.data.remote.FirebaseConfig
+import com.programovil.aura.data.remote.FirebaseConfig
 
 class AuthViewModel : ViewModel() {
 

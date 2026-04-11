@@ -1,4 +1,4 @@
-package org.example.aura_app
+package com.programovil.aura
 
 import platform.UIKit.UIDevice
 

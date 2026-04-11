@@ -1,4 +1,4 @@
-package org.example.aura_app
+package com.programovil.aura
 
 import androidx.compose.ui.window.ComposeUIViewController
 

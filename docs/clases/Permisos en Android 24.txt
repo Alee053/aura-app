@@ -1,0 +1,232 @@
+Permisos en Android
+Networking, GPS, Sensores, Multitarea.
+
+Permisos del sistema
+Android es un sistema operativo con privilegios independientes, en el que cada aplicación se ejecuta con una identidad de sistema distinta (ID de usuario de Linux y ID de grupo). 
+También se separan partes del sistema en identidades distintas. Así, Linux aísla las aplicaciones entre sí y del sistema operativo.
+Se ofrecen funciones de seguridad adicionales más precisas mediante un mecanismo de “permisos” que aplica restricciones en las operaciones específicas para que un proceso en particular pueda realizar y permisos por URI para la dar acceso ad-hoc a elementos específicos de datos.
+
+
+Arquitectura de seguridad
+Ninguna aplicación, de manera predeterminada, tiene permiso para realizar operaciones que pudieran tener consecuencias negativas para otras aplicaciones., el sistema operativo o el usuario.
+Leer datos privado
+Escribir en datos privado
+acceder a una red
+mantener el dispositivo activo, etc
+Debido a que cada aplicación de Android funciona en una zona de pruebas de proceso, las aplicaciones deben compartir recursos y datos de manera explícita.
+Las aplicaciones declaran estáticamente los permisos que necesitan y el sistema Android solicita al usuario su consentimiento.
+
+Firma de aplicaciones
+Todos los APK, deben estar firmado con un certificado cuya clave privada esté en manos del desarrollador.
+Este certificado tiene por objetivo distinguir a los autores de las aplicaciones.
+
+ID de usuario y acceso a archivos
+En el momento de la instalación, Android asigna a cada paquete un ID de usuario de Linux distinto.
+En otro dispositivo el mismo paquete puede tener otro ID de usuario, lo que importa es que cada paquete tenga un ID de usuario distinto en un dispositivo determinado.
+
+
+Uso de permisos
+Una aplicación básica de Android no tiene permisos asociados por defecto.
+Para usar funciones protegidas del dispositivo, se debe incluir una o más etiquetas <uses-permission>  en el Manifest.xml
+
+Niveles de permisos
+Se dividen en varios niveles de protección. Los dos niveles más importantes que debes conocer son el normal y el riesgoso.
+Los permisos normales abarcan áreas en las cuales tu app tiene que acceder a datos o recursos fuera de su zona de pruebas, pero donde no existe un riesgo mínimo para la privacidad del usuario o el funcionamiento de otras apps.
+Los permisos riesgosos abarcan áreas en las cuales la app requiere datos o recursos que incluyen información privada del usuario, o bien que podrían afectar los datos almacenados del usuario o el funcionamiento de otras apps.
+
+Permisos normales
+https://developer.android.com/reference/android/Manifest.permission.html
+Comunicaciones
+INTERNET
+ACCESS_NETWORK_STATE
+CHANGE_NETWORK_STATE
+NFC
+TRANSMIT_R
+Conexiones WIFI
+ACCESS_WIFI_STATE
+CHANGE_WIFI_STATE
+CHANGE_WIFI_MULTICAST_STATE
+Bluetooth
+BLUETOOTH
+BLUETOOTH_ADMIN
+Consumo de batería
+WAKE_LOCK
+FLASHLIGHT
+VIBRATE
+Aplicaciones
+RECEIVE_BOOT_COMPLETED
+BROADCAST_STICKY
+KILL_BACKGROUND_PROCESS
+REORDER_TASK
+INSTALL_SHORTCUT and UNINSTALL_SHORTCUT
+GET_PACKAGE_SIZE
+EXPAND_STATUS_BAR
+FOREGROUND_SERVICE
+Configuraciones del sistema
+SET_WALLPAPER
+SET_WALLPAPER_HITS
+SET_ALARM
+SET_TIME_ZONE
+ACCESS_NOTIFICATION_POLICY
+
+
+Audio
+MODY_AUDIO_SETTINGS
+Sincronización
+READ_SYNC_SETTINGS
+WRITE_SYNC_SETTINGS
+READ_SYNC_STATS
+Ubicación
+ACCESS_LOCATION_EXTRA_COMMANDS
+Seguridad
+USE_FINGERPRINT
+DISABLE_KEYGUARD
+
+Permisos peligrosos
+https://developer.android.com/reference/android/Manifest.permission.html
+Almacenamiento Externo
+WRITE_EXTERNAL_STORAGE
+READ_EXTERNAL_STORAGE
+Ubicación
+ACCESS_COARSE_LOCATION
+ACCESS_FINE_LOCATION
+Teléfono
+CALL_PHONE
+READ_PHONE_STATE
+READ_PHONE_NUMBERS
+READ_CALL_LOG
+WRITE_CALL_LOG
+ADD_VOICEMAIL
+USE_SIP
+PROCESS_OUTGOING_CALLS
+ANSWER_PHONE_CALLS
+
+Mensajes de texto (SMS)
+SEND_SMS
+RECEIVE_SMS
+READ_SMS
+RECEIVE_MMS
+RECEIVE_WAP_PUSCH
+Contactos
+READ_CONTACTS
+WRITE_CONTACTS
+GET_ACCOUNTS
+Calendario
+READ_CALENDAR
+WRITE_CALENDAR
+Cámara
+CAMARA
+Micrófono
+RECORD_AUDIO
+
+
+Sensores corporales
+BODY_SENSORS
+
+Solicitar permisos de la app
+Agregar permisos al Manifest
+  <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+            package="com.example.snazzyapp">
+
+        <uses-permission android:name="android.permission.INTERNET"/>
+        <!-- other permissions go here -->
+
+        <application ...>
+            ...
+        </application>
+    </manifest>
+
+
+Cómo verificar si tu app tiene permisos
+if( ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_CALENDAR) != PackageManager.PERMISSION_GRANTED) {
+   Toast.makeText(this, "No tienes permisos para escribir en el Calendario", Toast.LENGTH_LONG).show()
+} else {
+   Toast.makeText(this, "Si tienes permisos para escribir en el Calendario", Toast.LENGTH_LONG).show()
+}
+
+
+
+Solicitar permisos
+ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.WRITE_CALENDAR), WRITE_CALENDAR_PERMISSION_CONSTANT)
+
+
+Vibración de celular
+val vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+if ( vibrator.hasVibrator() ) {
+   if (Build.VERSION.SDK_INT >= 26) {
+       vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE))
+   } else {
+       vibrator.vibrate(200)
+   }
+} else {
+   Toast.makeText(this, "Este dispositivo no soporta la Vibración", Toast.LENGTH_LONG).show()
+}
+
+Consideraciones cuando no se otorga el permiso
+Denegar
+No volver a preguntar
+
+Validar con la solicitud por defecto o ir a Configuración
+if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_CALENDAR)) {
+   Toast.makeText(this," Calendario A", Toast.LENGTH_LONG).show()
+   ActivityCompat.requestPermissions(this@MainActivity, arrayOf(Manifest.permission.WRITE_CALENDAR), WRITE_CALENDAR_PERMISSION_CONSTANT)
+} else {
+   val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+   val uri = Uri.fromParts("package", packageName, null)
+   intent.setData(uri)
+   startActivityForResult(intent, 1)
+}
+
+
+Dexter
+https://github.com/Karumi/Dexter
+Incluir la librería
+implementation 'com.karumi:dexter:5.0.0'
+Dexter.withActivity(this)
+       .withPermission(Manifest.permission.WRITE_CALENDAR)
+       .withListener( object : PermissionListener {
+           override fun onPermissionGranted(response: PermissionGrantedResponse?) {
+               Toast.makeText(this@MainActivity, "Se puede escribir en el Calendario", Toast.LENGTH_LONG).show()
+           }
+           override fun onPermissionRationaleShouldBeShown(permission: PermissionRequest?, token: PermissionToken?) {
+               Toast.makeText(this@MainActivity, "No se puede escribir en el Calendario", Toast.LENGTH_LONG).show()
+               token?.continuePermissionRequest()
+           }
+           override fun onPermissionDenied(response: PermissionDeniedResponse?) {
+               if(response!!.isPermanentlyDenied()) {
+                   //Mostrar un alert e ir a la Configuración de la Aplicación.
+               }
+           }
+       })
+       .check()
+
+Metodo Completo
+button.setOnClickListener {
+   Dexter.withActivity(this)
+           .withPermission(Manifest.permission.WRITE_CALENDAR)
+           .withListener( object : PermissionListener {
+               override fun onPermissionGranted(response: PermissionGrantedResponse?) {
+                   Toast.makeText(this@MainActivity, "Se puede escribir en el Calendario", Toast.LENGTH_LONG).show()
+               }
+               override fun onPermissionRationaleShouldBeShown(permission: PermissionRequest?, token: PermissionToken?) {
+                   Toast.makeText(this@MainActivity, "No se puede escribir en el Calendario", Toast.LENGTH_LONG).show()
+                   token?.continuePermissionRequest()
+               }
+               override fun onPermissionDenied(response: PermissionDeniedResponse?) {
+                   if(response!!.isPermanentlyDenied) {
+                       val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                       val uri = Uri.fromParts("package", packageName, null)
+                       intent.setData(uri)
+                       startActivityForResult(intent, 1)
+                   }
+               }
+           })
+           .check()
+}
+
+Múltiples permisos con Dexter
+
+Ejercicio
+Partiendo de la guia de Google Maps
+Agregar un botón para que al presionar muestre un pin en el mapa  con la geolocalización del usuario 
+

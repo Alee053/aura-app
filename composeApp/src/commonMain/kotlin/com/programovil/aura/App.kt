@@ -31,7 +31,6 @@ fun App(
 ) {
     MaterialTheme {
         val authViewModel: AuthViewModel = koinInject()
-        val todoViewModel: TodoViewModel = koinInject()
         val authState by authViewModel.authState.collectAsState()
 
         when (val state = authState) {
@@ -41,6 +40,7 @@ fun App(
                 }
             }
             is AuthViewModel.AuthState.SignedIn -> {
+                val todoViewModel: TodoViewModel = koinInject()
                 TodoScreen(todoViewModel)
             }
             is AuthViewModel.AuthState.SignedOut,

@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
         val googleSignInClient = GoogleSignIn.getClient(
             this,
             GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken("623141386052-gpn8fq0c03i0khmt3nn9bj0h92fprnfh.apps.googleusercontent.com")
+                .requestIdToken("623141386052-ubttitbd4j8eqtvt4d2qvtbtba7cnfv9.apps.googleusercontent.com")
                 .requestEmail()
                 .build()
         )

@@ -35,24 +35,18 @@ class AuthViewModel : ViewModel() {
     }
 
     fun handleSignInResult(idToken: String?) {
-        android.util.Log.e("AuthViewModel", ">>>> handleSignInResult called, idToken present=${idToken != null}")
         if (idToken == null) {
-            android.util.Log.e("AuthViewModel", ">>>> idToken is null, setting Error state")
             _authState.value = AuthState.Error("Sign-in failed: no token")
             return
         }
         viewModelScope.launch {
             try {
                 val credential = GoogleAuthProvider.getCredential(idToken, null)
-                android.util.Log.e("AuthViewModel", ">>>> about to call signInWithCredential")
                 FirebaseConfig.auth.signInWithCredential(credential).await()
-                android.util.Log.e("AuthViewModel", ">>>> signInWithCredential succeeded, currentUser=${FirebaseConfig.auth.currentUser?.email}")
                 _authState.value = AuthState.SignedIn
             } catch (e: ApiException) {
-                android.util.Log.e("AuthViewModel", ">>>> ApiException: ${e.statusCode} - ${e.message}")
                 _authState.value = AuthState.Error("Sign-in failed: ${e.message}")
             } catch (e: Exception) {
-                android.util.Log.e("AuthViewModel", ">>>> Exception: ${e.javaClass.simpleName} - ${e.message}")
                 _authState.value = AuthState.Error("Sign-in failed: ${e.message}")
             }
         }

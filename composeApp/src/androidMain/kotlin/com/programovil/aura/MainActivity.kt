@@ -10,8 +10,6 @@ import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.lifecycle.lifecycleScope
-import com.google.firebase.auth.GoogleAuthProvider
-import com.programovil.aura.data.remote.FirebaseConfig
 import com.programovil.aura.presentation.auth.AuthViewModel
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.getViewModel
@@ -24,8 +22,6 @@ class MainActivity : ComponentActivity() {
     private val credentialManager = CredentialManager.create(this)
 
     private fun launchGoogleSignIn() {
-        // Use the Web Application type OAuth 2.0 client ID (client_type: 3)
-        // NOT the Android type (client_type: 1 with SHA-1)
         val googleIdOption = com.google.android.libraries.identity.googleid.GetGoogleIdOption.Builder()
             .setServerClientId("623141386052-gpn8fq0c03i0khmt3nn9bj0h92fprnfh.apps.googleusercontent.com")
             .setFilterByAuthorizedAccounts(true)
@@ -42,20 +38,16 @@ class MainActivity : ComponentActivity() {
                     request = request
                 )
                 val credential = result.credential
-                Log.e(TAG, ">>>> credential type string: ${credential.type}")
-                // googleid library uses TYPE_GOOGLE_ID_TOKEN_CREDENTIAL constant from GoogleIdTokenCredential
                 val googleIdType = com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
                 if (credential.type == googleIdType) {
                     val googleIdTokenCredential = com.google.android.libraries.identity.googleid.GoogleIdTokenCredential.createFrom(credential.data)
-                    val idToken = googleIdTokenCredential.idToken
-                    Log.e(TAG, ">>>> idToken obtained, length=${idToken?.length}")
-                    authViewModel.handleSignInResult(idToken)
+                    authViewModel.handleSignInResult(googleIdTokenCredential.idToken)
                 } else {
-                    Log.e(TAG, ">>>> Unexpected credential type: ${credential.type}")
+                    Log.e(TAG, "Unexpected credential type: ${credential.type}")
                     authViewModel.handleSignInResult(null)
                 }
             } catch (e: GetCredentialException) {
-                Log.e(TAG, "getCredential failed: ${e.message}, type=${e.javaClass.simpleName}")
+                Log.e(TAG, "Credential sign-in failed: ${e.message}")
                 authViewModel.handleSignInResult(null)
             } catch (e: Exception) {
                 Log.e(TAG, "Unexpected error: ${e.message}")

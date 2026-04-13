@@ -35,7 +35,9 @@ class AuthViewModel : ViewModel() {
     }
 
     fun handleSignInResult(idToken: String?) {
+        println("DEBUG AuthViewModel: handleSignInResult called, idToken=${idToken != null}")
         if (idToken == null) {
+            println("DEBUG AuthViewModel: idToken is null, setting Error state")
             _authState.value = AuthState.Error("Sign-in failed: no token")
             return
         }

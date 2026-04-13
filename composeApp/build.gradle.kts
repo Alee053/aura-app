@@ -35,7 +35,9 @@ kotlin {
             implementation(libs.navigation.compose)
             implementation(libs.firebase.auth.ktx)
             implementation(libs.firebase.firestore.ktx)
-            implementation(libs.play.services.auth)
+            implementation(libs.credentials)
+            implementation(libs.credentials.play.services.auth)
+            implementation(libs.googleid)
             implementation(libs.kotlinx.coroutines.play.services)
         }
         commonMain.dependencies {

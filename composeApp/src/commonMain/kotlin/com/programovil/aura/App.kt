@@ -20,8 +20,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.programovil.aura.auth.presentation.AuthViewModel
-import com.programovil.aura.todo.presentation.TodoScreen
-import com.programovil.aura.todo.presentation.TodoViewModel
+import com.programovil.aura.navigation.AppNavHost
 import org.koin.compose.koinInject
 
 @Composable
@@ -40,8 +39,7 @@ fun App(
                 }
             }
             is AuthViewModel.AuthState.SignedIn -> {
-                val todoViewModel: TodoViewModel = koinInject()
-                TodoScreen(todoViewModel)
+                AppNavHost()
             }
             is AuthViewModel.AuthState.SignedOut,
             is AuthViewModel.AuthState.Error -> {

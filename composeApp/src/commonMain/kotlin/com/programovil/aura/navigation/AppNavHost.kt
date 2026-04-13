@@ -1,11 +1,11 @@
-package com.programovil.aura.presentation.navigation
+package com.programovil.aura.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.programovil.aura.todo.presentation.TodoScreen
-import com.programovil.aura.todo.presentation.TodoViewModel
+import com.programovil.aura.todo.presentation.screen.TodoScreen
+import com.programovil.aura.todo.presentation.viewmodel.TodoViewModel
 import org.koin.compose.koinInject
 
 @Composable

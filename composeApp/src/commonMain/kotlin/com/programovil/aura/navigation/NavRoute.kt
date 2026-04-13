@@ -1,4 +1,4 @@
-package com.programovil.aura.presentation.navigation
+package com.programovil.aura.navigation
 
 import kotlinx.serialization.Serializable
 

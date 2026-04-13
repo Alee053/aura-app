@@ -32,7 +32,7 @@ class TodoRepositoryImpl : TodoRepository {
                         title = doc.getString("title") ?: "",
                         isCompleted = doc.getBoolean("isCompleted") ?: false
                     )
-                } ?: emptyList()
+                } ?: emptyList<Todo>()
                 trySend(Result.success(todos))
             }
         awaitClose { listener.remove() }

@@ -1,4 +1,4 @@
-package com.programovil.aura.presentation.auth
+package com.programovil.aura.auth.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

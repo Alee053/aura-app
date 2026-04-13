@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.programovil.aura.presentation.todo.TodoScreen
-import com.programovil.aura.presentation.todo.TodoViewModel
+import com.programovil.aura.todo.presentation.TodoScreen
+import com.programovil.aura.todo.presentation.TodoViewModel
 import org.koin.compose.koinInject
 
 @Composable

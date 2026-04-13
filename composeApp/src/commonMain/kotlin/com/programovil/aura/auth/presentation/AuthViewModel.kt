@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import com.programovil.aura.data.remote.FirebaseConfig
+import com.programovil.aura.shared.FirebaseConfig
 
 class AuthViewModel : ViewModel() {
 

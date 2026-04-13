@@ -6,7 +6,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
-import com.programovil.aura.data.remote.FirebaseConfig
+import com.programovil.aura.shared.FirebaseConfig
 import com.programovil.aura.domain.model.Todo
 import com.programovil.aura.domain.repository.TodoRepository
 

@@ -1,7 +1,7 @@
 package com.programovil.aura
 
 import android.app.Application
-import com.programovil.aura.data.remote.FirebaseConfig
+import com.programovil.aura.shared.FirebaseConfig
 import com.programovil.aura.di.getModules
 import org.koin.android.ext.koin.androidLogger
 import org.koin.android.ext.koin.androidContext

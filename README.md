@@ -13,6 +13,7 @@ Productivity app (Todo + Habits + Pomodoro + Agenda) built with Kotlin Multiplat
 | Remote DB | Cloud Firestore (Firebase) |
 | Auth | Firebase Auth (Google Sign-In) |
 | Navigation | Navigation Compose + kotlinx-serialization |
+| Localization | Loco (localise.biz) |
 
 ## Modules
 

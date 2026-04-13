@@ -6,4 +6,7 @@ import kotlinx.serialization.Serializable
 sealed class NavRoute {
     @Serializable
     data object Todo : NavRoute()
+
+    @Serializable
+    data class TodoDetail(val todoId: String) : NavRoute()
 }

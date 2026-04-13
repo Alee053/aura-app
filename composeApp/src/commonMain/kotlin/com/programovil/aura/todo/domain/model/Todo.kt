@@ -1,4 +1,4 @@
-package com.programovil.aura.domain.model
+package com.programovil.aura.todo.domain.model
 
 data class Todo(
     val id: String,

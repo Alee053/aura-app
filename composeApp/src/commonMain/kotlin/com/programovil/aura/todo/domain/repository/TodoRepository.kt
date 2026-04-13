@@ -1,7 +1,7 @@
-package com.programovil.aura.domain.repository
+package com.programovil.aura.todo.domain.repository
 
+import com.programovil.aura.todo.domain.model.Todo
 import kotlinx.coroutines.flow.Flow
-import com.programovil.aura.domain.model.Todo
 
 interface TodoRepository {
     fun getTodos(): Flow<Result<List<Todo>>>

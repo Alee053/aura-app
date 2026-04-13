@@ -1,12 +1,12 @@
-package com.programovil.aura.presentation.todo
+package com.programovil.aura.todo.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.programovil.aura.todo.domain.model.Todo
+import com.programovil.aura.todo.domain.repository.TodoRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import com.programovil.aura.domain.model.Todo
-import com.programovil.aura.domain.repository.TodoRepository
 
 class TodoViewModel(
     private val repository: TodoRepository

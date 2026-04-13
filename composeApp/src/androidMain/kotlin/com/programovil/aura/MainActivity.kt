@@ -24,8 +24,10 @@ class MainActivity : ComponentActivity() {
     private val credentialManager = CredentialManager.create(this)
 
     private fun launchGoogleSignIn() {
+        // Use the Web Application type OAuth 2.0 client ID (client_type: 3)
+        // NOT the Android type (client_type: 1 with SHA-1)
         val googleIdOption = com.google.android.libraries.identity.googleid.GetGoogleIdOption.Builder()
-            .setServerClientId("623141386052-ubttitbd4j8eqtvt4d2qvtbtba7cnfv9.apps.googleusercontent.com")
+            .setServerClientId("623141386052-gpn8fq0c03i0khmt3nn9bj0h92fprnfh.apps.googleusercontent.com")
             .setFilterByAuthorizedAccounts(true)
             .build()
 

@@ -1,15 +1,15 @@
 package com.programovil.aura.di
 
-import com.programovil.aura.data.repository.TodoRepositoryImpl
-import com.programovil.aura.domain.repository.TodoRepository
-import com.programovil.aura.presentation.auth.AuthViewModel
-import com.programovil.aura.presentation.todo.TodoViewModel
+import com.programovil.aura.auth.di.authModule
+import com.programovil.aura.auth.presentation.AuthViewModel
+import com.programovil.aura.todo.di.todoModule
+import com.programovil.aura.todo.presentation.TodoViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val presentationModule = module {
-    viewModel { TodoViewModel(get()) }
     viewModel { AuthViewModel() }
+    viewModel { TodoViewModel(get()) }
 }
 
 val domainModule = module {
@@ -17,10 +17,12 @@ val domainModule = module {
 }
 
 val dataModule = module {
-    single<TodoRepository> { TodoRepositoryImpl() }
+    // Data layer specifics if needed
 }
 
 fun getModules() = listOf(
+    authModule,
+    todoModule,
     domainModule,
     dataModule,
     presentationModule

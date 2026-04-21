@@ -143,7 +143,9 @@ fun HabitScreen(
                     items(uiState.thisWeekHabits, key = { it.habit.id }) { habitItem ->
                         HabitItem(
                             habitWithStatus = habitItem,
-                            onToggle = { viewModel.onEvent(HabitEvent.ToggleCompletion(habitItem.habit.id, "")) }
+                            onToggle = {
+                                viewModel.onEvent(HabitEvent.ToggleCompletion(habitItem.habit.id, habitItem.targetDate))
+                            }
                         )
                     }
                 }

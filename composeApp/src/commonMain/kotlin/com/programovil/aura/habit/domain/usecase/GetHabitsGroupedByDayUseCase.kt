@@ -55,7 +55,8 @@ class GetHabitsGroupedByDayUseCase(private val repository: HabitRepository) {
                     habit = habit,
                     isDone = isDone,
                     isMissed = !isDone && date.isBefore(LocalDate.now()),
-                    streak = streak
+                    streak = streak,
+                    targetDate = dateStr
                 )
             }
     }

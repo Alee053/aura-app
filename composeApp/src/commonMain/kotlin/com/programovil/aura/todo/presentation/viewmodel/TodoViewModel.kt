@@ -40,15 +40,17 @@ class TodoViewModel(
         }
     }
 
-    fun addTodo(title: String) {
+    fun addTodo(title: String, dueDate: Long? = null) {
         if (title.isBlank()) return
+        _error.value = null
         viewModelScope.launch {
-            addTodoUseCase(title.trim())
+            addTodoUseCase(title.trim(), dueDate)
                 .onFailure { _error.value = "Failed to add todo" }
         }
     }
 
     fun toggleTodo(todoId: String, isCompleted: Boolean) {
+        _error.value = null
         viewModelScope.launch {
             toggleTodoUseCase(todoId, isCompleted)
                 .onFailure { _error.value = "Failed to update todo" }
@@ -56,6 +58,7 @@ class TodoViewModel(
     }
 
     fun deleteTodo(todoId: String) {
+        _error.value = null
         viewModelScope.launch {
             deleteTodoUseCase(todoId)
                 .onFailure { _error.value = "Failed to delete todo" }

@@ -30,7 +30,8 @@ class TodoRepositoryImpl : TodoRepository {
                     Todo(
                         id = doc.id,
                         title = doc.getString("title") ?: "",
-                        isCompleted = doc.getBoolean("isCompleted") ?: false
+                        isCompleted = doc.getBoolean("isCompleted") ?: false,
+                        dueDate = doc.getLong("dueDate")
                     )
                 } ?: emptyList<Todo>()
                 trySend(Result.success(todos))
@@ -38,12 +39,16 @@ class TodoRepositoryImpl : TodoRepository {
         awaitClose { listener.remove() }
     }
 
-    override suspend fun addTodo(title: String): Result<Unit> = runCatching {
-        userTodosCollection().add(mapOf(
+    override suspend fun addTodo(title: String, dueDate: Long?): Result<Unit> = runCatching {
+        val data = mutableMapOf(
             "title" to title,
             "isCompleted" to false,
             "createdAt" to FieldValue.serverTimestamp()
-        )).await()
+        )
+        if (dueDate != null) {
+            data["dueDate"] = dueDate
+        }
+        userTodosCollection().add(data).await()
     }
 
     override suspend fun toggleTodo(todoId: String, isCompleted: Boolean): Result<Unit> = runCatching {

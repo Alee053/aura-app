@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.googleServices)
+    alias(libs.plugins.ksp)
 }
 
 kotlin {
@@ -39,6 +40,8 @@ kotlin {
             implementation(libs.credentials.play.services.auth)
             implementation(libs.googleid)
             implementation(libs.kotlinx.coroutines.play.services)
+            implementation(libs.room.runtime)
+            implementation(libs.room.ktx)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -90,4 +93,5 @@ android {
 
 dependencies {
     debugImplementation(libs.compose.uiTooling)
+    ksp(libs.room.compiler)
 }

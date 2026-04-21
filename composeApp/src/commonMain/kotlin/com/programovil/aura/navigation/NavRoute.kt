@@ -9,4 +9,7 @@ sealed class NavRoute {
 
     @Serializable
     data class TodoDetail(val todoId: String) : NavRoute()
+
+    @Serializable
+    data object Habit : NavRoute()
 }

@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.programovil.aura.habit.presentation.screen.HabitScreen
 import com.programovil.aura.todo.presentation.screen.TodoScreen
 import com.programovil.aura.todo.presentation.viewmodel.TodoViewModel
 import org.koin.compose.koinInject
@@ -20,6 +21,9 @@ fun AppNavHost() {
         composable<NavRoute.TodoDetail> { backStackEntry ->
             val todoDetail: NavRoute.TodoDetail = backStackEntry.toRoute()
             // TODO: Navigate to detail screen with todoDetail.todoId
+        }
+        composable<NavRoute.Habit> {
+            HabitScreen()
         }
     }
 }

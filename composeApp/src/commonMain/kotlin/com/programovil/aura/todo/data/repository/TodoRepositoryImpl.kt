@@ -3,6 +3,8 @@ package com.programovil.aura.todo.data.repository
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.firestore
 import com.programovil.aura.shared.FirebaseConfig
+import com.programovil.aura.todo.data.mapper.TodoData
+import com.programovil.aura.todo.data.mapper.toDomain
 import com.programovil.aura.todo.domain.model.Todo
 import com.programovil.aura.todo.domain.repository.TodoRepository
 import kotlinx.coroutines.channels.awaitClose
@@ -27,12 +29,13 @@ class TodoRepositoryImpl : TodoRepository {
                     return@addSnapshotListener
                 }
                 val todos = snapshot?.documents?.mapNotNull { doc ->
-                    Todo(
+                    val todoData = TodoData(
                         id = doc.id,
                         title = doc.getString("title") ?: "",
                         isCompleted = doc.getBoolean("isCompleted") ?: false,
                         dueDate = doc.getLong("dueDate")
                     )
+                    todoData.toDomain()
                 } ?: emptyList<Todo>()
                 trySend(Result.success(todos))
             }

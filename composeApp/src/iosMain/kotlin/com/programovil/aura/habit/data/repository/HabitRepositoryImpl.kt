@@ -6,8 +6,14 @@ import com.programovil.aura.habit.domain.model.HabitCompletion
 import com.programovil.aura.habit.domain.repository.HabitRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import org.koin.core.koin
 
-actual class HabitRepositoryImpl(
+actual fun createHabitRepository(): HabitRepository {
+    val userDefaults: HabitUserDefaults = koin.get()
+    return IOSHabitRepositoryImpl(userDefaults)
+}
+
+private class IOSHabitRepositoryImpl(
     private val userDefaults: HabitUserDefaults
 ) : HabitRepository {
 

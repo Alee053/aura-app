@@ -42,6 +42,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.play.services)
             implementation(libs.room.runtime)
             implementation(libs.room.ktx)
+            ksp(libs.room.compiler)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)

@@ -10,8 +10,15 @@ import com.programovil.aura.habit.domain.repository.HabitRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import org.koin.core.koin
 
-actual class HabitRepositoryImpl(
+actual fun createHabitRepository(): HabitRepository {
+    val habitDao: HabitDao = koin.get()
+    val habitCompletionDao: HabitCompletionDao = koin.get()
+    return AndroidHabitRepositoryImpl(habitDao, habitCompletionDao)
+}
+
+private class AndroidHabitRepositoryImpl(
     private val habitDao: HabitDao,
     private val habitCompletionDao: HabitCompletionDao
 ) : HabitRepository {

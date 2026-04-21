@@ -13,12 +13,6 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.TemporalAdjusters
 
-data class HabitGroupedByDay(
-    val section: DaySection,
-    val date: LocalDate,
-    val habits: List<HabitWithStatus>
-)
-
 class GetHabitsGroupedByDayUseCase(private val repository: HabitRepository) {
     private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 

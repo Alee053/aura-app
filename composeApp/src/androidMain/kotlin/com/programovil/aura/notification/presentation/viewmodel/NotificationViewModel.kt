@@ -85,7 +85,7 @@ class NotificationViewModel(
 
             workManager.enqueueUniquePeriodicWork(
                 DailySummaryWorker.WORK_NAME,
-                ExistingPeriodicWorkPolicy.CANCEL_AND_RECREATE,
+                ExistingPeriodicWorkPolicy.REPLACE,
                 workRequest
             )
         }

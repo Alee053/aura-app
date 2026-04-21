@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.googleServices)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 kotlin {
@@ -28,22 +29,6 @@ kotlin {
     }
 
     sourceSets {
-        androidMain.dependencies {
-            implementation(libs.compose.uiToolingPreview)
-            implementation(libs.androidx.activity.compose)
-            implementation(libs.koin.android)
-            implementation(libs.koin.compose)
-            implementation(libs.navigation.compose)
-            implementation(libs.firebase.auth.ktx)
-            implementation(libs.firebase.firestore.ktx)
-            implementation(libs.credentials)
-            implementation(libs.credentials.play.services.auth)
-            implementation(libs.googleid)
-            implementation(libs.kotlinx.coroutines.play.services)
-            implementation(libs.room.runtime)
-            implementation(libs.room.ktx)
-            ksp(libs.room.compiler)
-        }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
@@ -58,6 +43,8 @@ kotlin {
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.navigation.compose)
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.room.runtime)
+            implementation(libs.room.ktx)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -92,7 +79,11 @@ android {
     }
 }
 
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+
 dependencies {
     debugImplementation(libs.compose.uiTooling)
-    ksp(libs.room.compiler)
+    add("ksp", libs.room.compiler)
 }

@@ -21,7 +21,7 @@ class NotificationPreferences(private val context: Context) {
     }
 
     val dailySummaryEnabled: Flow<Boolean> = context.dataStore.data
-        .map { prefs -> prefs[Keys.DAILY_SUMMARY_ENABLED] ?: true }
+        .map { prefs -> prefs[Keys.DAILY_SUMMARY_ENABLED] ?: false }
 
     val notificationHour: Flow<Int> = context.dataStore.data
         .map { prefs -> prefs[Keys.NOTIFICATION_HOUR] ?: 8 }

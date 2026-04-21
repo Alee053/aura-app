@@ -20,7 +20,7 @@ class NotificationViewModel(
     private val workManager: WorkManager
 ) : ViewModel() {
 
-    private val _isEnabled = MutableStateFlow(true)
+    private val _isEnabled = MutableStateFlow(false)
     val isEnabled: StateFlow<Boolean> = _isEnabled
 
     private val _hour = MutableStateFlow(8)

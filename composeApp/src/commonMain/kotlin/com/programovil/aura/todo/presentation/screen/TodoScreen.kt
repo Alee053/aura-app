@@ -63,28 +63,12 @@ fun TodoScreen(
     var selectedDueDate by remember { mutableStateOf<Long?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
     var showDatePicker by remember { mutableStateOf(false) }
-    var showSettingsDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(error) {
         error?.let {
             snackbarHostState.showSnackbar(it)
             viewModel.clearError()
         }
-    }
-
-    if (showSettingsDialog) {
-        AlertDialog(
-            onDismissRequest = { showSettingsDialog = false },
-            confirmButton = {
-                TextButton(onClick = { showSettingsDialog = false }) {
-                    Text("OK")
-                }
-            },
-            title = { Text("Settings") },
-            text = {
-                Text("Settings will be available in the next update.")
-            }
-        )
     }
 
     if (showDatePicker) {
@@ -116,7 +100,7 @@ fun TodoScreen(
             TopAppBar(
                 title = { Text(stringResource(Res.string.todos_title)) },
                 actions = {
-                    TextButton(onClick = { showSettingsDialog = true }) {
+                    TextButton(onClick = onSettingsClick) {
                         Text("Settings")
                     }
                 }

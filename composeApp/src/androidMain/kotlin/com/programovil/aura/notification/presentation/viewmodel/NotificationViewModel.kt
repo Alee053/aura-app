@@ -1,8 +1,10 @@
 package com.programovil.aura.notification.presentation.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.programovil.aura.notification.data.NotificationPreferences
@@ -29,7 +31,14 @@ class NotificationViewModel(
 
     init {
         viewModelScope.launch {
-            notificationPreferences.dailySummaryEnabled.collect { _isEnabled.value = it }
+            notificationPreferences.dailySummaryEnabled.collect { enabled ->
+                _isEnabled.value = enabled
+                if (enabled) {
+                    scheduleDailySummary()
+                } else {
+                    cancelDailySummary()
+                }
+            }
         }
         viewModelScope.launch {
             notificationPreferences.notificationHour.collect { _hour.value = it }
@@ -77,6 +86,8 @@ class NotificationViewModel(
 
             val initialDelay = target.timeInMillis - now.timeInMillis
 
+            Log.d("NotificationVM", "Scheduling daily summary. Target: ${target.time}, Initial delay: ${initialDelay}ms")
+
             val workRequest = PeriodicWorkRequestBuilder<DailySummaryWorker>(
                 1, TimeUnit.DAYS
             )
@@ -88,6 +99,15 @@ class NotificationViewModel(
                 ExistingPeriodicWorkPolicy.REPLACE,
                 workRequest
             )
+        }
+    }
+
+    // Test method - triggers notification immediately
+    fun testNotification() {
+        viewModelScope.launch {
+            Log.d("NotificationVM", "Test notification triggered")
+            val testRequest = OneTimeWorkRequestBuilder<DailySummaryWorker>().build()
+            workManager.enqueue(testRequest)
         }
     }
 

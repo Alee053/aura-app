@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -106,6 +107,13 @@ fun NotificationSettingsScreen(
                         viewModel.setEnabled(enabled)
                     }
                 )
+            }
+
+            Button(
+                onClick = { viewModel.testNotification() },
+                modifier = Modifier.padding(top = 16.dp)
+            ) {
+                Text("Test Notification")
             }
 
             Row(

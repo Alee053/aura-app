@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -22,16 +23,21 @@ class AuthViewModel : ViewModel() {
     private val _authState = MutableStateFlow<AuthState>(AuthState.Loading)
     val authState: StateFlow<AuthState> = _authState
 
-    init {
-        checkAuthState()
-    }
-
-    private fun checkAuthState() {
-        _authState.value = if (FirebaseConfig.auth.currentUser != null) {
+    private val authStateListener = FirebaseAuth.AuthStateListener { auth ->
+        _authState.value = if (auth.currentUser != null) {
             AuthState.SignedIn
         } else {
             AuthState.SignedOut
         }
+    }
+
+    init {
+        FirebaseConfig.auth.addAuthStateListener(authStateListener)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        FirebaseConfig.auth.removeAuthStateListener(authStateListener)
     }
 
     fun handleSignInResult(idToken: String?) {
@@ -43,7 +49,6 @@ class AuthViewModel : ViewModel() {
             try {
                 val credential = GoogleAuthProvider.getCredential(idToken, null)
                 FirebaseConfig.auth.signInWithCredential(credential).await()
-                _authState.value = AuthState.SignedIn
             } catch (e: ApiException) {
                 _authState.value = AuthState.Error("Sign-in failed: ${e.message}")
             } catch (e: Exception) {
@@ -54,6 +59,5 @@ class AuthViewModel : ViewModel() {
 
     fun signOut() {
         FirebaseConfig.auth.signOut()
-        _authState.value = AuthState.SignedOut
     }
 }

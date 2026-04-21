@@ -2,7 +2,9 @@ package com.programovil.aura.notification
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import androidx.core.app.NotificationCompat
 import com.programovil.aura.R
 
@@ -33,6 +35,16 @@ object NotificationHelper {
         notificationManager.createNotificationChannels(listOf(dailySummaryChannel, dueDateChannel))
     }
 
+    private fun createPendingIntent(context: Context): PendingIntent {
+        val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
+        return PendingIntent.getActivity(
+            context,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+    }
+
     fun showDailySummaryNotification(context: Context, incompleteCount: Int) {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -48,6 +60,7 @@ object NotificationHelper {
             .setContentText(body)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setAutoCancel(true)
+            .setContentIntent(createPendingIntent(context))
             .build()
 
         notificationManager.notify(NOTIFICATION_ID_DAILY_SUMMARY, notification)
@@ -62,6 +75,7 @@ object NotificationHelper {
             .setContentText(todoTitle)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
+            .setContentIntent(createPendingIntent(context))
             .build()
 
         notificationManager.notify(NOTIFICATION_ID_DUE_DATE, notification)

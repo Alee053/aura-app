@@ -1,5 +1,10 @@
 package com.programovil.aura.notification.presentation.screen
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,7 +31,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import com.programovil.aura.notification.presentation.viewmodel.NotificationViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,11 +42,32 @@ fun NotificationSettingsScreen(
     viewModel: NotificationViewModel,
     onBackClick: () -> Unit
 ) {
+    val context = LocalContext.current
     val isEnabled by viewModel.isEnabled.collectAsState()
     val hour by viewModel.hour.collectAsState()
     val minute by viewModel.minute.collectAsState()
 
     var showTimePicker by remember { mutableStateOf(false) }
+    var showPermissionDialog by remember { mutableStateOf(false) }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            viewModel.setEnabled(true)
+        }
+    }
+
+    val hasNotificationPermission = remember {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+        } else {
+            true
+        }
+    }
 
     if (showTimePicker) {
         val timePickerState = rememberTimePickerState(
@@ -104,7 +132,11 @@ fun NotificationSettingsScreen(
                 Switch(
                     checked = isEnabled,
                     onCheckedChange = { enabled ->
-                        viewModel.setEnabled(enabled)
+                        if (enabled && !hasNotificationPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            showPermissionDialog = true
+                        } else {
+                            viewModel.setEnabled(enabled)
+                        }
                     }
                 )
             }
@@ -142,5 +174,26 @@ fun NotificationSettingsScreen(
                 modifier = Modifier.padding(top = 8.dp)
             )
         }
+    }
+
+    if (showPermissionDialog) {
+        AlertDialog(
+            onDismissRequest = { showPermissionDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    showPermissionDialog = false
+                    permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }) {
+                    Text("Allow")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showPermissionDialog = false }) {
+                    Text("Deny")
+                }
+            },
+            title = { Text("Notification Permission") },
+            text = { Text("Allow notifications to receive daily summaries and due date reminders.") }
+        )
     }
 }

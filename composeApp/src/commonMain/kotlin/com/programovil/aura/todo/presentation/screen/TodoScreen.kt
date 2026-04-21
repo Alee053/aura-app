@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -21,14 +20,10 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.material3.rememberTimePickerState
-import java.util.Calendar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -40,7 +35,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.programovil.aura.notification.presentation.viewmodel.NotificationViewModel
 import com.programovil.aura.todo.presentation.composable.TodoItem
 import com.programovil.aura.todo.presentation.viewmodel.TodoViewModel
 import org.koin.compose.viewmodel.koinViewModel
@@ -50,25 +44,22 @@ import aura_app.composeapp.generated.resources.empty_todos
 import aura_app.composeapp.generated.resources.new_todo_hint
 import aura_app.composeapp.generated.resources.todos_title
 import org.jetbrains.compose.resources.stringResource
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TodoScreen(
-    viewModel: TodoViewModel = koinViewModel(),
-    notificationViewModel: NotificationViewModel = koinViewModel()
+    viewModel: TodoViewModel = koinViewModel()
 ) {
     val todos by viewModel.todos.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
 
-    val isNotificationEnabled by notificationViewModel.isEnabled.collectAsState()
-    val notificationHour by notificationViewModel.hour.collectAsState()
-    val notificationMinute by notificationViewModel.minute.collectAsState()
-
     var newTodoTitle by remember { mutableStateOf("") }
     var selectedDueDate by remember { mutableStateOf<Long?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
-    var showTimePicker by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
 
     LaunchedEffect(error) {
@@ -78,35 +69,6 @@ fun TodoScreen(
         }
     }
 
-    if (showTimePicker) {
-        val timePickerState = rememberTimePickerState(
-            initialHour = notificationHour,
-            initialMinute = notificationMinute
-        )
-        AlertDialog(
-            onDismissRequest = { showTimePicker = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    notificationViewModel.setNotificationTime(
-                        timePickerState.hour,
-                        timePickerState.minute
-                    )
-                    showTimePicker = false
-                }) {
-                    Text("OK")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showTimePicker = false }) {
-                    Text("Cancel")
-                }
-            },
-            text = {
-                TimePicker(state = timePickerState)
-            }
-        )
-    }
-
     if (showDatePicker) {
         val datePickerState = rememberDatePickerState()
         DatePickerDialog(
@@ -114,15 +76,8 @@ fun TodoScreen(
             confirmButton = {
                 TextButton(onClick = {
                     datePickerState.selectedDateMillis?.let { millis ->
-                        // Convert to noon epoch millis
-                        val calendar = Calendar.getInstance().apply {
-                            timeInMillis = millis
-                            set(Calendar.HOUR_OF_DAY, 12)
-                            set(Calendar.MINUTE, 0)
-                            set(Calendar.SECOND, 0)
-                            set(Calendar.MILLISECOND, 0)
-                        }
-                        selectedDueDate = calendar.timeInMillis
+                        // Keep the selected millis as-is, noon will be set when scheduling
+                        selectedDueDate = millis
                     }
                     showDatePicker = false
                 }) {
@@ -186,8 +141,7 @@ fun TodoScreen(
                 )
                 Text(
                     text = selectedDueDate?.let { millis ->
-                        val calendar = Calendar.getInstance().apply { timeInMillis = millis }
-                        "${calendar.get(Calendar.DAY_OF_MONTH)}/${calendar.get(Calendar.MONTH) + 1}/${calendar.get(Calendar.YEAR)}"
+                        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(millis))
                     } ?: "Select date",
                     style = MaterialTheme.typography.bodyMedium,
                     color = if (selectedDueDate != null)
@@ -226,35 +180,6 @@ fun TodoScreen(
                             )
                         }
                     }
-                }
-            }
-
-            // Notification settings section
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Daily reminder",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = String.format("%02d:%02d", notificationHour, notificationMinute),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.clickable { showTimePicker = true }
-                    )
-                    Switch(
-                        checked = isNotificationEnabled,
-                        onCheckedChange = { notificationViewModel.setEnabled(it) }
-                    )
                 }
             }
         }

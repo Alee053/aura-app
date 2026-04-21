@@ -1,0 +1,7 @@
+<resources>
+    <string name="todos_title">Mis Tareas</string>
+    <string name="add_todo">+</string>
+    <string name="new_todo_hint">Nueva tarea</string>
+    <string name="empty_todos">No hay tareas. ¡Agrega la primera!</string>
+    <string name="delete">X</string>
+</resources>

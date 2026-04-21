@@ -1,0 +1,7 @@
+<resources>
+    <string name="todos_title">My Todos</string>
+    <string name="add_todo">+</string>
+    <string name="new_todo_hint">New todo</string>
+    <string name="empty_todos">No todos yet. Add your first one!</string>
+    <string name="delete">X</string>
+</resources>

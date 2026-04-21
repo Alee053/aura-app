@@ -18,6 +18,9 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.programovil.aura.todo.domain.model.Todo
+import aura_app.composeapp.generated.resources.Res
+import aura_app.composeapp.generated.resources.delete
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun TodoItem(
@@ -46,7 +49,7 @@ fun TodoItem(
             )
             IconButton(onClick = onDelete) {
                 Text(
-                    "X",
+                    stringResource(Res.string.delete),
                     color = MaterialTheme.colorScheme.error,
                     fontSize = 16.sp
                 )

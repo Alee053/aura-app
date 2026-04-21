@@ -151,7 +151,7 @@ fun TodoScreen(
                 else -> {
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.weight(1f).fillMaxWidth()
                     ) {
                         items(todos, key = { it.id }) { todo ->
                             TodoItem(

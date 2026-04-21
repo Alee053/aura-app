@@ -12,6 +12,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
@@ -24,7 +26,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
+import java.util.Calendar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -62,8 +66,10 @@ fun TodoScreen(
     val notificationMinute by notificationViewModel.minute.collectAsState()
 
     var newTodoTitle by remember { mutableStateOf("") }
+    var selectedDueDate by remember { mutableStateOf<Long?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
     var showTimePicker by remember { mutableStateOf(false) }
+    var showDatePicker by remember { mutableStateOf(false) }
 
     LaunchedEffect(error) {
         error?.let {
@@ -101,6 +107,38 @@ fun TodoScreen(
         )
     }
 
+    if (showDatePicker) {
+        val datePickerState = rememberDatePickerState()
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let { millis ->
+                        // Convert to noon epoch millis
+                        val calendar = Calendar.getInstance().apply {
+                            timeInMillis = millis
+                            set(Calendar.HOUR_OF_DAY, 12)
+                            set(Calendar.MINUTE, 0)
+                            set(Calendar.SECOND, 0)
+                            set(Calendar.MILLISECOND, 0)
+                        }
+                        selectedDueDate = calendar.timeInMillis
+                    }
+                    showDatePicker = false
+                }) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text("Cancel")
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(title = { Text(stringResource(Res.string.todos_title)) })
@@ -108,8 +146,9 @@ fun TodoScreen(
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 if (newTodoTitle.isNotBlank()) {
-                    viewModel.addTodo(newTodoTitle)
+                    viewModel.addTodo(newTodoTitle, selectedDueDate)
                     newTodoTitle = ""
+                    selectedDueDate = null
                 }
             }) {
                 Text(stringResource(Res.string.add_todo), fontSize = 24.sp)
@@ -132,6 +171,32 @@ fun TodoScreen(
                     .padding(vertical = 8.dp),
                 singleLine = true
             )
+
+            // Due date row
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Due date",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = selectedDueDate?.let { millis ->
+                        val calendar = Calendar.getInstance().apply { timeInMillis = millis }
+                        "${calendar.get(Calendar.DAY_OF_MONTH)}/${calendar.get(Calendar.MONTH) + 1}/${calendar.get(Calendar.YEAR)}"
+                    } ?: "Select date",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = if (selectedDueDate != null)
+                        MaterialTheme.colorScheme.onSurface
+                    else
+                        MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.clickable { showDatePicker = true }
+                )
+            }
 
             when {
                 isLoading -> {

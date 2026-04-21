@@ -12,6 +12,8 @@ class AndroidApp : Application() {
     override fun onCreate() {
         super.onCreate()
         FirebaseConfig.initialize(this)
+        FirebaseConfig.messaging.subscribeToTopic("test-notifications")
+            .addOnCompleteListener { }
         startKoin {
             androidLogger(Level.ERROR)
             androidContext(this@AndroidApp)

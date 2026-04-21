@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -51,7 +52,8 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TodoScreen(
-    viewModel: TodoViewModel = koinViewModel()
+    viewModel: TodoViewModel = koinViewModel(),
+    onSettingsClick: () -> Unit = {}
 ) {
     val todos by viewModel.todos.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
@@ -61,12 +63,28 @@ fun TodoScreen(
     var selectedDueDate by remember { mutableStateOf<Long?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
     var showDatePicker by remember { mutableStateOf(false) }
+    var showSettingsDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(error) {
         error?.let {
             snackbarHostState.showSnackbar(it)
             viewModel.clearError()
         }
+    }
+
+    if (showSettingsDialog) {
+        AlertDialog(
+            onDismissRequest = { showSettingsDialog = false },
+            confirmButton = {
+                TextButton(onClick = { showSettingsDialog = false }) {
+                    Text("OK")
+                }
+            },
+            title = { Text("Settings") },
+            text = {
+                Text("Settings will be available in the next update.")
+            }
+        )
     }
 
     if (showDatePicker) {
@@ -76,7 +94,6 @@ fun TodoScreen(
             confirmButton = {
                 TextButton(onClick = {
                     datePickerState.selectedDateMillis?.let { millis ->
-                        // Keep the selected millis as-is, noon will be set when scheduling
                         selectedDueDate = millis
                     }
                     showDatePicker = false
@@ -96,7 +113,14 @@ fun TodoScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(stringResource(Res.string.todos_title)) })
+            TopAppBar(
+                title = { Text(stringResource(Res.string.todos_title)) },
+                actions = {
+                    TextButton(onClick = { showSettingsDialog = true }) {
+                        Text("Settings")
+                    }
+                }
+            )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = {

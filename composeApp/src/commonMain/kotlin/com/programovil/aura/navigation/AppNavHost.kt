@@ -10,12 +10,18 @@ import com.programovil.aura.todo.presentation.viewmodel.TodoViewModel
 import org.koin.compose.koinInject
 
 @Composable
-fun AppNavHost() {
+fun AppNavHost(
+    onNavigateToSettings: () -> Unit
+) {
     val navController = rememberNavController()
     val todoViewModel: TodoViewModel = koinInject()
+
     NavHost(navController = navController, startDestination = NavRoute.Todo) {
         composable<NavRoute.Todo> {
-            TodoScreen(todoViewModel)
+            TodoScreen(
+                viewModel = todoViewModel,
+                onSettingsClick = onNavigateToSettings
+            )
         }
         composable<NavRoute.TodoDetail> { backStackEntry ->
             val todoDetail: NavRoute.TodoDetail = backStackEntry.toRoute()

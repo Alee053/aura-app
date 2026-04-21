@@ -8,5 +8,8 @@ sealed class NavRoute {
     data object Todo : NavRoute()
 
     @Serializable
+    data object NotificationSettings : NavRoute()
+
+    @Serializable
     data class TodoDetail(val todoId: String) : NavRoute()
 }

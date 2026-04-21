@@ -5,7 +5,7 @@ import com.programovil.aura.notification.NotificationHelper
 import com.programovil.aura.notification.data.NotificationPreferences
 import com.programovil.aura.notification.presentation.viewmodel.NotificationViewModel
 import org.koin.android.ext.koin.androidContext
-import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val notificationModule = module {

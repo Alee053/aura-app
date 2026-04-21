@@ -31,6 +31,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.programovil.aura.todo.presentation.composable.TodoItem
 import com.programovil.aura.todo.presentation.viewmodel.TodoViewModel
+import aura_app.composeapp.generated.resources.Res
+import aura_app.composeapp.generated.resources.add_todo
+import aura_app.composeapp.generated.resources.empty_todos
+import aura_app.composeapp.generated.resources.new_todo_hint
+import aura_app.composeapp.generated.resources.todos_title
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,7 +57,7 @@ fun TodoScreen(viewModel: TodoViewModel) {
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("My Todos") })
+            TopAppBar(title = { Text(stringResource(Res.string.todos_title)) })
         },
         floatingActionButton = {
             FloatingActionButton(onClick = {
@@ -60,7 +66,7 @@ fun TodoScreen(viewModel: TodoViewModel) {
                     newTodoTitle = ""
                 }
             }) {
-                Text("+", fontSize = 24.sp)
+                Text(stringResource(Res.string.add_todo), fontSize = 24.sp)
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -74,7 +80,7 @@ fun TodoScreen(viewModel: TodoViewModel) {
             OutlinedTextField(
                 value = newTodoTitle,
                 onValueChange = { newTodoTitle = it },
-                label = { Text("New todo") },
+                label = { Text(stringResource(Res.string.new_todo_hint)) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp),
@@ -90,7 +96,7 @@ fun TodoScreen(viewModel: TodoViewModel) {
                 todos.isEmpty() -> {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
-                            "No todos yet. Add your first one!",
+                            stringResource(Res.string.empty_todos),
                             style = MaterialTheme.typography.bodyLarge,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

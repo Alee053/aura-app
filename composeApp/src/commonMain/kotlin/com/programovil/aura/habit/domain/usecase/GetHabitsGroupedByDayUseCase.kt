@@ -28,7 +28,7 @@ class GetHabitsGroupedByDayUseCase(private val repository: HabitRepository) {
 
         return combine(
             repository.getHabits(),
-            repository.getCompletionsForHabit("") // placeholder - use all completions
+            repository.getAllCompletions()
         ) { habits, completions ->
             buildMap {
                 put(DaySection.TODAY, groupHabitsForDate(habits, completions, today))

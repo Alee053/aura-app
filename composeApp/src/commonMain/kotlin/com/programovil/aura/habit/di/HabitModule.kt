@@ -24,5 +24,5 @@ val habitModule = module {
     factoryOf(::GetHabitHistoryUseCase)
 
     // Presentation layer
-    viewModel { HabitViewModel(get(), get(), get(), get()) }
+    viewModel { HabitViewModel(get(), get(), get(), get(), get()) }
 }

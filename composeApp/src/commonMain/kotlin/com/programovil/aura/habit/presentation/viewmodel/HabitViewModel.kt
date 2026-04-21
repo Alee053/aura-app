@@ -2,9 +2,7 @@ package com.programovil.aura.habit.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.programovil.aura.habit.domain.model.DaySection
-import com.programovil.aura.habit.domain.model.HabitWithStatus
-import com.programovil.aura.habit.domain.model.RecurrenceType
+import com.programovil.aura.habit.domain.repository.HabitRepository
 import com.programovil.aura.habit.domain.usecase.AddHabitUseCase
 import com.programovil.aura.habit.domain.usecase.GetHabitsGroupedByDayUseCase
 import com.programovil.aura.habit.domain.usecase.ToggleHabitCompletionUseCase
@@ -34,6 +32,7 @@ sealed class HabitEvent {
 }
 
 class HabitViewModel(
+    private val repository: HabitRepository,
     private val getHabitsGroupedByDayUseCase: GetHabitsGroupedByDayUseCase,
     private val addHabitUseCase: AddHabitUseCase,
     private val toggleHabitCompletionUseCase: ToggleHabitCompletionUseCase,
@@ -46,6 +45,9 @@ class HabitViewModel(
     private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
     init {
+        viewModelScope.launch {
+            repository.cleanupOldCompletions(90)
+        }
         loadHabits()
     }
 

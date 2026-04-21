@@ -2,9 +2,7 @@ package com.programovil.aura.notification
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import androidx.core.app.NotificationCompat
 import com.programovil.aura.R
 
@@ -45,7 +43,7 @@ object NotificationHelper {
         }
 
         val notification = NotificationCompat.Builder(context, CHANNEL_DAILY_SUMMARY)
-            .setSmallIcon(R.drawable.ic_notification) // placeholder - see Step 2 note
+            .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle("Daily Summary")
             .setContentText(body)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
@@ -59,7 +57,7 @@ object NotificationHelper {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         val notification = NotificationCompat.Builder(context, CHANNEL_DUE_DATE_REMINDER)
-            .setSmallIcon(R.drawable.ic_notification) // placeholder - see Step 2 note
+            .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle("Task Due Today")
             .setContentText(todoTitle)
             .setPriority(NotificationCompat.PRIORITY_HIGH)

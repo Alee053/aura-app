@@ -9,7 +9,6 @@ import com.programovil.aura.notification.data.NotificationPreferences
 import com.programovil.aura.notification.presentation.worker.DailySummaryWorker
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import java.util.concurrent.TimeUnit

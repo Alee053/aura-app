@@ -30,6 +30,28 @@ kotlin {
     }
 
     sourceSets {
+        androidMain.dependencies {
+            implementation(libs.androidx.appcompat)
+            implementation(libs.androidx.activity.compose)
+            implementation(libs.compose.uiToolingPreview)
+            implementation(libs.koin.android)
+            implementation(libs.koin.compose)
+            implementation(libs.navigation.compose)
+            
+            // Firebase Android dependencies - using string notation for BOM due to Kotlin 2.3+ Provider issues
+            implementation("com.google.firebase:firebase-bom:34.12.0")
+            implementation(libs.firebase.auth.ktx)
+            implementation(libs.firebase.firestore.ktx)
+            implementation(libs.firebase.messaging.ktx)
+            
+            implementation(libs.credentials)
+            implementation(libs.credentials.play.services.auth)
+            implementation(libs.googleid)
+            
+            implementation(libs.kotlinx.coroutines.play.services)
+            implementation(libs.workmanager.ktx)
+            implementation(libs.datastore.preferences)
+        }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
@@ -48,27 +70,8 @@ kotlin {
             implementation(libs.room.ktx)
             implementation(libs.androidx.sqlite.bundled)
             
-            // kotlinx-datetime for multiplatform date handling
             implementation(libs.kotlinx.datetime)
-            
-            // Added icons to fix Unresolved reference 'Icons'
             implementation(libs.compose.material.icons.extended)
-        }
-        androidMain.dependencies {
-            implementation(libs.androidx.appcompat)
-            implementation(libs.androidx.activity.compose)
-            implementation(libs.koin.android)
-            
-            implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
-            implementation(libs.firebase.auth.ktx)
-            implementation(libs.firebase.firestore.ktx)
-            
-            // Credentials and Google ID
-            implementation(libs.credentials)
-            implementation(libs.credentials.play.services.auth)
-            implementation(libs.googleid)
-            
-            implementation(libs.kotlinx.coroutines.play.services)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

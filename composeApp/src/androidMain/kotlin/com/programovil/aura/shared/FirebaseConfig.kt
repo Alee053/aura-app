@@ -4,6 +4,7 @@ import android.content.Context
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.google.firebase.firestore.firestore
+import com.google.firebase.messaging.messaging
 import com.google.firebase.initialize
 
 object FirebaseConfig {
@@ -17,4 +18,5 @@ object FirebaseConfig {
 
     val auth = Firebase.auth
     val firestore = Firebase.firestore
+    val messaging = Firebase.messaging
 }

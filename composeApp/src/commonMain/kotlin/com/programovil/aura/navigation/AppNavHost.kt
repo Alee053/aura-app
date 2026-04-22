@@ -6,8 +6,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.programovil.aura.habit.presentation.screen.HabitScreen
+import com.programovil.aura.notification.presentation.screen.NotificationSettingsScreen
+import com.programovil.aura.notification.presentation.viewmodel.NotificationViewModel
 import com.programovil.aura.todo.presentation.screen.TodoScreen
 import com.programovil.aura.todo.presentation.viewmodel.TodoViewModel
+import org.koin.compose.koinInject
 
 @Composable
 fun AppNavHost(
@@ -29,6 +32,13 @@ fun AppNavHost(
         composable<NavRoute.Habit> {
             HabitScreen(
                 onSignOut = onSignOut
+            )
+        }
+        composable<NavRoute.NotificationSettings> {
+            val notificationViewModel: NotificationViewModel = koinInject()
+            NotificationSettingsScreen(
+                viewModel = notificationViewModel,
+                onBackClick = { navController.popBackStack() }
             )
         }
     }

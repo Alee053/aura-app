@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -100,6 +101,20 @@ fun AuthenticatedApp(
                     selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Habit>() } == true,
                     onClick = {
                         navController.navigate(NavRoute.Habit) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                )
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Notifications, contentDescription = "Notifications") },
+                    label = { Text("Notifs") },
+                    selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.NotificationSettings>() } == true,
+                    onClick = {
+                        navController.navigate(NavRoute.NotificationSettings) {
                             popUpTo(navController.graph.findStartDestination().id) {
                                 saveState = true
                             }

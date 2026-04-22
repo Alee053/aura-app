@@ -1,163 +1,87 @@
 # Architecture Specification
 
-This project follows the Clean Architecture pattern inspired by `ucbp26`.
+This project follows a strict Clean Architecture pattern optimized for Kotlin Multiplatform (KMP), inspired by `ucbp26`.
 
 ## Package Structure
 
 ```
 com.programovil.aura/
-├── App.kt
-├── navigation/
-│   ├── AppNavHost.kt
-│   └── NavRoute.kt          # Sealed class with routes + parameterized routes
-├── auth/                          # Simple feature - minimal refactor
-│   ├── di/
-│   │   └── AuthModule.kt
-│   └── presentation/
-│       └── AuthViewModel.kt
-├── todo/                          # Full Clean Architecture
-│   ├── data/
-│   │   ├── repository/
-│   │   │   └── TodoRepositoryImpl.kt
-│   │   └── mapper/
-│   │       └── TodoMapper.kt
-│   ├── domain/
-│   │   ├── model/
-│   │   │   └── Todo.kt
-│   │   ├── repository/
-│   │   │   └── TodoRepository.kt
-│   │   └── usecase/
-│   │       ├── AddTodoUseCase.kt
-│   │       ├── DeleteTodoUseCase.kt
-│   │       ├── GetTodosUseCase.kt
-│   │       └── ToggleTodoUseCase.kt
-│   ├── presentation/
-│   │   ├── screen/
-│   │   │   └── TodoScreen.kt
-│   │   ├── viewmodel/
-│   │   │   └── TodoViewModel.kt
-│   │   └── composable/
-│   │       └── TodoItem.kt
-│   └── di/
-│       └── TodoModule.kt          # Self-contained DI for todo feature
+├── App.kt                          # Root entry point with Bottom Navigation
 ├── di/
-│   └── InitKoin.kt                # Composes all feature modules via getModules()
-└── shared/
-    └── FirebaseConfig.kt
+│   └── InitKoin.kt                # Shared Koin initialization for all features
+├── navigation/
+│   ├── AppNavHost.kt              # Shared NavHost with cross-platform routes
+│   └── NavRoute.kt                # Type-safe routes via kotlinx-serialization
+├── auth/                          # Auth feature - abstracted for KMP
+│   ├── domain/AuthService.kt      # Interface for platform-specific auth
+│   ├── presentation/              # AuthViewModel (Shared logic)
+│   └── di/AuthModule.kt
+├── todo/                          # Todo feature - Firestore backed
+│   ├── domain/                    # Models, Repository Interface, UseCases
+│   ├── data/repository/           # Platform-specific Repository (expect/actual)
+│   ├── presentation/              # Screen, ViewModel, Composable
+│   └── di/TodoModule.kt
+├── habit/                         # Habit feature - Room KMP backed
+│   ├── domain/                    # Models, Repository Interface, UseCases
+│   ├── data/                      # Shared Repository, DAOs, Entities
+│   │   ├── local/HabitDatabase.kt # Shared DB definition & expect builder
+│   │   └── repository/            # Shared Repository implementation
+│   ├── presentation/              # Screen, ViewModel, Composable
+│   └── di/HabitModule.kt
+├── notification/                  # Notification feature
+│   ├── domain/NotificationScheduler.kt # Interface for scheduling
+│   ├── presentation/              # ViewModel, Settings Screen
+│   └── di/NotificationModule.kt
+└── shared/                        # Cross-cutting concerns
+    ├── data/DataStoreFactory.kt   # Shared KMP DataStore
+    └── ColorUtils.kt              # KMP Color parsing utilities
 ```
 
 ## Layer Definitions
 
 ### Domain Layer (`/domain/`)
-- **Models**: Pure data classes (`Todo.kt`)
-- **Repository interfaces**: Abstract definitions (`TodoRepository.kt`)
-- **Use cases**: Single-responsibility business logic (`GetTodosUseCase.kt`, `AddTodoUseCase.kt`, etc.)
+- **Models**: Pure data classes (e.g., `Habit.kt`).
+- **Interfaces**: Service or Repository definitions (e.g., `AuthService.kt`, `HabitRepository.kt`).
+- **Use cases**: Single-responsibility logic (e.g., `GetHabitsGroupedByDayUseCase.kt`).
 
 ### Data Layer (`/data/`)
-- **Repository implementations**: Implements domain interfaces (`TodoRepositoryImpl.kt`)
-- **Mappers**: Transforms DTOs to domain models (`TodoMapper.kt`)
-- **Data sources**: (Future) Remote/local data sources
+- **Repository implementations**: Concrete implementations of domain interfaces.
+- **Local Source**: Room KMP (`HabitDatabase`), platform `actual` builders.
+- **Remote Source**: Firebase Firestore (implemented via platform actuals).
+- **Mappers**: DTO/Entity to Domain model transformations.
 
 ### Presentation Layer (`/presentation/`)
-- **Screen**: Composables that represent full screens (`TodoScreen.kt`)
-- **ViewModel**: Manages UI state and business logic coordination (`TodoViewModel.kt`)
-- **Composable**: Reusable UI components (`TodoItem.kt`)
-
-### Navigation (`/navigation/`)
-- **NavRoute.kt**: Sealed class defining all navigation routes (both `object` and `data class` routes)
-- **AppNavHost.kt**: NavHost composable with route definitions, uses type-safe `toRoute<>()` for parameterized routes
+- **Screens**: Composables representing full navigation destinations.
+- **ViewModels**: Manage UI state (Shared logic).
+- **Composables**: Reusable UI units (e.g., `HabitItem.kt`).
 
 ## DI Architecture (Per-Feature)
 
-Each feature is self-contained with its own DI module that registers all dependencies for that feature.
-
-### Feature Modules
-
-**`auth/di/AuthModule.kt`** - Simple feature:
-```kotlin
-val authModule = module {
-    viewModel { AuthViewModel() }
-}
-```
-
-**`todo/di/TodoModule.kt`** - Full Clean Architecture feature:
-```kotlin
-val todoModule = module {
-    // Data layer
-    singleOf(::TodoRepositoryImpl).bind<TodoRepository>()
-
-    // Domain layer - use cases
-    factoryOf(::GetTodosUseCase)
-    factoryOf(::AddTodoUseCase)
-    factoryOf(::ToggleTodoUseCase)
-    factoryOf(::DeleteTodoUseCase)
-
-    // Presentation layer
-    viewModel { TodoViewModel(get(), get(), get(), get()) }
-}
-```
-
-### InitKoin
-
-**`di/InitKoin.kt`** - Composes all feature modules:
-```kotlin
-fun getModules() = listOf(
-    authModule,
-    todoModule
-)
-```
+Features are self-contained. Their modules are composed in `di/InitKoin.kt`.
 
 ### Koin Patterns
-- **`singleOf`** - Singleton scope (one instance across app) - for repository implementations
-- **`factoryOf`** - Factory scope (new instance per injection) - **preferred for use cases**
-- **`viewModel { }`** - ViewModel registration with constructor injection via `get()` - **required for ViewModels with constructor params**
-- **`viewModelOf`** - ViewModel registration via constructor reference - **only works for ViewModels with no constructor params**
+- **`singleOf` / `factoryOf`**: Preferred for automatic constructor injection.
+- **`viewModelOf`**: For shared ViewModels.
+- **`bind<Interface>()`**: To link implementations to domain interfaces.
+
+## Persistence Patterns
+
+### Local Persistence (Room KMP)
+Defined in `commonMain` with `expect fun getHabitDatabaseBuilder()`.
+- **Android**: Stores in app database path using `AndroidSQLiteDriver`.
+- **iOS**: Stores in `NSHomeDirectory` using `BundledSQLiteDriver`.
+
+### Cloud Persistence (Firestore)
+Abstracted behind repository interfaces to handle platform-specific SDK behavior.
 
 ## Naming Conventions
+- **Files**: PascalCase.
+- **Use Cases**: Verb-Noun pattern (`AddHabitUseCase`).
+- **ViewModels**: `FeatureName + ViewModel`.
+- **Date Handling**: Strictly use `kotlinx-datetime`.
+- **UUID**: Use custom KMP-compliant random string generators.
 
-- **Files**: PascalCase (`TodoViewModel.kt`, `NavRoute.kt`)
-- **Use cases**: Verb-Noun pattern (`GetTodosUseCase`, `AddTodoUseCase`)
-- **ViewModels**: FeatureName + ViewModel (`TodoViewModel`)
-- **Screens**: FeatureName + Screen (`TodoScreen`)
-- **Composables**: Descriptive name (`TodoItem`, `StarRating`)
-- **Navigation routes**: `NavRoute` suffix, sealed class pattern
-
-## Navigation Patterns
-
-### Simple Routes (no params)
-```kotlin
-// NavRoute.kt
-@Serializable
-data object Todo : NavRoute()
-
-// AppNavHost.kt
-composable<NavRoute.Todo> {
-    TodoScreen(viewModel)
-}
-```
-
-### Parameterized Routes (with params)
-```kotlin
-// NavRoute.kt
-@Serializable
-data class TodoDetail(val todoId: String) : NavRoute()
-
-// AppNavHost.kt
-import androidx.navigation.toRoute
-
-composable<NavRoute.TodoDetail> { backStackEntry ->
-    val todoDetail: NavRoute.TodoDetail = backStackEntry.toRoute()
-    // Use todoDetail.todoId
-}
-```
-
-## State Management
-
-ViewModels expose:
-- **StateFlow** for UI state
-- **Events** for user actions (optional, via sealed interfaces)
-- **Effects** for one-time events like navigation or snackbars (optional)
-
-## Reference
-
-This architecture mirrors the structure used in `ucbp26` (University course reference project).
+## Navigation
+Type-safe navigation using `androidx-navigation`.
+- **Object Routes**: For simple destinations.
+- **Data Class Routes**: For destinations with parameters.

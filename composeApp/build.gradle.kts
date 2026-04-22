@@ -39,7 +39,8 @@ kotlin {
             implementation(libs.navigation.compose)
             
             // Firebase Android dependencies - using string notation for BOM due to Kotlin 2.3+ Provider issues
-            implementation("com.google.firebase:firebase-bom:34.12.0")
+            implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
+            implementation("com.google.firebase:firebase-config-ktx:21.0.0")
             implementation(libs.firebase.auth.ktx)
             implementation(libs.firebase.firestore.ktx)
             implementation(libs.firebase.messaging.ktx)

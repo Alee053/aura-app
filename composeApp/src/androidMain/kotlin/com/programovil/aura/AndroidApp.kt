@@ -3,6 +3,7 @@ package com.programovil.aura
 import android.app.Application
 import com.programovil.aura.notification.NotificationHelper
 import com.programovil.aura.shared.FirebaseConfig
+import com.programovil.aura.shared.FirebaseRemoteConfigService
 import com.programovil.aura.di.getModules
 import org.koin.android.ext.koin.androidLogger
 import org.koin.android.ext.koin.androidContext

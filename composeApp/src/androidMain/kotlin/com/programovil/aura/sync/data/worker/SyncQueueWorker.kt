@@ -25,28 +25,21 @@ class SyncQueueWorker(
         var processedAny = false
 
         return try {
-            // Wait up to 5 seconds for Firebase Auth to restore session in background
+            // Wait up to 3 seconds for Firebase Auth
             var userId = FirebaseConfig.auth.currentUser?.uid
             var attempts = 0
-            while (userId == null && attempts < 5) {
+            while (userId == null && attempts < 3) {
                 kotlinx.coroutines.delay(1000)
                 userId = FirebaseConfig.auth.currentUser?.uid
                 attempts++
             }
 
-            if (userId == null) {
-                return Result.retry() // Retry later if session is still not available
-            }
-
-            val currentUserId = userId!!
+            val currentUserId = userId ?: return Result.failure()
             val firestore = FirebaseFirestore.getInstance()
             val database = get<com.programovil.aura.habit.data.local.HabitDatabase>()
 
-            // Get pending items from BOTH sources
             val localItems = getLocalPendingItems(database)
             val firestoreItems = getFirestorePendingItems(currentUserId)
-
-            // Merge items (avoid duplicates by id)
             val allItems = (localItems + firestoreItems).associateBy { it.id }.values.toList()
 
             if (allItems.isEmpty()) {
@@ -54,12 +47,14 @@ class SyncQueueWorker(
             }
 
             processedAny = true
+            
+            // SHOW NOTIFICATION IMMEDIATELY WHEN STARTING SYNC
+            NotificationHelper.showSyncSummaryNotification(applicationContext, 0, 0)
 
             for (item in allItems) {
                 try {
                     val success = processItem(firestore, currentUserId, item)
                     if (success) {
-                        // Remove from both sources
                         removeFromLocal(database, item.id)
                         removeFromFirestore(currentUserId, item.id)
                         syncedCount++
@@ -74,6 +69,7 @@ class SyncQueueWorker(
                 }
             }
 
+            // FINAL NOTIFICATION
             NotificationHelper.showSyncSummaryNotification(
                 applicationContext,
                 syncedCount,
@@ -83,11 +79,7 @@ class SyncQueueWorker(
             if (failedCount > 0) Result.retry() else Result.success()
         } catch (e: Exception) {
             if (processedAny) {
-                NotificationHelper.showSyncSummaryNotification(
-                    applicationContext,
-                    syncedCount,
-                    failedCount
-                )
+                NotificationHelper.showSyncSummaryNotification(applicationContext, syncedCount, failedCount)
             }
             Result.retry()
         }

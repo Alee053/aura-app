@@ -105,11 +105,6 @@ fun AuthenticatedApp(
     }
 
     Scaffold(
-        topBar = {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                SyncStatusBar()
-            }
-        },
         bottomBar = {
             NavigationBar {
                 if (showTodos) {

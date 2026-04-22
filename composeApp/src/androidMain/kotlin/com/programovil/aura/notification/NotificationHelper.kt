@@ -92,23 +92,26 @@ object NotificationHelper {
 
     fun showSyncSummaryNotification(context: Context, syncedCount: Int, failedCount: Int) {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
+        
         val body = when {
             failedCount > 0 -> "Synced $syncedCount items, $failedCount failed"
             syncedCount > 0 -> "Successfully synced $syncedCount item${if (syncedCount > 1) "s" else ""}"
             else -> "No items to sync"
         }
 
-        val notification = NotificationCompat.Builder(context, CHANNEL_SYNC)
+        // CLONING TEST NOTIFICATION LOGIC (WHICH WORKS)
+        val notification = NotificationCompat.Builder(context, CHANNEL_DAILY_SUMMARY)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle("Sync Complete")
+            .setContentTitle("Sync Process Complete")
             .setContentText(body)
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setDefaults(NotificationCompat.DEFAULT_ALL)
             .setAutoCancel(true)
             .setContentIntent(createPendingIntent(context))
             .build()
 
-        notificationManager.notify(NOTIFICATION_ID_SYNC, notification)
+        // Using the same ID logic that works for the daily summary test
+        notificationManager.notify(NOTIFICATION_ID_DAILY_SUMMARY, notification)
     }
 
     private const val NOTIFICATION_ID_DAILY_SUMMARY = 1001

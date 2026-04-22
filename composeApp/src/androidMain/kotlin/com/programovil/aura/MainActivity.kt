@@ -23,8 +23,9 @@ class MainActivity : ComponentActivity() {
 
     private fun launchGoogleSignIn() {
         val googleIdOption = com.google.android.libraries.identity.googleid.GetGoogleIdOption.Builder()
-            .setServerClientId("623141386052-gpn8fq0c03i0khmt3nn9bj0h92fprnfh.apps.googleusercontent.com")
-            .setFilterByAuthorizedAccounts(true)
+            .setServerClientId("1093577707060-no5gln1m1iri29khllqd0us0bchd7gqf.apps.googleusercontent.com")
+            .setFilterByAuthorizedAccounts(false) // <--- ¡CÁMBIALO A FALSE!
+            .setAutoSelectEnabled(true)
             .build()
 
         val request = GetCredentialRequest.Builder()

@@ -52,6 +52,8 @@ kotlin {
             implementation(libs.kotlinx.coroutines.play.services)
             implementation(libs.workmanager.ktx)
             implementation(libs.datastore.preferences)
+            implementation(libs.room.ktx)
+            implementation(libs.kotlinx.coroutines.android)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -68,8 +70,9 @@ kotlin {
             implementation(libs.navigation.compose)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.room.runtime)
-            implementation(libs.room.ktx)
+            //implementation(libs.room.ktx)
             implementation(libs.androidx.sqlite.bundled)
+            implementation(libs.kotlinx.coroutines.core)
             
             implementation(libs.kotlinx.datetime)
             implementation(libs.compose.material.icons.extended)

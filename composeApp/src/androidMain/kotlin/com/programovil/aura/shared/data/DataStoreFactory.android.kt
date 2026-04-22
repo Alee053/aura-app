@@ -6,7 +6,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
-
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
     name = "aura_preferences"
 )

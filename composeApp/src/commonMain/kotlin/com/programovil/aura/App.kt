@@ -20,8 +20,11 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -35,7 +38,10 @@ import androidx.navigation.compose.rememberNavController
 import com.programovil.aura.auth.presentation.AuthViewModel
 import com.programovil.aura.navigation.AppNavHost
 import com.programovil.aura.navigation.NavRoute
+import com.programovil.aura.shared.FeatureFlag
+import com.programovil.aura.shared.FeatureFlagManager
 import com.programovil.aura.todo.presentation.viewmodel.TodoViewModel
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -75,54 +81,76 @@ fun AuthenticatedApp(
 ) {
     val navController = rememberNavController()
     val todoViewModel: TodoViewModel = koinViewModel()
+    val featureFlagManager: FeatureFlagManager = koinInject()
+    val featureFlags by featureFlagManager.flags.collectAsState()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+
+    LaunchedEffect(Unit) {
+        featureFlagManager.initialize()
+    }
+
+    val showTodos by remember(featureFlags) {
+        mutableStateOf(featureFlags[FeatureFlag.TODOS_ENABLED] ?: true)
+    }
+    val showHabits by remember(featureFlags) {
+        mutableStateOf(featureFlags[FeatureFlag.HABITS_ENABLED] ?: true)
+    }
+    val showNotifications by remember(featureFlags) {
+        mutableStateOf(featureFlags[FeatureFlag.NOTIFICATIONS_ENABLED] ?: true)
+    }
 
     Scaffold(
         bottomBar = {
             NavigationBar {
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Checklist, contentDescription = "Todos") },
-                    label = { Text("Todos") },
-                    selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Todo>() } == true,
-                    onClick = {
-                        navController.navigate(NavRoute.Todo) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
+                if (showTodos) {
+                    NavigationBarItem(
+                        icon = { Icon(Icons.Default.Checklist, contentDescription = "Todos") },
+                        label = { Text("Todos") },
+                        selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Todo>() } == true,
+                        onClick = {
+                            navController.navigate(NavRoute.Todo) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
                             }
-                            launchSingleTop = true
-                            restoreState = true
                         }
-                    }
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.DateRange, contentDescription = "Habits") },
-                    label = { Text("Habits") },
-                    selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Habit>() } == true,
-                    onClick = {
-                        navController.navigate(NavRoute.Habit) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
+                    )
+                }
+                if (showHabits) {
+                    NavigationBarItem(
+                        icon = { Icon(Icons.Default.DateRange, contentDescription = "Habits") },
+                        label = { Text("Habits") },
+                        selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Habit>() } == true,
+                        onClick = {
+                            navController.navigate(NavRoute.Habit) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
                             }
-                            launchSingleTop = true
-                            restoreState = true
                         }
-                    }
-                )
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Notifications, contentDescription = "Notifications") },
-                    label = { Text("Notifs") },
-                    selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.NotificationSettings>() } == true,
-                    onClick = {
-                        navController.navigate(NavRoute.NotificationSettings) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
+                    )
+                }
+                if (showNotifications) {
+                    NavigationBarItem(
+                        icon = { Icon(Icons.Default.Notifications, contentDescription = "Notifications") },
+                        label = { Text("Notifs") },
+                        selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.NotificationSettings>() } == true,
+                        onClick = {
+                            navController.navigate(NavRoute.NotificationSettings) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
                             }
-                            launchSingleTop = true
-                            restoreState = true
                         }
-                    }
-                )
+                    )
+                }
             }
         }
     ) { padding ->

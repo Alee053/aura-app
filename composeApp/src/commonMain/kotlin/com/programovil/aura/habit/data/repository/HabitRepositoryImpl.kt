@@ -72,6 +72,14 @@ class HabitRepositoryImpl(
         database.habitCompletionDao().deleteOldCompletions(cutoffDate)
     }
 
+    override suspend fun getUnsyncedHabits(): List<Habit> {
+        return habitDao.getUnsyncedHabits().map { it.toDomain() }
+    }
+
+    override suspend fun markAsSynced(habitId: String): Result<Unit> = runCatching {
+        habitDao.markAsSynced(habitId)
+    }
+
     private fun randomUUID(): String {
         return "hc-${Clock.System.now().toEpochMilliseconds()}-${(1000..9999).random()}"
     }

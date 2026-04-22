@@ -10,5 +10,6 @@ data class HabitEntity(
     val recurrenceType: String,
     val daysOfWeek: String,
     val color: String,
-    val createdAt: Long
+    val createdAt: Long,
+    val isSynced: Boolean = false
 )

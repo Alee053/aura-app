@@ -12,4 +12,8 @@ class IosNotificationScheduler : NotificationScheduler {
     override fun testNotification() {
         // TODO: Implement iOS local notifications
     }
+
+    override fun scheduleHabitSync() {
+        // No-op on iOS for now
+    }
 }

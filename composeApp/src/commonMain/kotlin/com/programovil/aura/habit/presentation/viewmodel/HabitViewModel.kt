@@ -10,6 +10,7 @@ import com.programovil.aura.habit.domain.usecase.AddHabitUseCase
 import com.programovil.aura.habit.domain.usecase.GetHabitHistoryUseCase
 import com.programovil.aura.habit.domain.usecase.GetHabitsGroupedByDayUseCase
 import com.programovil.aura.habit.domain.usecase.ToggleHabitCompletionUseCase
+import com.programovil.aura.notification.domain.NotificationScheduler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -40,7 +41,8 @@ class HabitViewModel(
     private val getHabitsGroupedByDayUseCase: GetHabitsGroupedByDayUseCase,
     private val addHabitUseCase: AddHabitUseCase,
     private val toggleHabitCompletionUseCase: ToggleHabitCompletionUseCase,
-    private val getHabitHistoryUseCase: GetHabitHistoryUseCase
+    private val getHabitHistoryUseCase: GetHabitHistoryUseCase,
+    private val notificationScheduler: NotificationScheduler
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HabitListUiState())
@@ -83,6 +85,7 @@ class HabitViewModel(
     private fun addHabit(name: String, recurrenceType: RecurrenceType, daysOfWeek: List<Int>, color: String) {
         viewModelScope.launch {
             addHabitUseCase(name, recurrenceType, daysOfWeek, color)
+                .onSuccess { notificationScheduler.scheduleHabitSync() }
                 .onFailure { _uiState.value = _uiState.value.copy(error = "Failed to add habit") }
         }
     }

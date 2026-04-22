@@ -1,11 +1,14 @@
 package com.programovil.aura.notification.domain
 
 import android.util.Log
+import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.programovil.aura.notification.presentation.worker.DailySummaryWorker
+import com.programovil.aura.notification.presentation.worker.HabitSyncWorker
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
@@ -49,5 +52,17 @@ class AndroidNotificationScheduler(
     override fun testNotification() {
         val testRequest = OneTimeWorkRequestBuilder<DailySummaryWorker>().build()
         workManager.enqueue(testRequest)
+    }
+
+    override fun scheduleHabitSync() {
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val syncRequest = OneTimeWorkRequestBuilder<HabitSyncWorker>()
+            .setConstraints(constraints)
+            .build()
+
+        workManager.enqueue(syncRequest)
     }
 }

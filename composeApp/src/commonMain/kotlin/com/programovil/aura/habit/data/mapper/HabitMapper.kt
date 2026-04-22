@@ -13,7 +13,8 @@ object HabitMapper {
         recurrenceType = RecurrenceType.valueOf(recurrenceType),
         daysOfWeek = if (daysOfWeek.isBlank()) emptyList() else daysOfWeek.split(",").map { it.toInt() },
         color = color,
-        createdAt = createdAt
+        createdAt = createdAt,
+        isSynced = isSynced
     )
 
     fun Habit.toEntity(): HabitEntity = HabitEntity(
@@ -22,7 +23,8 @@ object HabitMapper {
         recurrenceType = recurrenceType.name,
         daysOfWeek = daysOfWeek.joinToString(","),
         color = color,
-        createdAt = createdAt
+        createdAt = createdAt,
+        isSynced = isSynced
     )
 
     fun HabitCompletionEntity.toDomain(): HabitCompletion = HabitCompletion(

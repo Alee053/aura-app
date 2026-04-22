@@ -81,6 +81,24 @@ object NotificationHelper {
         notificationManager.notify(NOTIFICATION_ID_DUE_DATE, notification)
     }
 
+    fun showSyncCompleteNotification(context: Context, count: Int) {
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val body = "Sincronización completada. Se subieron $count hábitos a la nube"
+
+        val notification = NotificationCompat.Builder(context, CHANNEL_DAILY_SUMMARY)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle("Sincronización completada")
+            .setContentText(body)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
+            .setContentIntent(createPendingIntent(context))
+            .build()
+
+        notificationManager.notify(NOTIFICATION_ID_SYNC_COMPLETE, notification)
+    }
+
     private const val NOTIFICATION_ID_DAILY_SUMMARY = 1001
     private const val NOTIFICATION_ID_DUE_DATE = 1002
+    private const val NOTIFICATION_ID_SYNC_COMPLETE = 1003
 }

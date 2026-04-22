@@ -12,4 +12,6 @@ interface HabitRepository {
     suspend fun deleteHabit(habitId: String): Result<Unit>
     suspend fun toggleCompletion(habitId: String, date: String): Result<Unit>
     suspend fun cleanupOldCompletions(olderThanDays: Int): Result<Unit>
+    suspend fun getUnsyncedHabits(): List<Habit>
+    suspend fun markAsSynced(habitId: String): Result<Unit>
 }

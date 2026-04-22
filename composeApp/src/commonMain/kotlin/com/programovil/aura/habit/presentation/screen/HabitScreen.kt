@@ -1,5 +1,6 @@
 package com.programovil.aura.habit.presentation.screen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +41,14 @@ fun HabitScreen(
     onSignOut: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val allVisibleHabits = remember(uiState) {
+        (uiState.todayHabits + uiState.tomorrowHabits + uiState.thisWeekHabits)
+            .map { it.habit }
+            .distinctBy { it.id }
+    }
+    val hasPendingSync = remember(allVisibleHabits) {
+        allVisibleHabits.any { it.isSyncPending }
+    }
     var showAddDialog by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
     
@@ -89,6 +98,12 @@ fun HabitScreen(
                     .padding(padding),
                 contentPadding = PaddingValues(vertical = 8.dp)
             ) {
+                if (allVisibleHabits.isNotEmpty()) {
+                    item {
+                        SyncStatusBanner(hasPendingSync = hasPendingSync)
+                    }
+                }
+
                 // Today section
                 if (uiState.todayHabits.isNotEmpty()) {
                     item {
@@ -184,6 +199,31 @@ fun HabitScreen(
             }
         )
     }
+}
+
+@Composable
+private fun SyncStatusBanner(hasPendingSync: Boolean) {
+    val backgroundColor = if (hasPendingSync) {
+        MaterialTheme.colorScheme.tertiaryContainer
+    } else {
+        MaterialTheme.colorScheme.primaryContainer
+    }
+    val contentColor = if (hasPendingSync) {
+        MaterialTheme.colorScheme.onTertiaryContainer
+    } else {
+        MaterialTheme.colorScheme.onPrimaryContainer
+    }
+
+    Text(
+        text = if (hasPendingSync) "Not Synchronized" else "Synchronized",
+        style = MaterialTheme.typography.labelLarge,
+        color = contentColor,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .background(backgroundColor, MaterialTheme.shapes.medium)
+            .padding(horizontal = 12.dp, vertical = 10.dp)
+    )
 }
 
 @Composable

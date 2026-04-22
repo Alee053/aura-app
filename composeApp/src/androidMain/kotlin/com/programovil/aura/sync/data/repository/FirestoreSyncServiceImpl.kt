@@ -82,30 +82,33 @@ class FirestoreSyncService(
     }
 
     override suspend fun enqueueSync(entityType: String, entityId: String, action: String, data: String): Boolean {
-        // Try Firestore first
-        try {
-            val uid = userId ?: return false
-            val syncCollection = firestore.collection("users").document(uid).collection("sync_queue")
-            val syncItem = mapOf(
-                "entityType" to entityType,
-                "entityId" to entityId,
-                "action" to action,
-                "data" to data,
-                "pending" to true,
-                "retryCount" to 0,
-                "createdAt" to System.currentTimeMillis()
-            )
-            syncCollection.add(syncItem).await()
-            return true
-        } catch (e: Exception) {
-            // Firestore failed, save to local Room database
-        }
-
-        // Fallback to local Room database
+        // Always save to local Room database first so the UI (SyncStatusBar) can show it
         val result = saveToLocalQueue(entityType, entityId, action, data)
+        
         if (result) {
+            // Trigger WorkManager to handle the sync whenever connectivity is available
             SyncScheduler.triggerImmediateSync(context)
         }
+        
+        // Also try to back it up in Firestore sync_queue if online
+        try {
+            userId?.let { uid ->
+                val syncCollection = firestore.collection("users").document(uid).collection("sync_queue")
+                val syncItem = mapOf(
+                    "entityType" to entityType,
+                    "entityId" to entityId,
+                    "action" to action,
+                    "data" to data,
+                    "pending" to true,
+                    "retryCount" to 0,
+                    "createdAt" to System.currentTimeMillis()
+                )
+                syncCollection.add(syncItem) // Non-blocking firestore call (it has its own internal queue)
+            }
+        } catch (e: Exception) {
+            // Ignore firestore backup failure
+        }
+
         return result
     }
 

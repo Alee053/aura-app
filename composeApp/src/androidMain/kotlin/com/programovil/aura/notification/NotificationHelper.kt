@@ -12,7 +12,7 @@ object NotificationHelper {
 
     const val CHANNEL_DAILY_SUMMARY = "daily_summary"
     const val CHANNEL_DUE_DATE_REMINDER = "due_date_reminder"
-    const val CHANNEL_SYNC = "sync_channel"
+    const val CHANNEL_SYNC = "sync_channel_v2"
 
     fun createNotificationChannels(context: Context) {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

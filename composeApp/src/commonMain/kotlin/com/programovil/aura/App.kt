@@ -106,7 +106,7 @@ fun AuthenticatedApp(
 
     Scaffold(
         topBar = {
-            Surface(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.fillMaxWidth()) {
                 SyncStatusBar()
             }
         },

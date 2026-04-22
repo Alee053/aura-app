@@ -1,0 +1,60 @@
+<h2>Proposed Architecture</h2>
+<p class="subtitle">Habit tracker follows the same Clean Architecture pattern as todo feature</p>
+
+<div class="mockup">
+  <div class="mockup-header">Package Structure: habit/</div>
+  <div class="mockup-body">
+    <div style="font-family: monospace; font-size: 12px; line-height: 1.6; color: #666;">
+      habit/
+      ├── data/
+      │   ├── repository/
+      │   │   └── HabitRepositoryImpl.kt     # Android: Room, iOS: UserDefaults
+      │   └── mapper/
+      │       └── HabitMapper.kt
+      ├── domain/
+      │   ├── model/
+      │   │   └── Habit.kt                   # id, name, recurrenceType, daysOfWeek, color
+      │   ├── repository/
+      │   │   └── HabitRepository.kt         # interface
+      │   └── usecase/
+      │       ├── GetHabitsForDayUseCase.kt
+      │       ├── AddHabitUseCase.kt
+      │       ├── ToggleHabitCompletionUseCase.kt
+      │       └── GetHabitHistoryUseCase.kt
+      ├── presentation/
+      │   ├── screen/
+      │   │   └── HabitScreen.kt
+      │   ├── viewmodel/
+      │   │   └── HabitViewModel.kt
+      │   └── composable/
+      │       ├── HabitItem.kt
+      │       └── AddHabitDialog.kt
+      └── di/
+          └── HabitModule.kt
+    </div>
+  </div>
+</div>
+
+<div class="pros-cons" style="margin-top: 20px;">
+  <div class="pros">
+    <h4>Consistent with todo</h4>
+    <ul>
+      <li>Same layer pattern: domain → data → presentation</li>
+      <li>Same DI module structure</li>
+      <li>Same naming conventions</li>
+      <li>Easy to maintain and understand</li>
+    </ul>
+  </div>
+  <div class="cons">
+    <h4>Platform split</h4>
+    <ul>
+      <li>Room for Android persistence</li>
+      <li>UserDefaults for iOS persistence</li>
+      <li>Both behind shared repository interface</li>
+    </ul>
+  </div>
+</div>
+
+<p class="section" style="margin-top: 20px;">
+  Does this architecture look right for the habit feature?
+</p>

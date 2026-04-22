@@ -19,7 +19,7 @@ private const val TAG = "MainActivity"
 class MainActivity : ComponentActivity() {
 
     private lateinit var authViewModel: AuthViewModel
-    private val credentialManager = CredentialManager.create(this)
+    private val credentialManager by lazy { CredentialManager.create(this) }
 
     private fun launchGoogleSignIn() {
         val googleIdOption = com.google.android.libraries.identity.googleid.GetGoogleIdOption.Builder()

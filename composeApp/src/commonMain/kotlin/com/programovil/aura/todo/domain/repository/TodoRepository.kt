@@ -9,3 +9,5 @@ interface TodoRepository {
     suspend fun toggleTodo(todoId: String, isCompleted: Boolean): Result<Unit>
     suspend fun deleteTodo(todoId: String): Result<Unit>
 }
+
+expect fun createTodoRepository(): TodoRepository

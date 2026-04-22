@@ -7,6 +7,8 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.googleServices)
+    alias(libs.plugins.room)
+    alias(libs.plugins.ksp)
 }
 
 kotlin {
@@ -23,25 +25,32 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
+            linkerOpts.add("-lsqlite3")
         }
     }
 
     sourceSets {
         androidMain.dependencies {
-            implementation(libs.compose.uiToolingPreview)
+            implementation(libs.androidx.appcompat)
             implementation(libs.androidx.activity.compose)
+            implementation(libs.compose.uiToolingPreview)
             implementation(libs.koin.android)
             implementation(libs.koin.compose)
             implementation(libs.navigation.compose)
+            
+            // Firebase Android dependencies - using string notation for BOM due to Kotlin 2.3+ Provider issues
+            implementation("com.google.firebase:firebase-bom:34.12.0")
             implementation(libs.firebase.auth.ktx)
             implementation(libs.firebase.firestore.ktx)
+            implementation(libs.firebase.messaging.ktx)
+            
             implementation(libs.credentials)
             implementation(libs.credentials.play.services.auth)
             implementation(libs.googleid)
+            
             implementation(libs.kotlinx.coroutines.play.services)
             implementation(libs.workmanager.ktx)
             implementation(libs.datastore.preferences)
-            implementation(libs.firebase.messaging.ktx)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -57,6 +66,12 @@ kotlin {
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.navigation.compose)
             implementation(libs.kotlinx.serialization.json)
+            implementation(libs.room.runtime)
+            implementation(libs.room.ktx)
+            implementation(libs.androidx.sqlite.bundled)
+            
+            implementation(libs.kotlinx.datetime)
+            implementation(libs.compose.material.icons.extended)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -91,6 +106,13 @@ android {
     }
 }
 
+room {
+    schemaDirectory("$projectDir/schemas")
+}
+
 dependencies {
     debugImplementation(libs.compose.uiTooling)
+    add("kspAndroid", libs.room.compiler)
+    add("kspIosSimulatorArm64", libs.room.compiler)
+    add("kspIosArm64", libs.room.compiler)
 }

@@ -36,7 +36,7 @@ object NotificationHelper {
         val syncChannel = NotificationChannel(
             CHANNEL_SYNC,
             "Sync Status",
-            NotificationManager.IMPORTANCE_DEFAULT
+            NotificationManager.IMPORTANCE_HIGH
         ).apply {
             description = "Synchronization status notifications"
         }

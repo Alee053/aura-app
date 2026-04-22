@@ -7,10 +7,7 @@ import com.programovil.aura.habit.data.mapper.HabitMapper.toEntity
 import com.programovil.aura.habit.domain.model.Habit
 import com.programovil.aura.habit.domain.model.HabitCompletion
 import com.programovil.aura.habit.domain.repository.HabitRepository
-import com.programovil.aura.sync.data.local.entity.EntityType
-import com.programovil.aura.sync.data.local.entity.SyncAction
 import com.programovil.aura.sync.data.repository.IFirestoreSyncService
-import com.programovil.aura.sync.data.repository.SyncQueueRepository
 import com.programovil.aura.sync.data.repository.createFirestoreSyncService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -22,11 +19,10 @@ import kotlinx.datetime.toLocalDateTime
 
 class HabitRepositoryImpl(
     private val database: HabitDatabase,
-    private val syncQueueRepository: SyncQueueRepository? = null
+    private val syncService: IFirestoreSyncService
 ) : HabitRepository {
 
     private val habitDao: HabitDao get() = database.habitDao()
-    private val syncService: IFirestoreSyncService = createFirestoreSyncService()
 
     override fun getHabits(): Flow<List<Habit>> {
         return habitDao.getAllHabits().map { entities ->
@@ -57,14 +53,10 @@ class HabitRepositoryImpl(
             "createdAt" to habit.createdAt
         )
 
+        // Try immediate sync first, if fails enqueue to sync_queue
         val success = syncService.syncHabit(habitData, habit.id, "CREATE")
-        if (!success && syncQueueRepository != null) {
-            syncQueueRepository.enqueue(
-                EntityType.HABIT,
-                habit.id,
-                SyncAction.CREATE,
-                habitData.toString()
-            )
+        if (!success) {
+            syncService.enqueueSync("HABIT", habit.id, "CREATE", habitData.toString())
         }
     }
 
@@ -72,13 +64,8 @@ class HabitRepositoryImpl(
         habitDao.deleteHabit(habitId)
 
         val success = syncService.syncHabit(emptyMap(), habitId, "DELETE")
-        if (!success && syncQueueRepository != null) {
-            syncQueueRepository.enqueue(
-                EntityType.HABIT,
-                habitId,
-                SyncAction.DELETE,
-                "{}"
-            )
+        if (!success) {
+            syncService.enqueueSync("HABIT", habitId, "DELETE", "{}")
         }
     }
 
@@ -112,13 +99,8 @@ class HabitRepositoryImpl(
 
         val action = if (isDeleting) "DELETE" else "CREATE"
         val success = syncService.syncCompletion(completionData, completionId, action)
-        if (!success && syncQueueRepository != null) {
-            syncQueueRepository.enqueue(
-                EntityType.COMPLETION,
-                completionId,
-                if (isDeleting) SyncAction.DELETE else SyncAction.CREATE,
-                completionData.toString()
-            )
+        if (!success) {
+            syncService.enqueueSync("COMPLETION", completionId, action, completionData.toString())
         }
     }
 

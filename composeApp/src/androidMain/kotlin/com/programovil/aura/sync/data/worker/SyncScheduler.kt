@@ -26,7 +26,7 @@ object SyncScheduler {
 
         workManager.enqueueUniquePeriodicWork(
             SyncQueueWorker.WORK_NAME,
-            ExistingPeriodicWorkPolicy.REPLACE,
+            ExistingPeriodicWorkPolicy.KEEP,
             syncRequest
         )
     }

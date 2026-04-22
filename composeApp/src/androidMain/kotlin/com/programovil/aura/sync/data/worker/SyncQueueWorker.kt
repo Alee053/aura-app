@@ -1,8 +1,6 @@
 package com.programovil.aura.sync.data.worker
 
 import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.google.firebase.firestore.FieldValue
@@ -22,108 +20,158 @@ class SyncQueueWorker(
 ) : CoroutineWorker(context, params), KoinComponent {
 
     override suspend fun doWork(): Result {
-        if (!isNetworkAvailable()) {
-            return Result.retry()
-        }
-
-        val userId = FirebaseConfig.auth.currentUser?.uid
-        if (userId == null) {
-            return Result.failure()
-        }
-
-        val firestore = FirebaseConfig.firestore
-        val pendingItems = getPendingItemsSync()
-
-        if (pendingItems.isEmpty()) {
-            return Result.success()
-        }
-
         var syncedCount = 0
         var failedCount = 0
+        var processedAny = false
 
-        for (item in pendingItems) {
-            try {
-                val success = processItem(firestore, userId, item)
-                if (success) {
-                    markCompleted(item.id)
-                    syncedCount++
-                } else {
-                    incrementRetryCount(item.id)
+        return try {
+            // Wait up to 5 seconds for Firebase Auth to restore session in background
+            var userId = FirebaseConfig.auth.currentUser?.uid
+            var attempts = 0
+            while (userId == null && attempts < 5) {
+                kotlinx.coroutines.delay(1000)
+                userId = FirebaseConfig.auth.currentUser?.uid
+                attempts++
+            }
+
+            if (userId == null) {
+                return Result.retry() // Retry later if session is still not available
+            }
+
+            val currentUserId = userId!!
+            val firestore = FirebaseFirestore.getInstance()
+            val database = get<com.programovil.aura.habit.data.local.HabitDatabase>()
+
+            // Get pending items from BOTH sources
+            val localItems = getLocalPendingItems(database)
+            val firestoreItems = getFirestorePendingItems(currentUserId)
+
+            // Merge items (avoid duplicates by id)
+            val allItems = (localItems + firestoreItems).associateBy { it.id }.values.toList()
+
+            if (allItems.isEmpty()) {
+                return Result.success()
+            }
+
+            processedAny = true
+
+            for (item in allItems) {
+                try {
+                    val success = processItem(firestore, currentUserId, item)
+                    if (success) {
+                        // Remove from both sources
+                        removeFromLocal(database, item.id)
+                        removeFromFirestore(currentUserId, item.id)
+                        syncedCount++
+                    } else {
+                        incrementRetryCount(database, item.id)
+                        incrementFirestoreRetry(currentUserId, item.id)
+                        failedCount++
+                    }
+                } catch (e: Exception) {
+                    incrementRetryCount(database, item.id)
                     failedCount++
                 }
-            } catch (e: Exception) {
-                incrementRetryCount(item.id)
-                failedCount++
             }
-        }
 
-        NotificationHelper.showSyncSummaryNotification(
-            applicationContext,
-            syncedCount,
-            failedCount
-        )
+            NotificationHelper.showSyncSummaryNotification(
+                applicationContext,
+                syncedCount,
+                failedCount
+            )
 
-        return Result.success()
-    }
-
-    private fun getDatabase() = get<com.programovil.aura.habit.data.local.HabitDatabase>()
-
-    private fun getPendingItemsSync(): List<SyncQueueEntity> {
-        val dao = getDatabase().syncQueueDao()
-        return kotlinx.coroutines.runBlocking {
-            dao.getPendingItemsSync()
-        }
-    }
-
-    private fun markCompleted(id: String) {
-        val dao = getDatabase().syncQueueDao()
-        kotlinx.coroutines.runBlocking {
-            dao.markCompleted(id)
+            if (failedCount > 0) Result.retry() else Result.success()
+        } catch (e: Exception) {
+            if (processedAny) {
+                NotificationHelper.showSyncSummaryNotification(
+                    applicationContext,
+                    syncedCount,
+                    failedCount
+                )
+            }
+            Result.retry()
         }
     }
 
-    private fun incrementRetryCount(id: String) {
-        val dao = getDatabase().syncQueueDao()
-        kotlinx.coroutines.runBlocking {
-            dao.incrementRetryCount(id)
+    private suspend fun getLocalPendingItems(database: com.programovil.aura.habit.data.local.HabitDatabase): List<SyncQueueEntity> {
+        return database.syncQueueDao().getPendingItemsSync()
+    }
+
+    private suspend fun getFirestorePendingItems(userId: String): List<SyncQueueEntity> {
+        return try {
+            FirebaseFirestore.getInstance()
+                .collection("users").document(userId)
+                .collection("sync_queue")
+                .whereEqualTo("pending", true)
+                .get()
+                .await()
+                .documents
+                .mapNotNull { doc ->
+                    SyncQueueEntity(
+                        id = doc.id,
+                        entityType = doc.getString("entityType") ?: return@mapNotNull null,
+                        entityId = doc.getString("entityId") ?: return@mapNotNull null,
+                        action = doc.getString("action") ?: return@mapNotNull null,
+                        data = doc.getString("data") ?: "{}",
+                        createdAt = doc.getLong("createdAt") ?: 0,
+                        pending = true,
+                        retryCount = doc.getLong("retryCount")?.toInt() ?: 0
+                    )
+                }
+        } catch (e: Exception) {
+            emptyList()
         }
     }
 
-    private fun isNetworkAvailable(): Boolean {
-        val connectivityManager = applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val network = connectivityManager.activeNetwork ?: return false
-        val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return false
-        return capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+    private suspend fun removeFromLocal(database: com.programovil.aura.habit.data.local.HabitDatabase, id: String) {
+        database.syncQueueDao().delete(id)
+    }
+
+    private suspend fun removeFromFirestore(userId: String, id: String) {
+        try {
+            FirebaseFirestore.getInstance()
+                .collection("users").document(userId)
+                .collection("sync_queue").document(id)
+                .delete()
+                .await()
+        } catch (e: Exception) {
+            // Ignore
+        }
+    }
+
+    private suspend fun incrementRetryCount(database: com.programovil.aura.habit.data.local.HabitDatabase, id: String) {
+        database.syncQueueDao().incrementRetryCount(id)
+    }
+
+    private suspend fun incrementFirestoreRetry(userId: String, id: String) {
+        try {
+            FirebaseFirestore.getInstance()
+                .collection("users").document(userId)
+                .collection("sync_queue").document(id)
+                .update("retryCount", FieldValue.increment(1))
+                .await()
+        } catch (e: Exception) {
+            // Ignore
+        }
     }
 
     private suspend fun processItem(firestore: FirebaseFirestore, userId: String, item: SyncQueueEntity): Boolean {
-        if (item.retryCount >= MAX_RETRIES) {
-            return false
-        }
-
-        val entityType = item.entityType
-        val action = item.action
-
-        return when (entityType) {
-            EntityType.HABIT.name -> processHabit(firestore, userId, item, action)
-            EntityType.TODO.name -> processTodo(firestore, userId, item, action)
-            EntityType.COMPLETION.name -> processCompletion(firestore, userId, item, action)
+        return when (item.entityType) {
+            EntityType.HABIT.name -> processHabit(firestore, userId, item)
+            EntityType.TODO.name -> processTodo(firestore, userId, item)
+            EntityType.COMPLETION.name -> processCompletion(firestore, userId, item)
             else -> false
         }
     }
 
-    private suspend fun processHabit(firestore: FirebaseFirestore, userId: String, item: SyncQueueEntity, action: String): Boolean {
+    private suspend fun processHabit(firestore: FirebaseFirestore, userId: String, item: SyncQueueEntity): Boolean {
         val collection = firestore.collection("users").document(userId).collection("habits")
 
         return try {
-            when (action) {
+            when (item.action) {
                 SyncAction.CREATE.name, SyncAction.UPDATE.name -> {
                     val data = parseJson(item.data)
-                    if (action == SyncAction.CREATE.name) {
-                        collection.document(item.entityId).set(data).await()
-                    } else {
-                        collection.document(item.entityId).update(data).await()
-                    }
+                    collection.document(item.entityId).set(data).await()
                     true
                 }
                 SyncAction.DELETE.name -> {
@@ -137,15 +185,15 @@ class SyncQueueWorker(
         }
     }
 
-    private suspend fun processTodo(firestore: FirebaseFirestore, userId: String, item: SyncQueueEntity, action: String): Boolean {
+    private suspend fun processTodo(firestore: FirebaseFirestore, userId: String, item: SyncQueueEntity): Boolean {
         val collection = firestore.collection("users").document(userId).collection("todos")
 
         return try {
-            when (action) {
+            when (item.action) {
                 SyncAction.CREATE.name -> {
                     val data = parseJson(item.data).toMutableMap()
                     data["createdAt"] = FieldValue.serverTimestamp()
-                    collection.add(data).await()
+                    collection.document(item.entityId).set(data).await()
                     true
                 }
                 SyncAction.UPDATE.name -> {
@@ -164,11 +212,11 @@ class SyncQueueWorker(
         }
     }
 
-    private suspend fun processCompletion(firestore: FirebaseFirestore, userId: String, item: SyncQueueEntity, action: String): Boolean {
+    private suspend fun processCompletion(firestore: FirebaseFirestore, userId: String, item: SyncQueueEntity): Boolean {
         val collection = firestore.collection("users").document(userId).collection("completions")
 
         return try {
-            when (action) {
+            when (item.action) {
                 SyncAction.CREATE.name -> {
                     val data = parseJson(item.data)
                     collection.document(item.entityId).set(data).await()
@@ -189,12 +237,22 @@ class SyncQueueWorker(
         val result = mutableMapOf<String, Any>()
         try {
             val cleanJson = json.trim().removeSurrounding("{", "}")
+            if (cleanJson.isEmpty()) return result
+            
             cleanJson.split(",").forEach { pair ->
-                val parts = pair.split(":")
+                val parts = pair.split("=") // Kotlin Map.toString() uses '=' not ':'
                 if (parts.size == 2) {
                     val key = parts[0].trim().removeSurrounding("\"", "'")
                     val value = parts[1].trim().removeSurrounding("\"", "'")
                     result[key] = value
+                } else {
+                    // Try with ':' just in case
+                    val partsColon = pair.split(":")
+                    if (partsColon.size == 2) {
+                        val key = partsColon[0].trim().removeSurrounding("\"", "'")
+                        val value = partsColon[1].trim().removeSurrounding("\"", "'")
+                        result[key] = value
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -205,6 +263,5 @@ class SyncQueueWorker(
 
     companion object {
         const val WORK_NAME = "sync_queue_work"
-        private const val MAX_RETRIES = 3
     }
 }

@@ -15,6 +15,9 @@ interface HabitCompletionDao {
     @Query("SELECT * FROM habit_completions WHERE completedDate = :date")
     fun getCompletionsForDate(date: String): Flow<List<HabitCompletionEntity>>
 
+    @Query("SELECT * FROM habit_completions WHERE completedDate = :date")
+    suspend fun getCompletionsForDateSync(date: String): List<HabitCompletionEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCompletion(completion: HabitCompletionEntity)
 

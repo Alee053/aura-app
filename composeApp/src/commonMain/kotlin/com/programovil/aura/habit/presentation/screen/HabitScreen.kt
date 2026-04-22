@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -22,8 +23,6 @@ import com.programovil.aura.habit.presentation.viewmodel.HabitEvent
 import com.programovil.aura.habit.presentation.viewmodel.HabitViewModel
 import kotlinx.datetime.*
 import org.koin.compose.koinInject
-
-import androidx.compose.material.icons.filled.ExitToApp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,7 +62,7 @@ fun HabitScreen(
                         Icon(Icons.Default.Add, contentDescription = "Add habit")
                     }
                     IconButton(onClick = onSignOut) {
-                        Icon(Icons.Default.ExitToApp, contentDescription = "Sign Out")
+                        Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Sign Out")
                     }
                 }
             )
@@ -89,14 +88,14 @@ fun HabitScreen(
                             subtitle = today.toString()
                         )
                     }
-                    items(uiState.todayHabits, key = { it.habit.id }) { habitItem ->
+                    items(uiState.todayHabits, key = { it.habit.id + it.targetDate }) { habitItem ->
                         HabitItem(
                             habitWithStatus = habitItem,
                             onToggle = {
                                 viewModel.onEvent(
                                     HabitEvent.ToggleCompletion(
                                         habitItem.habit.id,
-                                        today.toString()
+                                        habitItem.targetDate
                                     )
                                 )
                             }
@@ -112,14 +111,14 @@ fun HabitScreen(
                             subtitle = tomorrow.toString()
                         )
                     }
-                    items(uiState.tomorrowHabits, key = { it.habit.id }) { habitItem ->
+                    items(uiState.tomorrowHabits, key = { it.habit.id + it.targetDate }) { habitItem ->
                         HabitItem(
                             habitWithStatus = habitItem,
                             onToggle = {
                                 viewModel.onEvent(
                                     HabitEvent.ToggleCompletion(
                                         habitItem.habit.id,
-                                        tomorrow.toString()
+                                        habitItem.targetDate
                                     )
                                 )
                             }
@@ -135,11 +134,16 @@ fun HabitScreen(
                             subtitle = null
                         )
                     }
-                    items(uiState.thisWeekHabits, key = { it.habit.id }) { habitItem ->
+                    items(uiState.thisWeekHabits, key = { it.habit.id + it.targetDate }) { habitItem ->
                         HabitItem(
                             habitWithStatus = habitItem,
                             onToggle = {
-                                viewModel.onEvent(HabitEvent.ToggleCompletion(habitItem.habit.id, habitItem.targetDate))
+                                viewModel.onEvent(
+                                    HabitEvent.ToggleCompletion(
+                                        habitItem.habit.id,
+                                        habitItem.targetDate
+                                    )
+                                )
                             }
                         )
                     }

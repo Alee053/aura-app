@@ -15,10 +15,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.programovil.aura.habit.domain.model.HabitWithStatus
+import com.programovil.aura.shared.parseHexColor
 
 @Composable
 fun HabitItem(
@@ -42,7 +42,7 @@ fun HabitItem(
             modifier = Modifier
                 .size(12.dp)
                 .clip(CircleShape)
-                .background(Color(android.graphics.Color.parseColor(habit.color)))
+                .background(parseHexColor(habit.color))
         )
 
         // Name

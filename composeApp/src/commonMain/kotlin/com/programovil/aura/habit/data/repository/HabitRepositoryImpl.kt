@@ -8,9 +8,13 @@ import com.programovil.aura.habit.domain.model.Habit
 import com.programovil.aura.habit.domain.model.HabitCompletion
 import com.programovil.aura.habit.domain.repository.HabitRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import java.util.UUID
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
+import kotlinx.datetime.toLocalDateTime
 
 class HabitRepositoryImpl(
     private val database: HabitDatabase
@@ -46,24 +50,29 @@ class HabitRepositoryImpl(
 
     override suspend fun toggleCompletion(habitId: String, date: String): Result<Unit> = runCatching {
         val habitCompletionDao = database.habitCompletionDao()
-        val existing = habitCompletionDao.getCompletionsForDate(date).first()
+        val existing = habitCompletionDao.getCompletionsForDateSync(date)
             .find { it.habitId == habitId }
+        
         if (existing != null) {
             habitCompletionDao.deleteCompletion(habitId, date)
         } else {
             val completion = HabitCompletion(
-                id = UUID.randomUUID().toString(),
+                id = randomUUID(),
                 habitId = habitId,
                 completedDate = date,
-                completedAt = System.currentTimeMillis()
+                completedAt = Clock.System.now().toEpochMilliseconds()
             )
             habitCompletionDao.insertCompletion(completion.toEntity())
         }
     }
 
     override suspend fun cleanupOldCompletions(olderThanDays: Int): Result<Unit> = runCatching {
-        val cutoffDate = java.time.LocalDate.now().minusDays(olderThanDays.toLong())
-            .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+        val cutoffDate = today.minus(olderThanDays, DateTimeUnit.DAY).toString()
         database.habitCompletionDao().deleteOldCompletions(cutoffDate)
+    }
+
+    private fun randomUUID(): String {
+        return "hc-${Clock.System.now().toEpochMilliseconds()}-${(1000..9999).random()}"
     }
 }

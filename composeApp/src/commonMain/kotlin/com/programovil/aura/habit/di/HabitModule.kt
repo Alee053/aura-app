@@ -10,6 +10,7 @@ import com.programovil.aura.habit.domain.usecase.GetHabitsGroupedByDayUseCase
 import com.programovil.aura.habit.domain.usecase.ToggleHabitCompletionUseCase
 import com.programovil.aura.habit.presentation.viewmodel.HabitViewModel
 import org.koin.core.module.dsl.factoryOf
+import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
@@ -18,7 +19,7 @@ val habitModule = module {
     // Data layer
     single { getHabitDatabaseBuilder() }
     single { getHabitDatabase(get()) }
-    single { HabitRepositoryImpl(get()) } bind HabitRepository::class
+    singleOf(::HabitRepositoryImpl).bind<HabitRepository>()
 
     // Domain layer - use cases
     factoryOf(::AddHabitUseCase)

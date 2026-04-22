@@ -32,10 +32,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.programovil.aura.habit.domain.model.RecurrenceType
+import com.programovil.aura.shared.parseHexColor
 
 private val colorPalette = listOf(
     "#FF6B6B", // Red
@@ -152,7 +152,7 @@ fun AddHabitDialog(
                             modifier = Modifier
                                 .size(32.dp)
                                 .clip(CircleShape)
-                                .background(Color(android.graphics.Color.parseColor(color)))
+                                .background(parseHexColor(color))
                                 .then(
                                     if (color == selectedColor) {
                                         Modifier.border(2.dp, MaterialTheme.colorScheme.onSurface, CircleShape)

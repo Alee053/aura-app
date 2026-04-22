@@ -14,7 +14,7 @@ class AddHabitUseCase(private val repository: HabitRepository) {
     ): Result<Unit> {
         if (name.isBlank()) return Result.failure(IllegalArgumentException("Name cannot be empty"))
         val habit = Habit(
-            id = generateUUID(),
+            id = randomUUID(),
             name = name.trim(),
             recurrenceType = recurrenceType,
             daysOfWeek = if (recurrenceType == RecurrenceType.WEEKLY) daysOfWeek else emptyList(),
@@ -24,7 +24,7 @@ class AddHabitUseCase(private val repository: HabitRepository) {
         return repository.addHabit(habit)
     }
 
-    private fun generateUUID(): String {
-        return "habit-${Clock.System.now().toEpochMilliseconds()}-${(1000..9999).random()}"
+    private fun randomUUID(): String {
+        return "h-${Clock.System.now().toEpochMilliseconds()}-${(1000..9999).random()}"
     }
 }

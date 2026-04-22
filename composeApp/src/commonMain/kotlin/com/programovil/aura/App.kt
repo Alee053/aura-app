@@ -87,9 +87,7 @@ fun AuthenticatedApp(
     val currentDestination = navBackStackEntry?.destination
 
     LaunchedEffect(Unit) {
-        android.util.Log.d("App", "LaunchedEffect: calling featureFlagManager.initialize()")
         featureFlagManager.initialize()
-        android.util.Log.d("App", "LaunchedEffect: initialize() completed")
     }
 
     val showTodos by remember(featureFlags) {

@@ -12,6 +12,7 @@ object NotificationHelper {
 
     const val CHANNEL_DAILY_SUMMARY = "daily_summary"
     const val CHANNEL_DUE_DATE_REMINDER = "due_date_reminder"
+    const val CHANNEL_SYNC = "sync_channel"
 
     fun createNotificationChannels(context: Context) {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -32,7 +33,15 @@ object NotificationHelper {
             description = "Reminders for tasks due today"
         }
 
-        notificationManager.createNotificationChannels(listOf(dailySummaryChannel, dueDateChannel))
+        val syncChannel = NotificationChannel(
+            CHANNEL_SYNC,
+            "Sync Status",
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).apply {
+            description = "Synchronization status notifications"
+        }
+
+        notificationManager.createNotificationChannels(listOf(dailySummaryChannel, dueDateChannel, syncChannel))
     }
 
     private fun createPendingIntent(context: Context): PendingIntent {
@@ -81,6 +90,28 @@ object NotificationHelper {
         notificationManager.notify(NOTIFICATION_ID_DUE_DATE, notification)
     }
 
+    fun showSyncSummaryNotification(context: Context, syncedCount: Int, failedCount: Int) {
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val body = when {
+            failedCount > 0 -> "Synced $syncedCount items, $failedCount failed"
+            syncedCount > 0 -> "Successfully synced $syncedCount item${if (syncedCount > 1) "s" else ""}"
+            else -> "No items to sync"
+        }
+
+        val notification = NotificationCompat.Builder(context, CHANNEL_SYNC)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle("Sync Complete")
+            .setContentText(body)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
+            .setContentIntent(createPendingIntent(context))
+            .build()
+
+        notificationManager.notify(NOTIFICATION_ID_SYNC, notification)
+    }
+
     private const val NOTIFICATION_ID_DAILY_SUMMARY = 1001
     private const val NOTIFICATION_ID_DUE_DATE = 1002
+    private const val NOTIFICATION_ID_SYNC = 1003
 }

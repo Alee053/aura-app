@@ -4,5 +4,6 @@ data class Todo(
     val id: String,
     val title: String,
     val isCompleted: Boolean = false,
-    val dueDate: Long? = null  // epoch millis, nullable
+    val dueDate: Long? = null,
+    val pendiente: Boolean = true
 )

@@ -5,6 +5,7 @@ import com.programovil.aura.notification.NotificationHelper
 import com.programovil.aura.shared.FirebaseConfig
 import com.programovil.aura.shared.FirebaseRemoteConfigService
 import com.programovil.aura.di.getModules
+import com.programovil.aura.sync.data.worker.SyncScheduler
 import org.koin.android.ext.koin.androidLogger
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
@@ -25,5 +26,7 @@ class AndroidApp : Application() {
             androidContext(this@AndroidApp)
             modules(getModules(remoteConfigService))
         }
+
+        SyncScheduler.schedulePeriodicSync(this)
     }
 }

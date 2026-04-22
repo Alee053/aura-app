@@ -3,6 +3,7 @@ package com.programovil.aura.shared
 import android.content.Context
 import com.google.firebase.Firebase
 import com.google.firebase.remoteconfig.remoteConfig
+import com.google.firebase.remoteconfig.remoteConfigSettings
 import kotlinx.coroutines.tasks.await
 
 class FirebaseRemoteConfigService(context: Context) : RemoteConfigService {
@@ -10,7 +11,10 @@ class FirebaseRemoteConfigService(context: Context) : RemoteConfigService {
     private val remoteConfig = Firebase.remoteConfig
 
     init {
-        remoteConfig.settings.minimumFetchIntervalMillis = 0
+        val configSettings = remoteConfigSettings {
+            minimumFetchIntervalInSeconds = 0
+        }
+        remoteConfig.setConfigSettingsAsync(configSettings)
         val defaults = FeatureFlag.entries.associate { flag ->
             flag.key to flag.defaultValue
         }

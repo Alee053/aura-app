@@ -37,22 +37,25 @@ kotlin {
             implementation(libs.koin.android)
             implementation(libs.koin.compose)
             implementation(libs.navigation.compose)
-            
-            // Firebase Android dependencies - using string notation for BOM due to Kotlin 2.3+ Provider issues
-            implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
-            implementation("com.google.firebase:firebase-config-ktx:21.0.0")
-            implementation(libs.firebase.auth.ktx)
-            implementation(libs.firebase.firestore.ktx)
-            implementation(libs.firebase.messaging.ktx)
-            
+
+            // --- FIREBASE (Limpio y controlado por el BoM) --
+            implementation(project.dependencies.platform(libs.firebase.bom))
+            implementation(libs.firebase.database)
+            implementation(libs.firebase.auth)
+            implementation(libs.firebase.firestore)
+            implementation(libs.firebase.messaging)
+            implementation(libs.firebase.config)
+            // Dejé config como string pero sin versión para que el BoM la asigne automáticamente
+
+            // --- SERVICIOS DE GOOGLE Y ANDROID ---
             implementation(libs.credentials)
             implementation(libs.credentials.play.services.auth)
             implementation(libs.googleid)
-            
             implementation(libs.kotlinx.coroutines.play.services)
             implementation(libs.workmanager.ktx)
             implementation(libs.datastore.preferences)
         }
+
         commonMain.dependencies {
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
@@ -67,13 +70,15 @@ kotlin {
             implementation(libs.koin.compose.viewmodel)
             implementation(libs.navigation.compose)
             implementation(libs.kotlinx.serialization.json)
+
+            // --- ROOM (Sin -ktx para evitar el error en iOS) ---
             implementation(libs.room.runtime)
-            implementation(libs.room.ktx)
             implementation(libs.androidx.sqlite.bundled)
-            
+
             implementation(libs.kotlinx.datetime)
             implementation(libs.compose.material.icons.extended)
         }
+
         commonTest.dependencies {
             implementation(libs.kotlin.test)
         }
@@ -112,6 +117,7 @@ room {
 }
 
 dependencies {
+    // La implementación suelta de database fue eliminada de aquí
     debugImplementation(libs.compose.uiTooling)
     add("kspAndroid", libs.room.compiler)
     add("kspIosSimulatorArm64", libs.room.compiler)

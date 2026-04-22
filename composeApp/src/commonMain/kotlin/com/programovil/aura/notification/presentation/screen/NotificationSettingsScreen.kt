@@ -29,6 +29,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.programovil.aura.notification.presentation.viewmodel.NotificationViewModel
 import com.programovil.aura.shared.presentation.rememberNotificationPermissionState
+import aura_app.composeapp.generated.resources.Res
+import aura_app.composeapp.generated.resources.notification_settings
+import aura_app.composeapp.generated.resources.back
+import aura_app.composeapp.generated.resources.daily_summary
+import aura_app.composeapp.generated.resources.enabled
+import aura_app.composeapp.generated.resources.test_notification
+import aura_app.composeapp.generated.resources.notification_time
+import aura_app.composeapp.generated.resources.notification_helper
+import aura_app.composeapp.generated.resources.notification_permission
+import aura_app.composeapp.generated.resources.notification_permission_text
+import aura_app.composeapp.generated.resources.ok
+import aura_app.composeapp.generated.resources.cancel
+import aura_app.composeapp.generated.resources.allow
+import aura_app.composeapp.generated.resources.deny
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,12 +76,12 @@ fun NotificationSettingsScreen(
                     viewModel.setNotificationTime(timePickerState.hour, timePickerState.minute)
                     showTimePicker = false
                 }) {
-                    Text("OK")
+                    Text(stringResource(Res.string.ok))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showTimePicker = false }) {
-                    Text("Cancel")
+                    Text(stringResource(Res.string.cancel))
                 }
             },
             text = {
@@ -78,10 +93,10 @@ fun NotificationSettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Notification Settings") },
+                title = { Text(stringResource(Res.string.notification_settings)) },
                 navigationIcon = {
                     TextButton(onClick = onBackClick) {
-                        Text("Back")
+                        Text(stringResource(Res.string.back))
                     }
                 }
             )
@@ -94,7 +109,7 @@ fun NotificationSettingsScreen(
                 .padding(16.dp)
         ) {
             Text(
-                text = "Daily Summary",
+                text = stringResource(Res.string.daily_summary),
                 style = MaterialTheme.typography.titleMedium
             )
 
@@ -106,7 +121,7 @@ fun NotificationSettingsScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Enabled",
+                    text = stringResource(Res.string.enabled),
                     style = MaterialTheme.typography.bodyLarge
                 )
                 Switch(
@@ -125,7 +140,7 @@ fun NotificationSettingsScreen(
                 onClick = { viewModel.testNotification() },
                 modifier = Modifier.padding(top = 16.dp)
             ) {
-                Text("Test Notification")
+                Text(stringResource(Res.string.test_notification))
             }
 
             Row(
@@ -137,7 +152,7 @@ fun NotificationSettingsScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Notification time",
+                    text = stringResource(Res.string.notification_time),
                     style = MaterialTheme.typography.bodyLarge
                 )
                 Text(
@@ -148,7 +163,7 @@ fun NotificationSettingsScreen(
             }
 
             Text(
-                text = "Notifications will be sent daily at the time set above.",
+                text = stringResource(Res.string.notification_helper),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 8.dp)
@@ -164,16 +179,16 @@ fun NotificationSettingsScreen(
                     showPermissionDialog = false
                     permissionState.launchPermissionRequest()
                 }) {
-                    Text("Allow")
+                    Text(stringResource(Res.string.allow))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showPermissionDialog = false }) {
-                    Text("Deny")
+                    Text(stringResource(Res.string.deny))
                 }
             },
-            title = { Text("Notification Permission") },
-            text = { Text("Allow notifications to receive daily summaries and due date reminders.") }
+            title = { Text(stringResource(Res.string.notification_permission)) },
+            text = { Text(stringResource(Res.string.notification_permission_text)) }
         )
     }
 }

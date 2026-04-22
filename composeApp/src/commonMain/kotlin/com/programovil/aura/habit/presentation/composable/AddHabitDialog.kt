@@ -34,6 +34,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import aura_app.composeapp.generated.resources.Res
+import aura_app.composeapp.generated.resources.new_habit
+import aura_app.composeapp.generated.resources.habit_name
+import aura_app.composeapp.generated.resources.daily
+import aura_app.composeapp.generated.resources.weekly
+import aura_app.composeapp.generated.resources.repeat_on
+import aura_app.composeapp.generated.resources.color_label
+import aura_app.composeapp.generated.resources.cancel
+import aura_app.composeapp.generated.resources.save
+import org.jetbrains.compose.resources.stringResource
 import com.programovil.aura.habit.domain.model.RecurrenceType
 import com.programovil.aura.shared.parseHexColor
 
@@ -68,7 +78,7 @@ fun AddHabitDialog(
                 modifier = Modifier.padding(24.dp)
             ) {
                 Text(
-                    text = "New Habit",
+                    text = stringResource(Res.string.new_habit),
                     style = MaterialTheme.typography.headlineSmall
                 )
 
@@ -78,7 +88,7 @@ fun AddHabitDialog(
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Habit name") },
+                    label = { Text(stringResource(Res.string.habit_name)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true
                 )
@@ -91,19 +101,19 @@ fun AddHabitDialog(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Daily")
+                    Text(stringResource(Res.string.daily))
                     Switch(
                         checked = !isDaily,
                         onCheckedChange = { isDaily = !it }
                     )
-                    Text("Weekly")
+                    Text(stringResource(Res.string.weekly))
                 }
 
                 // Day selector (only for weekly)
                 if (!isDaily) {
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
-                        text = "Repeat on:",
+                        text = stringResource(Res.string.repeat_on),
                         style = MaterialTheme.typography.labelMedium
                     )
                     Spacer(modifier = Modifier.height(8.dp))
@@ -140,7 +150,7 @@ fun AddHabitDialog(
 
                 // Color palette
                 Text(
-                    text = "Color:",
+                    text = stringResource(Res.string.color_label),
                     style = MaterialTheme.typography.labelMedium
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -171,7 +181,7 @@ fun AddHabitDialog(
                     horizontalArrangement = Arrangement.End
                 ) {
                     TextButton(onClick = onDismiss) {
-                        Text("Cancel")
+                        Text(stringResource(Res.string.cancel))
                     }
                     Button(
                         onClick = {
@@ -186,7 +196,7 @@ fun AddHabitDialog(
                         },
                         enabled = name.isNotBlank()
                     ) {
-                        Text("Save")
+                        Text(stringResource(Res.string.save))
                     }
                 }
             }

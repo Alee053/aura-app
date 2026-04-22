@@ -26,6 +26,11 @@ import aura_app.composeapp.generated.resources.add_todo
 import aura_app.composeapp.generated.resources.empty_todos
 import aura_app.composeapp.generated.resources.new_todo_hint
 import aura_app.composeapp.generated.resources.todos_title
+import aura_app.composeapp.generated.resources.sign_out
+import aura_app.composeapp.generated.resources.ok
+import aura_app.composeapp.generated.resources.cancel
+import aura_app.composeapp.generated.resources.select_due_date
+import aura_app.composeapp.generated.resources.due_date_label
 import org.jetbrains.compose.resources.stringResource
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -63,12 +68,12 @@ fun TodoScreen(
                     selectedDueDate = datePickerState.selectedDateMillis
                     showDatePicker = false
                 }) {
-                    Text("OK")
+                    Text(stringResource(Res.string.ok))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDatePicker = false }) {
-                    Text("Cancel")
+                    Text(stringResource(Res.string.cancel))
                 }
             }
         ) {
@@ -82,7 +87,7 @@ fun TodoScreen(
                 title = { Text(stringResource(Res.string.todos_title)) },
                 actions = {
                     IconButton(onClick = onSignOut) {
-                        Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Sign Out")
+                        Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = stringResource(Res.string.sign_out))
                     }
                 }
             )
@@ -118,7 +123,7 @@ fun TodoScreen(
                     IconButton(onClick = { showDatePicker = true }) {
                         Icon(
                             imageVector = Icons.Default.CalendarToday,
-                            contentDescription = "Select due date",
+                            contentDescription = stringResource(Res.string.select_due_date),
                             tint = if (selectedDueDate != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -129,7 +134,7 @@ fun TodoScreen(
                 val date = Instant.fromEpochMilliseconds(millis)
                     .toLocalDateTime(TimeZone.currentSystemDefault()).date
                 Text(
-                    text = "Due date: $date",
+                    text = stringResource(Res.string.due_date_label, date.toString()),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.padding(bottom = 8.dp)

@@ -22,6 +22,15 @@ import com.programovil.aura.habit.presentation.composable.HabitItem
 import com.programovil.aura.habit.presentation.viewmodel.HabitEvent
 import com.programovil.aura.habit.presentation.viewmodel.HabitViewModel
 import kotlinx.datetime.*
+import aura_app.composeapp.generated.resources.Res
+import aura_app.composeapp.generated.resources.habits_title
+import aura_app.composeapp.generated.resources.sign_out
+import aura_app.composeapp.generated.resources.add_habit
+import aura_app.composeapp.generated.resources.today
+import aura_app.composeapp.generated.resources.tomorrow
+import aura_app.composeapp.generated.resources.this_week
+import aura_app.composeapp.generated.resources.empty_habits
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,7 +58,7 @@ fun HabitScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text("Habits")
+                        Text(stringResource(Res.string.habits_title))
                         Text(
                             text = today.toString(),
                             style = MaterialTheme.typography.bodySmall,
@@ -59,10 +68,10 @@ fun HabitScreen(
                 },
                 actions = {
                     IconButton(onClick = { showAddDialog = true }) {
-                        Icon(Icons.Default.Add, contentDescription = "Add habit")
+                        Icon(Icons.Default.Add, contentDescription = stringResource(Res.string.add_habit))
                     }
                     IconButton(onClick = onSignOut) {
-                        Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = "Sign Out")
+                        Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = stringResource(Res.string.sign_out))
                     }
                 }
             )
@@ -84,7 +93,7 @@ fun HabitScreen(
                 if (uiState.todayHabits.isNotEmpty()) {
                     item {
                         HabitSectionHeader(
-                            title = "Today",
+                            title = stringResource(Res.string.today),
                             subtitle = today.toString()
                         )
                     }
@@ -107,7 +116,7 @@ fun HabitScreen(
                 if (uiState.tomorrowHabits.isNotEmpty()) {
                     item {
                         HabitSectionHeader(
-                            title = "Tomorrow",
+                            title = stringResource(Res.string.tomorrow),
                             subtitle = tomorrow.toString()
                         )
                     }
@@ -130,7 +139,7 @@ fun HabitScreen(
                 if (uiState.thisWeekHabits.isNotEmpty()) {
                     item {
                         HabitSectionHeader(
-                            title = "This Week",
+                            title = stringResource(Res.string.this_week),
                             subtitle = null
                         )
                     }
@@ -155,7 +164,7 @@ fun HabitScreen(
                     uiState.thisWeekHabits.isEmpty()) {
                     item {
                         Text(
-                            text = "No habits yet. Tap + to add one!",
+                            text = stringResource(Res.string.empty_habits),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(32.dp)

@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import com.programovil.aura.todo.domain.model.Todo
 import aura_app.composeapp.generated.resources.Res
 import aura_app.composeapp.generated.resources.delete
+import aura_app.composeapp.generated.resources.due_label
 import org.jetbrains.compose.resources.stringResource
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -58,7 +59,7 @@ fun TodoItem(
                     val date = Instant.fromEpochMilliseconds(millis)
                         .toLocalDateTime(TimeZone.currentSystemDefault()).date
                     Text(
-                        text = "Due: $date",
+                        text = stringResource(Res.string.due_label, date.toString()),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1

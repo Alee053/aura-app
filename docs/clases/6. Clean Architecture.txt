@@ -1,0 +1,18 @@
+Clean Architecture
+
+La Arquitectura Limpia es un patrón arquitectónico que promueve la organización del código en capas con responsabilidades bien definidas, lo que hace que la aplicación sea más modular, mantenible, testeable y escalable. 
+
+
+Las principales ventajas de usar la Arquitectura Limpia son las siguientes:
+Separación de preocupaciones (SoC): La Arquitectura Limpia organiza el código en capas diferenciadas con responsabilidades específicas, garantizando que cada capa gestione un aspecto específico de la aplicación. Este SoC genera una base de código más modular y fácil de mantener, lo que facilita su comprensión, modificación y ampliación.
+Capacidad de prueba: Al separar las diferentes preocupaciones en capas independientes, resulta más fácil probar cada capa de forma aislada. Esto permite a los desarrolladores escribir pruebas unitarias y de integración completas, garantizando así el correcto funcionamiento de la aplicación y su menor propensión a errores.
+Reutilización: La estructura modular de la Arquitectura Limpia promueve la reutilización al fomentar la creación de componentes que se pueden compartir fácilmente entre diferentes partes de la aplicación o incluso entre diferentes proyectos. Esto reduce la duplicación de código y mejora la eficiencia general del proceso de desarrollo.
+Flexibilidad: La Arquitectura Limpia desacopla las distintas capas de la aplicación, lo que facilita modificar o actualizar cualquiera de ellas de forma independiente sin afectar a las demás. Esto proporciona mayor flexibilidad al refactorizar, realizar cambios en la aplicación o adaptarse a nuevos requisitos.
+Escalabilidad: La naturaleza modular de la Arquitectura Limpia facilita la escalabilidad de la aplicación a medida que crece en complejidad o tamaño.
+
+
+Beneficios de utilizar una arquitectura limpia
+Al organizar el código en capas y componentes bien definidos, los desarrolladores pueden agregar nuevas características, actualizar la funcionalidad existente o mejorar el rendimiento más fácilmente sin introducir efectos secundarios no deseados ni hacer que la base del código sea inmanejable.
+Colaboración más fácil: La Arquitectura Limpia ayuda a los equipos a trabajar con mayor eficacia al proporcionar una estructura clara y directrices para organizar el código. Esto facilita que los desarrolladores comprendan la base de código, encuentren los componentes necesarios y contribuyan al proyecto de forma más eficiente.
+Preparación para el futuro: Al adherirse a los principios de la Arquitectura Limpia, se garantiza que la aplicación se construya sobre una base sólida que pueda evolucionar y adaptarse con el tiempo. Esto la hace más resiliente a los cambios en la tecnología, los requisitos o los miembros del equipo, mejorando así la viabilidad a largo plazo del proyecto.
+

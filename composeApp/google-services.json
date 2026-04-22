@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "623141386052",
+    "project_id": "aura-app-7dce3",
+    "storage_bucket": "aura-app-7dce3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:623141386052:android:f39e06c09c251c87a4c911",
+        "android_client_info": {
+          "package_name": "com.programovil.aura"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "623141386052-ubttitbd4j8eqtvt4d2qvtbtba7cnfv9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.programovil.aura",
+            "certificate_hash": "31717b9c148ab9be1224ad940f40f2752e3ec7a7"
+          }
+        },
+        {
+          "client_id": "623141386052-gpn8fq0c03i0khmt3nn9bj0h92fprnfh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6OQL3prYO3ChIgIr5drr_FC1jz40YWC8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "623141386052-gpn8fq0c03i0khmt3nn9bj0h92fprnfh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

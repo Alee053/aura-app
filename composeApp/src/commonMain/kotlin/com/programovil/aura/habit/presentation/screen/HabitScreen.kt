@@ -1,6 +1,7 @@
 package com.programovil.aura.habit.presentation.screen
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,33 +11,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.programovil.aura.habit.domain.model.DaySection
 import com.programovil.aura.habit.presentation.composable.AddHabitDialog
 import com.programovil.aura.habit.presentation.composable.HabitItem
 import com.programovil.aura.habit.presentation.viewmodel.HabitEvent
 import com.programovil.aura.habit.presentation.viewmodel.HabitViewModel
+import kotlinx.datetime.*
 import org.koin.compose.koinInject
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,7 +31,9 @@ fun HabitScreen(
     val uiState by viewModel.uiState.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
-    val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    
+    val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+    val tomorrow = today.plus(1, DateTimeUnit.DAY)
 
     LaunchedEffect(uiState.error) {
         uiState.error?.let { error ->
@@ -62,7 +49,7 @@ fun HabitScreen(
                     Column {
                         Text("Habits")
                         Text(
-                            text = LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, MMM d")),
+                            text = today.toString(),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -78,7 +65,9 @@ fun HabitScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
         if (uiState.isLoading) {
-            CircularProgressIndicator(modifier = Modifier.padding(padding))
+            Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
         } else {
             LazyColumn(
                 modifier = Modifier
@@ -91,7 +80,7 @@ fun HabitScreen(
                     item {
                         HabitSectionHeader(
                             title = "Today",
-                            subtitle = LocalDate.now().format(DateTimeFormatter.ofPattern("MMM d"))
+                            subtitle = today.toString()
                         )
                     }
                     items(uiState.todayHabits, key = { it.habit.id }) { habitItem ->
@@ -101,7 +90,7 @@ fun HabitScreen(
                                 viewModel.onEvent(
                                     HabitEvent.ToggleCompletion(
                                         habitItem.habit.id,
-                                        LocalDate.now().format(dateFormatter)
+                                        today.toString()
                                     )
                                 )
                             }
@@ -114,7 +103,7 @@ fun HabitScreen(
                     item {
                         HabitSectionHeader(
                             title = "Tomorrow",
-                            subtitle = LocalDate.now().plusDays(1).format(DateTimeFormatter.ofPattern("MMM d"))
+                            subtitle = tomorrow.toString()
                         )
                     }
                     items(uiState.tomorrowHabits, key = { it.habit.id }) { habitItem ->
@@ -124,7 +113,7 @@ fun HabitScreen(
                                 viewModel.onEvent(
                                     HabitEvent.ToggleCompletion(
                                         habitItem.habit.id,
-                                        LocalDate.now().plusDays(1).format(dateFormatter)
+                                        tomorrow.toString()
                                     )
                                 )
                             }

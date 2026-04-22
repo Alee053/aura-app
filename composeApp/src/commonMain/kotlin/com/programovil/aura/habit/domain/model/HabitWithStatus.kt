@@ -1,5 +1,7 @@
 package com.programovil.aura.habit.domain.model
 
+import com.programovil.aura.habit.domain.model.Habit
+
 data class HabitWithStatus(
     val habit: Habit,
     val isDone: Boolean,

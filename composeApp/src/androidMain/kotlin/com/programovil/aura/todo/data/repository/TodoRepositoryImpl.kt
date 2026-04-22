@@ -1,7 +1,7 @@
-package com.programovil.aura.todo.data.repository
+package com.programovil.aura.todo.domain.repository
 
 import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.firestore
+import com.google.firebase.firestore.FirebaseFirestore
 import com.programovil.aura.shared.FirebaseConfig
 import com.programovil.aura.todo.domain.model.Todo
 import com.programovil.aura.todo.domain.repository.TodoRepository
@@ -10,7 +10,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
-class TodoRepositoryImpl : TodoRepository {
+actual fun createTodoRepository(): TodoRepository = TodoRepositoryImpl()
+
+private class TodoRepositoryImpl : TodoRepository {
 
     private val userId: String
         get() = FirebaseConfig.auth.currentUser?.uid

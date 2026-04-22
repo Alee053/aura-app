@@ -7,8 +7,8 @@ import androidx.room.PrimaryKey
 data class HabitEntity(
     @PrimaryKey val id: String,
     val name: String,
-    val recurrenceType: String, // "DAILY" or "WEEKLY"
-    val daysOfWeek: String, // comma-separated, e.g., "1,3,5" for Mon,Wed,Fri. Empty for DAILY.
+    val recurrenceType: String,
+    val daysOfWeek: String,
     val color: String,
     val createdAt: Long
 )

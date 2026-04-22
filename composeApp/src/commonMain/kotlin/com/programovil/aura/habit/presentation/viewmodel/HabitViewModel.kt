@@ -2,16 +2,20 @@ package com.programovil.aura.habit.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.programovil.aura.habit.domain.model.DaySection
+import com.programovil.aura.habit.domain.model.HabitWithStatus
+import com.programovil.aura.habit.domain.model.RecurrenceType
 import com.programovil.aura.habit.domain.repository.HabitRepository
 import com.programovil.aura.habit.domain.usecase.AddHabitUseCase
+import com.programovil.aura.habit.domain.usecase.GetHabitHistoryUseCase
 import com.programovil.aura.habit.domain.usecase.GetHabitsGroupedByDayUseCase
 import com.programovil.aura.habit.domain.usecase.ToggleHabitCompletionUseCase
-import com.programovil.aura.habit.domain.usecase.GetHabitHistoryUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 data class HabitListUiState(
     val todayHabits: List<HabitWithStatus> = emptyList(),
@@ -41,8 +45,6 @@ class HabitViewModel(
 
     private val _uiState = MutableStateFlow(HabitListUiState())
     val uiState: StateFlow<HabitListUiState> = _uiState
-
-    private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
     init {
         viewModelScope.launch {
@@ -89,6 +91,7 @@ class HabitViewModel(
         _uiState.value = _uiState.value.copy(error = null)
     }
 
-    fun getTodayDate(): String = LocalDate.now().format(dateFormatter)
-    fun getTomorrowDate(): String = LocalDate.now().plusDays(1).format(dateFormatter)
+    fun getTodayDate(): String {
+        return Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toString()
+    }
 }

@@ -8,26 +8,21 @@ import com.programovil.aura.habit.domain.model.RecurrenceType
 import com.programovil.aura.habit.domain.repository.HabitRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import java.time.DayOfWeek
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.temporal.TemporalAdjusters
+import kotlinx.datetime.*
 
 class GetHabitsGroupedByDayUseCase(private val repository: HabitRepository) {
-    private val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
 
     operator fun invoke(): Flow<Map<DaySection, List<HabitWithStatus>>> {
-        val today = LocalDate.now()
-        val endOfWeek = today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
-
+        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
+        
         return combine(
             repository.getHabits(),
             repository.getAllCompletions()
         ) { habits, completions ->
             buildMap {
                 put(DaySection.TODAY, groupHabitsForDate(habits, completions, today))
-                put(DaySection.TOMORROW, groupHabitsForDate(habits, completions, today.plusDays(1)))
-                put(DaySection.THIS_WEEK, buildThisWeekHabits(habits, completions, today, endOfWeek))
+                put(DaySection.TOMORROW, groupHabitsForDate(habits, completions, today.plus(1, DateTimeUnit.DAY)))
+                put(DaySection.THIS_WEEK, buildThisWeekHabits(habits, completions, today))
             }
         }
     }
@@ -37,8 +32,8 @@ class GetHabitsGroupedByDayUseCase(private val repository: HabitRepository) {
         completions: List<HabitCompletion>,
         date: LocalDate
     ): List<HabitWithStatus> {
-        val dayOfWeek = date.dayOfWeek.value // 1=Monday, 7=Sunday
-        val dateStr = date.format(dateFormatter)
+        val dayOfWeek = date.dayOfWeek.isoDayNumber // 1=Monday, 7=Sunday
+        val dateStr = date.toString()
 
         return habits
             .filter { it.isScheduledFor(dayOfWeek) }
@@ -48,7 +43,7 @@ class GetHabitsGroupedByDayUseCase(private val repository: HabitRepository) {
                 HabitWithStatus(
                     habit = habit,
                     isDone = isDone,
-                    isMissed = !isDone && date.isBefore(LocalDate.now()),
+                    isMissed = !isDone && date < Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
                     streak = streak,
                     targetDate = dateStr
                 )
@@ -58,14 +53,13 @@ class GetHabitsGroupedByDayUseCase(private val repository: HabitRepository) {
     private fun buildThisWeekHabits(
         habits: List<Habit>,
         completions: List<HabitCompletion>,
-        today: LocalDate,
-        endOfWeek: LocalDate
+        today: LocalDate
     ): List<HabitWithStatus> {
         val result = mutableListOf<HabitWithStatus>()
-        var date = today.plusDays(2) // Start from day after tomorrow
-        while (!date.isAfter(endOfWeek)) {
+        // Show next 7 days starting from day after tomorrow
+        for (i in 2..7) {
+            val date = today.plus(i, DateTimeUnit.DAY)
             result.addAll(groupHabitsForDate(habits, completions, date))
-            date = date.plusDays(1)
         }
         return result
     }
@@ -74,18 +68,19 @@ class GetHabitsGroupedByDayUseCase(private val repository: HabitRepository) {
         var streak = 0
         var currentDate = fromDate
         val completedDates = completions.filter { it.habitId == habit.id }.map { it.completedDate }.toSet()
+        val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
 
         // Look back up to 90 days
         repeat(90) {
-            if (habit.isScheduledFor(currentDate.dayOfWeek.value)) {
-                val dateStr = currentDate.format(dateFormatter)
+            if (habit.isScheduledFor(currentDate.dayOfWeek.isoDayNumber)) {
+                val dateStr = currentDate.toString()
                 if (completedDates.contains(dateStr)) {
                     streak++
-                } else if (currentDate.isBefore(LocalDate.now()) || currentDate.isEqual(LocalDate.now())) {
+                } else if (currentDate <= today) {
                     return streak // streak broken
                 }
             }
-            currentDate = currentDate.minusDays(1)
+            currentDate = currentDate.minus(1, DateTimeUnit.DAY)
         }
         return streak
     }

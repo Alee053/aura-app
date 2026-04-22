@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.googleServices)
     alias(libs.plugins.room)
+    alias(libs.plugins.ksp)
 }
 
 kotlin {
@@ -24,6 +25,7 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
+            linkerOpts.add("-lsqlite3")
         }
     }
 
@@ -44,6 +46,29 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.room.runtime)
             implementation(libs.room.ktx)
+            implementation(libs.androidx.sqlite.bundled)
+            
+            // kotlinx-datetime for multiplatform date handling
+            implementation(libs.kotlinx.datetime)
+            
+            // Added icons to fix Unresolved reference 'Icons'
+            implementation(libs.compose.material.icons.extended)
+        }
+        androidMain.dependencies {
+            implementation(libs.androidx.appcompat)
+            implementation(libs.androidx.activity.compose)
+            implementation(libs.koin.android)
+            
+            implementation(platform("com.google.firebase:firebase-bom:34.12.0"))
+            implementation(libs.firebase.auth.ktx)
+            implementation(libs.firebase.firestore.ktx)
+            
+            // Credentials and Google ID
+            implementation(libs.credentials)
+            implementation(libs.credentials.play.services.auth)
+            implementation(libs.googleid)
+            
+            implementation(libs.kotlinx.coroutines.play.services)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -84,4 +109,7 @@ room {
 
 dependencies {
     debugImplementation(libs.compose.uiTooling)
+    add("kspAndroid", libs.room.compiler)
+    add("kspIosSimulatorArm64", libs.room.compiler)
+    add("kspIosArm64", libs.room.compiler)
 }

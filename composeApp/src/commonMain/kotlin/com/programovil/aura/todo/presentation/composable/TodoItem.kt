@@ -23,9 +23,9 @@ import com.programovil.aura.todo.domain.model.Todo
 import aura_app.composeapp.generated.resources.Res
 import aura_app.composeapp.generated.resources.delete
 import org.jetbrains.compose.resources.stringResource
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 @Composable
 fun TodoItem(
@@ -55,8 +55,10 @@ fun TodoItem(
                     overflow = TextOverflow.Ellipsis
                 )
                 todo.dueDate?.let { millis ->
+                    val date = Instant.fromEpochMilliseconds(millis)
+                        .toLocalDateTime(TimeZone.currentSystemDefault()).date
                     Text(
-                        text = "Due: ${SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(millis))}",
+                        text = "Due: $date",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 1

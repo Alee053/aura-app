@@ -22,7 +22,7 @@ class AuthViewModel(
     val authState: StateFlow<AuthState> = _authState
 
     init {
-        _authState.value = authService.getCurrentAuthState()
+        // Rely on the listener to provide the initial state immediately
         authService.addStateListener { state ->
             _authState.value = state
         }

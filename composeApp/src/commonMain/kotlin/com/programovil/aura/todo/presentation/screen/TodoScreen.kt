@@ -3,6 +3,7 @@ package com.programovil.aura.todo.presentation.screen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -11,6 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -25,6 +27,9 @@ import aura_app.composeapp.generated.resources.empty_todos
 import aura_app.composeapp.generated.resources.new_todo_hint
 import aura_app.composeapp.generated.resources.todos_title
 import org.jetbrains.compose.resources.stringResource
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,12 +42,37 @@ fun TodoScreen(
     val error by viewModel.error.collectAsState()
 
     var newTodoTitle by remember { mutableStateOf("") }
+    var selectedDueDate by remember { mutableStateOf<Long?>(null) }
+    var showDatePicker by remember { mutableStateOf(false) }
+    
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(error) {
         error?.let {
             snackbarHostState.showSnackbar(it)
             viewModel.clearError()
+        }
+    }
+
+    if (showDatePicker) {
+        val datePickerState = rememberDatePickerState()
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    selectedDueDate = datePickerState.selectedDateMillis
+                    showDatePicker = false
+                }) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text("Cancel")
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
         }
     }
 
@@ -60,11 +90,12 @@ fun TodoScreen(
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 if (newTodoTitle.isNotBlank()) {
-                    viewModel.addTodo(newTodoTitle)
+                    viewModel.addTodo(newTodoTitle, selectedDueDate)
                     newTodoTitle = ""
+                    selectedDueDate = null
                 }
             }) {
-                Text(stringResource(Res.string.add_todo), fontSize = 24.sp)
+                Icon(Icons.Default.Add, contentDescription = stringResource(Res.string.add_todo))
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
@@ -82,8 +113,28 @@ fun TodoScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp),
-                singleLine = true
+                singleLine = true,
+                trailingIcon = {
+                    IconButton(onClick = { showDatePicker = true }) {
+                        Icon(
+                            imageVector = Icons.Default.CalendarToday,
+                            contentDescription = "Select due date",
+                            tint = if (selectedDueDate != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
             )
+            
+            selectedDueDate?.let { millis ->
+                val date = Instant.fromEpochMilliseconds(millis)
+                    .toLocalDateTime(TimeZone.currentSystemDefault()).date
+                Text(
+                    text = "Due date: $date",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+            }
 
             when {
                 isLoading -> {

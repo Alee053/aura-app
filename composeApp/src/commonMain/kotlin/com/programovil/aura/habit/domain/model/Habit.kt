@@ -6,5 +6,6 @@ data class Habit(
     val recurrenceType: RecurrenceType,
     val daysOfWeek: List<Int> = emptyList(), // 1=Monday, 7=Sunday. Empty for DAILY.
     val color: String, // hex color code
-    val createdAt: Long = System.currentTimeMillis()
+    val createdAt: Long = System.currentTimeMillis(),
+    val isSyncPending: Boolean = true
 )

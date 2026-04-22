@@ -1,5 +1,6 @@
 package com.programovil.aura.habit.data.local.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -10,5 +11,7 @@ data class HabitEntity(
     val recurrenceType: String,
     val daysOfWeek: String,
     val color: String,
-    val createdAt: Long
+    val createdAt: Long,
+    @ColumnInfo(defaultValue = "1")
+    var isSyncPending: Boolean = true
 )

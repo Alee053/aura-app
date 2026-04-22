@@ -7,7 +7,7 @@ import com.programovil.aura.habit.data.local.entity.HabitEntity
 
 @Database(
     entities = [HabitEntity::class, HabitCompletionEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class HabitDatabase : RoomDatabase() {
@@ -19,6 +19,7 @@ expect fun getHabitDatabaseBuilder(): RoomDatabase.Builder<HabitDatabase>
 
 fun getHabitDatabase(builder: RoomDatabase.Builder<HabitDatabase>): HabitDatabase {
     return builder
+        .fallbackToDestructiveMigration(true)
         .setDriver(androidx.sqlite.driver.bundled.BundledSQLiteDriver())
         .setQueryCoroutineContext(kotlinx.coroutines.Dispatchers.IO)
         .build()

@@ -16,10 +16,13 @@ class AndroidApp : Application() {
         FirebaseConfig.messaging.subscribeToTopic("test-notifications")
             .addOnCompleteListener { }
         NotificationHelper.createNotificationChannels(this)
+
+        val remoteConfigService = FirebaseRemoteConfigService(this)
+
         startKoin {
             androidLogger(Level.ERROR)
             androidContext(this@AndroidApp)
-            modules(getModules())
+            modules(getModules(remoteConfigService))
         }
     }
 }

@@ -4,6 +4,7 @@ import com.programovil.aura.habit.data.local.HabitDao
 import com.programovil.aura.habit.data.local.HabitDatabase
 import com.programovil.aura.habit.data.mapper.HabitMapper.toDomain
 import com.programovil.aura.habit.data.mapper.HabitMapper.toEntity
+import com.programovil.aura.habit.data.sync.HabitSyncScheduler
 import com.programovil.aura.habit.domain.model.Habit
 import com.programovil.aura.habit.domain.model.HabitCompletion
 import com.programovil.aura.habit.domain.repository.HabitRepository
@@ -17,7 +18,8 @@ import kotlinx.datetime.minus
 import kotlinx.datetime.toLocalDateTime
 
 class HabitRepositoryImpl(
-    private val database: HabitDatabase
+    private val database: HabitDatabase,
+    private val habitSyncScheduler: HabitSyncScheduler
 ) : HabitRepository {
 
     private val habitDao: HabitDao get() = database.habitDao()
@@ -42,6 +44,10 @@ class HabitRepositoryImpl(
 
     override suspend fun addHabit(habit: Habit): Result<Unit> = runCatching {
         habitDao.insertHabit(habit.toEntity())
+        val syncedImmediately = habitSyncScheduler.syncNow()
+        if (!syncedImmediately) {
+            habitSyncScheduler.enqueueSync()
+        }
     }
 
     override suspend fun deleteHabit(habitId: String): Result<Unit> = runCatching {

@@ -1,17 +1,23 @@
 package com.programovil.aura.notification
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.core.content.ContextCompat
 import com.programovil.aura.R
 
 object NotificationHelper {
 
     const val CHANNEL_DAILY_SUMMARY = "daily_summary"
     const val CHANNEL_DUE_DATE_REMINDER = "due_date_reminder"
+    const val CHANNEL_HABIT_SYNC = "habit_sync"
 
     fun createNotificationChannels(context: Context) {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -32,7 +38,17 @@ object NotificationHelper {
             description = "Reminders for tasks due today"
         }
 
-        notificationManager.createNotificationChannels(listOf(dailySummaryChannel, dueDateChannel))
+        val habitSyncChannel = NotificationChannel(
+            CHANNEL_HABIT_SYNC,
+            "Habit Synchronization",
+            NotificationManager.IMPORTANCE_DEFAULT
+        ).apply {
+            description = "Confirms when habits are synchronized with the cloud"
+        }
+
+        notificationManager.createNotificationChannels(
+            listOf(dailySummaryChannel, dueDateChannel, habitSyncChannel)
+        )
     }
 
     private fun createPendingIntent(context: Context): PendingIntent {
@@ -81,6 +97,30 @@ object NotificationHelper {
         notificationManager.notify(NOTIFICATION_ID_DUE_DATE, notification)
     }
 
+    fun showHabitSyncNotification(context: Context, syncedCount: Int) {
+        if (!canPostNotifications(context)) return
+
+        val notification = NotificationCompat.Builder(context, CHANNEL_HABIT_SYNC)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle("Habits synchronized")
+            .setContentText("Sync complete: $syncedCount habit${if (syncedCount == 1) "" else "s"} saved to Firestore.")
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setAutoCancel(true)
+            .setContentIntent(createPendingIntent(context))
+            .build()
+
+        NotificationManagerCompat.from(context).notify(NOTIFICATION_ID_HABIT_SYNC, notification)
+    }
+
+    private fun canPostNotifications(context: Context): Boolean {
+        return Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
+    }
+
     private const val NOTIFICATION_ID_DAILY_SUMMARY = 1001
     private const val NOTIFICATION_ID_DUE_DATE = 1002
+    private const val NOTIFICATION_ID_HABIT_SYNC = 1003
 }

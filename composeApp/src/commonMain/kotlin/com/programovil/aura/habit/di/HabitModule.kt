@@ -3,6 +3,7 @@ package com.programovil.aura.habit.di
 import com.programovil.aura.habit.data.local.getHabitDatabase
 import com.programovil.aura.habit.data.local.getHabitDatabaseBuilder
 import com.programovil.aura.habit.data.repository.HabitRepositoryImpl
+import com.programovil.aura.habit.data.sync.createHabitSyncScheduler
 import com.programovil.aura.habit.domain.repository.HabitRepository
 import com.programovil.aura.habit.domain.usecase.AddHabitUseCase
 import com.programovil.aura.habit.domain.usecase.GetHabitHistoryUseCase
@@ -19,6 +20,7 @@ val habitModule = module {
     // Data layer
     single { getHabitDatabaseBuilder() }
     single { getHabitDatabase(get()) }
+    single { createHabitSyncScheduler() }
     singleOf(::HabitRepositoryImpl).bind<HabitRepository>()
 
     // Domain layer - use cases

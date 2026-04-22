@@ -57,6 +57,9 @@ class HabitRepositoryImpl(
         val success = syncService.syncHabit(habitData, habit.id, "CREATE")
         if (!success) {
             syncService.enqueueSync("HABIT", habit.id, "CREATE", habitData.toString())
+        } else {
+            // Direct success notification
+            syncService.showSyncNotification(1, 0)
         }
     }
 

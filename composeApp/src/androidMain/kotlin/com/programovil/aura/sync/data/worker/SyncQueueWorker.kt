@@ -22,7 +22,6 @@ class SyncQueueWorker(
     override suspend fun doWork(): Result {
         var syncedCount = 0
         var failedCount = 0
-        var processedAny = false
 
         return try {
             // Wait up to 3 seconds for Firebase Auth
@@ -42,15 +41,7 @@ class SyncQueueWorker(
             val firestoreItems = getFirestorePendingItems(currentUserId)
             val allItems = (localItems + firestoreItems).associateBy { it.id }.values.toList()
 
-            if (allItems.isEmpty()) {
-                return Result.success()
-            }
-
-            processedAny = true
-            
-            // SHOW NOTIFICATION IMMEDIATELY WHEN STARTING SYNC
-            NotificationHelper.showSyncSummaryNotification(applicationContext, 0, 0)
-
+            // Process items if any
             for (item in allItems) {
                 try {
                     val success = processItem(firestore, currentUserId, item)
@@ -69,7 +60,7 @@ class SyncQueueWorker(
                 }
             }
 
-            // FINAL NOTIFICATION
+            // ALWAYS SHOW NOTIFICATION AT THE END
             NotificationHelper.showSyncSummaryNotification(
                 applicationContext,
                 syncedCount,
@@ -78,9 +69,8 @@ class SyncQueueWorker(
 
             if (failedCount > 0) Result.retry() else Result.success()
         } catch (e: Exception) {
-            if (processedAny) {
-                NotificationHelper.showSyncSummaryNotification(applicationContext, syncedCount, failedCount)
-            }
+            // Even on error, show what we have
+            NotificationHelper.showSyncSummaryNotification(applicationContext, syncedCount, failedCount)
             Result.retry()
         }
     }

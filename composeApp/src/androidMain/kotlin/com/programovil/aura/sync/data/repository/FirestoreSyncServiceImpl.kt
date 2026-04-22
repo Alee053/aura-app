@@ -2,6 +2,7 @@ package com.programovil.aura.sync.data.repository
 
 import android.content.Context
 import com.programovil.aura.habit.data.local.HabitDatabase
+import com.programovil.aura.notification.NotificationHelper
 import com.programovil.aura.shared.FirebaseConfig
 import com.programovil.aura.sync.data.local.entity.EntityType
 import com.programovil.aura.sync.data.local.entity.SyncAction
@@ -79,6 +80,10 @@ class FirestoreSyncService(
         } catch (e: Exception) {
             false
         }
+    }
+
+    override fun showSyncNotification(syncedCount: Int, failedCount: Int) {
+        NotificationHelper.showSyncSummaryNotification(context, syncedCount, failedCount)
     }
 
     override suspend fun enqueueSync(entityType: String, entityId: String, action: String, data: String): Boolean {

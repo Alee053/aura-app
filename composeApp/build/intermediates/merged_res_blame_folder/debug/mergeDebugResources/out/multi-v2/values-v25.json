@@ -1,0 +1,20 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.programovil.aura.composeApp-mergeDebugResources-66:/values-v25/values-v25.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\USUARIO\\.gradle\\caches\\9.3.1\\transforms\\824c5afe76a4b22b09cb92a3fc77179d\\workspace\\transformed\\appcompat-1.7.1\\res\\values-v25\\values-v25.xml",
+                    "from": {
+                        "startLines": "2,3,4,6",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "55,126,209,308",
+                        "endLines": "2,3,5,7",
+                        "endColumns": "70,82,12,12",
+                        "endOffsets": "121,204,303,414"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">aura-app</string>
+    <string name="default_web_client_id" translatable="false">623141386052-gpn8fq0c03i0khmt3nn9bj0h92fprnfh.apps.googleusercontent.com</string>
+    <string name="gcm_defaultSenderId" translatable="false">623141386052</string>
+    <string name="google_api_key" translatable="false">AIzaSyC6OQL3prYO3ChIgIr5drr_FC1jz40YWC8</string>
+    <string name="google_app_id" translatable="false">1:623141386052:android:f39e06c09c251c87a4c911</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyC6OQL3prYO3ChIgIr5drr_FC1jz40YWC8</string>
+    <string name="google_storage_bucket" translatable="false">aura-app-7dce3.firebasestorage.app</string>
+    <string name="project_id" translatable="false">aura-app-7dce3</string>
+</resources>

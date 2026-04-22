@@ -1,14 +1,19 @@
 package com.programovil.aura.todo.presentation.screen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
@@ -17,7 +22,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -31,22 +38,31 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.programovil.aura.todo.presentation.composable.TodoItem
 import com.programovil.aura.todo.presentation.viewmodel.TodoViewModel
+import org.koin.compose.viewmodel.koinViewModel
 import aura_app.composeapp.generated.resources.Res
 import aura_app.composeapp.generated.resources.add_todo
 import aura_app.composeapp.generated.resources.empty_todos
 import aura_app.composeapp.generated.resources.new_todo_hint
 import aura_app.composeapp.generated.resources.todos_title
 import org.jetbrains.compose.resources.stringResource
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TodoScreen(viewModel: TodoViewModel) {
+fun TodoScreen(
+    viewModel: TodoViewModel = koinViewModel(),
+    onSettingsClick: () -> Unit = {}
+) {
     val todos by viewModel.todos.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
 
     var newTodoTitle by remember { mutableStateOf("") }
+    var selectedDueDate by remember { mutableStateOf<Long?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
+    var showDatePicker by remember { mutableStateOf(false) }
 
     LaunchedEffect(error) {
         error?.let {
@@ -55,15 +71,47 @@ fun TodoScreen(viewModel: TodoViewModel) {
         }
     }
 
+    if (showDatePicker) {
+        val datePickerState = rememberDatePickerState()
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let { millis ->
+                        selectedDueDate = millis
+                    }
+                    showDatePicker = false
+                }) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text("Cancel")
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
+
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(stringResource(Res.string.todos_title)) })
+            TopAppBar(
+                title = { Text(stringResource(Res.string.todos_title)) },
+                actions = {
+                    TextButton(onClick = onSettingsClick) {
+                        Text("Settings")
+                    }
+                }
+            )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 if (newTodoTitle.isNotBlank()) {
-                    viewModel.addTodo(newTodoTitle)
+                    viewModel.addTodo(newTodoTitle, selectedDueDate)
                     newTodoTitle = ""
+                    selectedDueDate = null
                 }
             }) {
                 Text(stringResource(Res.string.add_todo), fontSize = 24.sp)
@@ -87,6 +135,31 @@ fun TodoScreen(viewModel: TodoViewModel) {
                 singleLine = true
             )
 
+            // Due date row
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Due date",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = selectedDueDate?.let { millis ->
+                        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(millis))
+                    } ?: "Select date",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = if (selectedDueDate != null)
+                        MaterialTheme.colorScheme.onSurface
+                    else
+                        MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.clickable { showDatePicker = true }
+                )
+            }
+
             when {
                 isLoading -> {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -105,7 +178,7 @@ fun TodoScreen(viewModel: TodoViewModel) {
                 else -> {
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.weight(1f).fillMaxWidth()
                     ) {
                         items(todos, key = { it.id }) { todo ->
                             TodoItem(

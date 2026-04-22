@@ -39,6 +39,9 @@ kotlin {
             implementation(libs.credentials.play.services.auth)
             implementation(libs.googleid)
             implementation(libs.kotlinx.coroutines.play.services)
+            implementation(libs.workmanager.ktx)
+            implementation(libs.datastore.preferences)
+            implementation(libs.firebase.messaging.ktx)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)

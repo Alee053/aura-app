@@ -1,5 +1,6 @@
 package com.programovil.aura.todo.presentation.composable
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,12 +16,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.programovil.aura.todo.domain.model.Todo
 import aura_app.composeapp.generated.resources.Res
 import aura_app.composeapp.generated.resources.delete
 import org.jetbrains.compose.resources.stringResource
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun TodoItem(
@@ -41,12 +46,23 @@ fun TodoItem(
         ) {
             Checkbox(checked = todo.isCompleted, onCheckedChange = { onToggle() })
             Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = todo.title,
-                style = MaterialTheme.typography.bodyLarge,
-                textDecoration = if (todo.isCompleted) TextDecoration.LineThrough else null,
-                modifier = Modifier.weight(1f)
-            )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = todo.title,
+                    style = MaterialTheme.typography.bodyLarge,
+                    textDecoration = if (todo.isCompleted) TextDecoration.LineThrough else null,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                todo.dueDate?.let { millis ->
+                    Text(
+                        text = "Due: ${SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(millis))}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1
+                    )
+                }
+            }
             IconButton(onClick = onDelete) {
                 Text(
                     stringResource(Res.string.delete),

@@ -23,10 +23,13 @@ import com.programovil.aura.habit.presentation.viewmodel.HabitViewModel
 import kotlinx.datetime.*
 import org.koin.compose.koinInject
 
+import androidx.compose.material.icons.filled.ExitToApp
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HabitScreen(
-    viewModel: HabitViewModel = koinInject()
+    viewModel: HabitViewModel = koinInject(),
+    onSignOut: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
@@ -58,6 +61,9 @@ fun HabitScreen(
                 actions = {
                     IconButton(onClick = { showAddDialog = true }) {
                         Icon(Icons.Default.Add, contentDescription = "Add habit")
+                    }
+                    IconButton(onClick = onSignOut) {
+                        Icon(Icons.Default.ExitToApp, contentDescription = "Sign Out")
                     }
                 }
             )

@@ -12,18 +12,24 @@ import com.programovil.aura.todo.presentation.viewmodel.TodoViewModel
 @Composable
 fun AppNavHost(
     navController: NavHostController,
-    todoViewModel: TodoViewModel
+    todoViewModel: TodoViewModel,
+    onSignOut: () -> Unit
 ) {
     NavHost(navController = navController, startDestination = NavRoute.Todo) {
         composable<NavRoute.Todo> {
-            TodoScreen(todoViewModel)
+            TodoScreen(
+                viewModel = todoViewModel,
+                onSignOut = onSignOut
+            )
         }
         composable<NavRoute.TodoDetail> { backStackEntry ->
             val todoDetail: NavRoute.TodoDetail = backStackEntry.toRoute()
             // TODO: Navigate to detail screen with todoDetail.todoId
         }
         composable<NavRoute.Habit> {
-            HabitScreen()
+            HabitScreen(
+                onSignOut = onSignOut
+            )
         }
     }
 }

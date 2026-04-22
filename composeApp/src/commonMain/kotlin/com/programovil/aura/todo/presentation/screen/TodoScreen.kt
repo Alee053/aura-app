@@ -38,9 +38,16 @@ import aura_app.composeapp.generated.resources.new_todo_hint
 import aura_app.composeapp.generated.resources.todos_title
 import org.jetbrains.compose.resources.stringResource
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material3.*
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TodoScreen(viewModel: TodoViewModel) {
+fun TodoScreen(
+    viewModel: TodoViewModel,
+    onSignOut: () -> Unit = {}
+) {
     val todos by viewModel.todos.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
@@ -57,7 +64,14 @@ fun TodoScreen(viewModel: TodoViewModel) {
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(stringResource(Res.string.todos_title)) })
+            TopAppBar(
+                title = { Text(stringResource(Res.string.todos_title)) },
+                actions = {
+                    IconButton(onClick = onSignOut) {
+                        Icon(Icons.Default.ExitToApp, contentDescription = "Sign Out")
+                    }
+                }
+            )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = {

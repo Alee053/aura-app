@@ -15,6 +15,7 @@ fun getModules(remoteConfigService: RemoteConfigService) = listOf(
     notificationModule,
     module {
         single<RemoteConfigService> { remoteConfigService }
-        single { FeatureFlagManager(get()) }
+        // Se inyecta ConfigDao para la sincronización con caché local
+        single { FeatureFlagManager(get(), get()) }
     }
 )

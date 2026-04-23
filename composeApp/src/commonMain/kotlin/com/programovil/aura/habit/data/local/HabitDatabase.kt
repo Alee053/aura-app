@@ -4,15 +4,17 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.programovil.aura.habit.data.local.entity.HabitCompletionEntity
 import com.programovil.aura.habit.data.local.entity.HabitEntity
+import com.programovil.aura.habit.data.local.entity.ConfigEntity
 
 @Database(
-    entities = [HabitEntity::class, HabitCompletionEntity::class],
-    version = 1,
+    entities = [HabitEntity::class, HabitCompletionEntity::class, ConfigEntity::class],
+    version = 2,
     exportSchema = false
 )
 abstract class HabitDatabase : RoomDatabase() {
     abstract fun habitDao(): HabitDao
     abstract fun habitCompletionDao(): HabitCompletionDao
+    abstract fun configDao(): ConfigDao
 }
 
 expect fun getHabitDatabaseBuilder(): RoomDatabase.Builder<HabitDatabase>
@@ -21,5 +23,6 @@ fun getHabitDatabase(builder: RoomDatabase.Builder<HabitDatabase>): HabitDatabas
     return builder
         .setDriver(androidx.sqlite.driver.bundled.BundledSQLiteDriver())
         .setQueryCoroutineContext(kotlinx.coroutines.Dispatchers.IO)
+        .fallbackToDestructiveMigration(true)
         .build()
 }

@@ -1,5 +1,6 @@
 package com.programovil.aura.habit.di
 
+import com.programovil.aura.habit.data.local.HabitDatabase
 import com.programovil.aura.habit.data.local.getHabitDatabase
 import com.programovil.aura.habit.data.local.getHabitDatabaseBuilder
 import com.programovil.aura.habit.data.repository.HabitRepositoryImpl
@@ -19,6 +20,10 @@ val habitModule = module {
     // Data layer
     single { getHabitDatabaseBuilder() }
     single { getHabitDatabase(get()) }
+    single { get<HabitDatabase>().habitDao() }
+    single { get<HabitDatabase>().habitCompletionDao() }
+    single { get<HabitDatabase>().configDao() }
+
     singleOf(::HabitRepositoryImpl).bind<HabitRepository>()
 
     // Domain layer - use cases

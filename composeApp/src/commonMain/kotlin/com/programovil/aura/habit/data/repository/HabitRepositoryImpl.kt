@@ -41,7 +41,8 @@ class HabitRepositoryImpl(
     }
 
     override suspend fun addHabit(habit: Habit): Result<Unit> = runCatching {
-        habitDao.insertHabit(habit.toEntity())
+        // Al añadir un hábito, por defecto isSynced es false para la cola de sincronización offline
+        habitDao.insertHabit(habit.toEntity().copy(isSynced = false))
     }
 
     override suspend fun deleteHabit(habitId: String): Result<Unit> = runCatching {

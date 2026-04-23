@@ -10,11 +10,20 @@ import com.programovil.aura.R
 
 object NotificationHelper {
 
+    const val CHANNEL_SYNC = "sync_channel"
     const val CHANNEL_DAILY_SUMMARY = "daily_summary"
     const val CHANNEL_DUE_DATE_REMINDER = "due_date_reminder"
 
     fun createNotificationChannels(context: Context) {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val syncChannel = NotificationChannel(
+            CHANNEL_SYNC,
+            "Sincronización",
+            NotificationManager.IMPORTANCE_LOW
+        ).apply {
+            description = "Notificaciones de sincronización de datos"
+        }
 
         val dailySummaryChannel = NotificationChannel(
             CHANNEL_DAILY_SUMMARY,
@@ -32,7 +41,7 @@ object NotificationHelper {
             description = "Reminders for tasks due today"
         }
 
-        notificationManager.createNotificationChannels(listOf(dailySummaryChannel, dueDateChannel))
+        notificationManager.createNotificationChannels(listOf(syncChannel, dailySummaryChannel, dueDateChannel))
     }
 
     private fun createPendingIntent(context: Context): PendingIntent {
@@ -43,6 +52,21 @@ object NotificationHelper {
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
+    }
+
+    fun showNotification(context: Context, title: String, message: String) {
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        
+        val notification = NotificationCompat.Builder(context, CHANNEL_SYNC)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setAutoCancel(true)
+            .setContentIntent(createPendingIntent(context))
+            .build()
+
+        notificationManager.notify(NOTIFICATION_ID_SYNC, notification)
     }
 
     fun showDailySummaryNotification(context: Context, incompleteCount: Int) {
@@ -83,4 +107,5 @@ object NotificationHelper {
 
     private const val NOTIFICATION_ID_DAILY_SUMMARY = 1001
     private const val NOTIFICATION_ID_DUE_DATE = 1002
+    private const val NOTIFICATION_ID_SYNC = 1003
 }

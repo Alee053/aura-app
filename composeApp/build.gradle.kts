@@ -38,12 +38,12 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.navigation.compose)
             
-            // Firebase Android dependencies - using string notation for BOM due to Kotlin 2.3+ Provider issues
             implementation(project.dependencies.platform(libs.firebase.bom))
             implementation(libs.firebase.config.ktx)
             implementation(libs.firebase.auth.ktx)
             implementation(libs.firebase.firestore.ktx)
             implementation(libs.firebase.messaging.ktx)
+            implementation(libs.firebase.database) // Usando el catálogo de versiones
             
             implementation(libs.credentials)
             implementation(libs.credentials.play.services.auth)
@@ -68,18 +68,11 @@ kotlin {
             implementation(libs.navigation.compose)
             implementation(libs.kotlinx.serialization.json)
 
-            // Room KMP core runtime
             implementation(libs.room.runtime)
-            // REMOVED: implementation(libs.room.ktx)
-
-            // Required for iOS SQLite execution
             implementation(libs.androidx.sqlite.bundled)
 
             implementation(libs.kotlinx.datetime)
             implementation(libs.compose.material.icons.extended)
-        }
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
         }
     }
 }

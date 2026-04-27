@@ -9,5 +9,5 @@ actual fun getHabitDatabaseBuilder(): RoomDatabase.Builder<HabitDatabase> {
     return Room.databaseBuilder<HabitDatabase>(
         name = dbFile,
         factory = { HabitDatabase::class.instantiateImpl() }
-    )
+    ).fallbackToDestructiveMigration()
 }

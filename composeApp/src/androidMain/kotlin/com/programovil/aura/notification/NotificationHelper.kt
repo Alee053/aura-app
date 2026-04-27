@@ -12,6 +12,7 @@ object NotificationHelper {
 
     const val CHANNEL_DAILY_SUMMARY = "daily_summary"
     const val CHANNEL_DUE_DATE_REMINDER = "due_date_reminder"
+    const val CHANNEL_SYNC = "sync_channel_v2"
 
     fun createNotificationChannels(context: Context) {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -32,7 +33,15 @@ object NotificationHelper {
             description = "Reminders for tasks due today"
         }
 
-        notificationManager.createNotificationChannels(listOf(dailySummaryChannel, dueDateChannel))
+        val syncChannel = NotificationChannel(
+            CHANNEL_SYNC,
+            "Sync Status",
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = "Synchronization status notifications"
+        }
+
+        notificationManager.createNotificationChannels(listOf(dailySummaryChannel, dueDateChannel, syncChannel))
     }
 
     private fun createPendingIntent(context: Context): PendingIntent {
@@ -81,6 +90,31 @@ object NotificationHelper {
         notificationManager.notify(NOTIFICATION_ID_DUE_DATE, notification)
     }
 
+    fun showSyncSummaryNotification(context: Context, syncedCount: Int, failedCount: Int) {
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        
+        val body = when {
+            failedCount > 0 -> "Synced $syncedCount items, $failedCount failed"
+            syncedCount > 0 -> "Successfully synced $syncedCount item${if (syncedCount > 1) "s" else ""}"
+            else -> "No items to sync"
+        }
+
+        // CLONING TEST NOTIFICATION LOGIC (WHICH WORKS)
+        val notification = NotificationCompat.Builder(context, CHANNEL_DAILY_SUMMARY)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle("Sync Process Complete")
+            .setContentText(body)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setDefaults(NotificationCompat.DEFAULT_ALL)
+            .setAutoCancel(true)
+            .setContentIntent(createPendingIntent(context))
+            .build()
+
+        // Using the same ID logic that works for the daily summary test
+        notificationManager.notify(NOTIFICATION_ID_DAILY_SUMMARY, notification)
+    }
+
     private const val NOTIFICATION_ID_DAILY_SUMMARY = 1001
     private const val NOTIFICATION_ID_DUE_DATE = 1002
+    private const val NOTIFICATION_ID_SYNC = 1003
 }

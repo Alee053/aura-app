@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -18,7 +19,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -40,6 +43,7 @@ import com.programovil.aura.navigation.AppNavHost
 import com.programovil.aura.navigation.NavRoute
 import com.programovil.aura.shared.FeatureFlag
 import com.programovil.aura.shared.FeatureFlagManager
+import com.programovil.aura.sync.presentation.ui.SyncStatusBar
 import com.programovil.aura.todo.presentation.viewmodel.TodoViewModel
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel

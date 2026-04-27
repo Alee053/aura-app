@@ -5,6 +5,7 @@ import com.programovil.aura.habit.di.habitModule
 import com.programovil.aura.notification.di.notificationModule
 import com.programovil.aura.shared.FeatureFlagManager
 import com.programovil.aura.shared.RemoteConfigService
+import com.programovil.aura.sync.di.syncModule
 import com.programovil.aura.todo.di.todoModule
 import org.koin.dsl.module
 
@@ -13,6 +14,7 @@ fun getModules(remoteConfigService: RemoteConfigService) = listOf(
     todoModule,
     habitModule,
     notificationModule,
+    syncModule,
     module {
         single<RemoteConfigService> { remoteConfigService }
         single { FeatureFlagManager(get()) }

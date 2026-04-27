@@ -5,12 +5,16 @@ import com.programovil.aura.notification.NotificationHelper
 import com.programovil.aura.shared.FirebaseConfig
 import com.programovil.aura.shared.FirebaseRemoteConfigService
 import com.programovil.aura.di.getModules
+import com.programovil.aura.sync.data.connectivity.ConnectivityObserverImpl
+import com.programovil.aura.sync.data.worker.SyncScheduler
 import org.koin.android.ext.koin.androidLogger
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
 
 class AndroidApp : Application() {
+    private lateinit var connectivityObserver: ConnectivityObserverImpl
+
     override fun onCreate() {
         super.onCreate()
         FirebaseConfig.initialize(this)
@@ -25,5 +29,9 @@ class AndroidApp : Application() {
             androidContext(this@AndroidApp)
             modules(getModules(remoteConfigService))
         }
+
+        SyncScheduler.schedulePeriodicSync(this)
+        connectivityObserver = ConnectivityObserverImpl(this)
+        connectivityObserver.register()
     }
 }

@@ -78,97 +78,99 @@ fun HabitScreen(
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
-        if (uiState.isLoading) {
-            Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-                contentPadding = PaddingValues(vertical = 8.dp)
-            ) {
-                // Today section
-                if (uiState.todayHabits.isNotEmpty()) {
-                    item {
-                        HabitSectionHeader(
-                            title = stringResource(Res.string.today),
-                            subtitle = today.toString()
-                        )
-                    }
-                    items(uiState.todayHabits, key = { it.habit.id + it.targetDate }) { habitItem ->
-                        HabitItem(
-                            habitWithStatus = habitItem,
-                            onToggle = {
-                                viewModel.onEvent(
-                                    HabitEvent.ToggleCompletion(
-                                        habitItem.habit.id,
-                                        habitItem.targetDate
-                                    )
-                                )
-                            }
-                        )
-                    }
+        Column(modifier = Modifier.padding(padding)) {
+            com.programovil.aura.sync.presentation.ui.SyncStatusBar()
+            
+            if (uiState.isLoading) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
                 }
-
-                // Tomorrow section
-                if (uiState.tomorrowHabits.isNotEmpty()) {
-                    item {
-                        HabitSectionHeader(
-                            title = stringResource(Res.string.tomorrow),
-                            subtitle = tomorrow.toString()
-                        )
-                    }
-                    items(uiState.tomorrowHabits, key = { it.habit.id + it.targetDate }) { habitItem ->
-                        HabitItem(
-                            habitWithStatus = habitItem,
-                            onToggle = {
-                                viewModel.onEvent(
-                                    HabitEvent.ToggleCompletion(
-                                        habitItem.habit.id,
-                                        habitItem.targetDate
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(vertical = 8.dp)
+                ) {
+                    // Today section
+                    if (uiState.todayHabits.isNotEmpty()) {
+                        item {
+                            HabitSectionHeader(
+                                title = stringResource(Res.string.today),
+                                subtitle = today.toString()
+                            )
+                        }
+                        items(uiState.todayHabits, key = { it.habit.id + it.targetDate }) { habitItem ->
+                            HabitItem(
+                                habitWithStatus = habitItem,
+                                onToggle = {
+                                    viewModel.onEvent(
+                                        HabitEvent.ToggleCompletion(
+                                            habitItem.habit.id,
+                                            habitItem.targetDate
+                                        )
                                     )
-                                )
-                            }
-                        )
+                                }
+                            )
+                        }
                     }
-                }
 
-                // This Week section
-                if (uiState.thisWeekHabits.isNotEmpty()) {
-                    item {
-                        HabitSectionHeader(
-                            title = stringResource(Res.string.this_week),
-                            subtitle = null
-                        )
-                    }
-                    items(uiState.thisWeekHabits, key = { it.habit.id + it.targetDate }) { habitItem ->
-                        HabitItem(
-                            habitWithStatus = habitItem,
-                            onToggle = {
-                                viewModel.onEvent(
-                                    HabitEvent.ToggleCompletion(
-                                        habitItem.habit.id,
-                                        habitItem.targetDate
+                    // Tomorrow section
+                    if (uiState.tomorrowHabits.isNotEmpty()) {
+                        item {
+                            HabitSectionHeader(
+                                title = stringResource(Res.string.tomorrow),
+                                subtitle = tomorrow.toString()
+                            )
+                        }
+                        items(uiState.tomorrowHabits, key = { it.habit.id + it.targetDate }) { habitItem ->
+                            HabitItem(
+                                habitWithStatus = habitItem,
+                                onToggle = {
+                                    viewModel.onEvent(
+                                        HabitEvent.ToggleCompletion(
+                                            habitItem.habit.id,
+                                            habitItem.targetDate
+                                        )
                                     )
-                                )
-                            }
-                        )
+                                }
+                            )
+                        }
                     }
-                }
 
-                // Empty state
-                if (uiState.todayHabits.isEmpty() &&
-                    uiState.tomorrowHabits.isEmpty() &&
-                    uiState.thisWeekHabits.isEmpty()) {
-                    item {
-                        Text(
-                            text = stringResource(Res.string.empty_habits),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(32.dp)
-                        )
+                    // This Week section
+                    if (uiState.thisWeekHabits.isNotEmpty()) {
+                        item {
+                            HabitSectionHeader(
+                                title = stringResource(Res.string.this_week),
+                                subtitle = null
+                            )
+                        }
+                        items(uiState.thisWeekHabits, key = { it.habit.id + it.targetDate }) { habitItem ->
+                            HabitItem(
+                                habitWithStatus = habitItem,
+                                onToggle = {
+                                    viewModel.onEvent(
+                                        HabitEvent.ToggleCompletion(
+                                            habitItem.habit.id,
+                                            habitItem.targetDate
+                                        )
+                                    )
+                                }
+                            )
+                        }
+                    }
+
+                    // Empty state
+                    if (uiState.todayHabits.isEmpty() &&
+                        uiState.tomorrowHabits.isEmpty() &&
+                        uiState.thisWeekHabits.isEmpty()) {
+                        item {
+                            Text(
+                                text = stringResource(Res.string.empty_habits),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(32.dp)
+                            )
+                        }
                     }
                 }
             }

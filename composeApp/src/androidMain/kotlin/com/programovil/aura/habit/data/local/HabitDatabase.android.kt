@@ -17,7 +17,7 @@ actual fun getHabitDatabaseBuilder(): RoomDatabase.Builder<HabitDatabase> {
     return Room.databaseBuilder<HabitDatabase>(
         context = context,
         name = dbFile.absolutePath
-    )
+    ).fallbackToDestructiveMigration()
 }
 
 object KoinContext : KoinComponent {

@@ -7,7 +7,6 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.googleServices)
-    alias(libs.plugins.room)
     alias(libs.plugins.ksp)
 }
 
@@ -68,13 +67,6 @@ kotlin {
             implementation(libs.navigation.compose)
             implementation(libs.kotlinx.serialization.json)
 
-            // Room KMP core runtime
-            implementation(libs.room.runtime)
-            // REMOVED: implementation(libs.room.ktx)
-
-            // Required for iOS SQLite execution
-            implementation(libs.androidx.sqlite.bundled)
-
             implementation(libs.kotlinx.datetime)
             implementation(libs.compose.material.icons.extended)
         }
@@ -111,13 +103,6 @@ android {
     }
 }
 
-room {
-    schemaDirectory("$projectDir/schemas")
-}
-
 dependencies {
     debugImplementation(libs.compose.uiTooling)
-    add("kspAndroid", libs.room.compiler)
-    add("kspIosSimulatorArm64", libs.room.compiler)
-    add("kspIosArm64", libs.room.compiler)
 }

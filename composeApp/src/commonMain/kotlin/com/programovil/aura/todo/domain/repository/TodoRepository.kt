@@ -1,8 +1,10 @@
 package com.programovil.aura.todo.domain.repository
 
 import com.programovil.aura.todo.domain.model.Todo
+import io.mockative.Mockable
 import kotlinx.coroutines.flow.Flow
 
+@Mockable
 interface TodoRepository {
     fun getTodos(): Flow<Result<List<Todo>>>
     suspend fun addTodo(title: String, dueDate: Long? = null): Result<Unit>

@@ -7,7 +7,6 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.googleServices)
-    alias(libs.plugins.ksp)
 }
 
 kotlin {
@@ -24,7 +23,6 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
-            linkerOpts.add("-lsqlite3")
         }
     }
 

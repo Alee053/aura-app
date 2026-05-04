@@ -5,7 +5,7 @@ import com.programovil.aura.habit.domain.repository.HabitRepository
 import kotlinx.coroutines.flow.Flow
 
 class GetHabitHistoryUseCase(private val repository: HabitRepository) {
-    operator fun invoke(habitId: String): Flow<List<HabitCompletion>> {
+    operator fun invoke(habitId: String): Flow<Result<List<HabitCompletion>>> {
         return repository.getCompletionsForHabit(habitId)
     }
 }

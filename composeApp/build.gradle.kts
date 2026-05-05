@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.googleServices)
+    alias(libs.plugins.mockative)
 }
 
 kotlin {
@@ -67,9 +68,16 @@ kotlin {
 
             implementation(libs.kotlinx.datetime)
             implementation(libs.compose.material.icons.extended)
+            implementation(libs.mockative)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.turbine)
+            implementation(libs.mockative)
+        }
+        androidInstrumentedTest.dependencies {
+            implementation(libs.compose.ui.test.junit4)
         }
     }
 }
@@ -84,6 +92,7 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     packaging {
         resources {

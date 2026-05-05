@@ -85,3 +85,122 @@ Abstracted behind repository interfaces to handle platform-specific SDK behavior
 Type-safe navigation using `androidx-navigation`.
 - **Object Routes**: For simple destinations.
 - **Data Class Routes**: For destinations with parameters.
+
+## Testing
+
+### Stack
+- **kotlin-test**: Unit testing framework for Kotlin Multiplatform.
+- **Turbine**: Flow testing library for coroutines (`app.cash.turbine:turbine`).
+- **Mockative**: Mocking library with KSP code generation (`io.mockative:mockative`).
+- **compose-ui-test-junit4**: Android instrumented tests for Compose UI.
+
+### Dependencies (libs.versions.toml)
+```toml
+[versions]
+coroutines = "1.8.1"
+turbine = "1.1.0"
+mockative = "3.2.3"
+
+[libraries]
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
+mockative = { module = "io.mockative:mockative", version.ref = "mockative" }
+compose-ui-test-junit4 = { module = "org.jetbrains.compose.ui:ui-test-junit4", version.ref = "composeMultiplatform" }
+
+[plugins]
+mockative = { id = "io.mockative", version.ref = "mockative" }
+```
+
+### Gradle Configuration (composeApp/build.gradle.kts)
+```kotlin
+plugins {
+    alias(libs.plugins.mockative)  // Applied in composeApp only (not root — conflicts with AGP classpath)
+}
+
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            implementation(libs.mockative)  // Required for @Mockable annotation
+        }
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
+            implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.turbine)
+            implementation(libs.mockative)
+        }
+        androidInstrumentedTest.dependencies {
+            implementation(libs.compose.ui.test.junit4)
+        }
+    }
+}
+
+android {
+    defaultConfig {
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+}
+```
+
+### gradle.properties (required for mockative)
+```properties
+# KSP2 required by Mockative
+ksp.useKSP2=true
+ksp.incremental=false
+# Configuration cache disabled — Mockative plugin incompatible with it
+org.gradle.configuration-cache=false
+```
+
+### @Mockable annotation
+Apply `@Mockable` to interfaces or classes that need to be mocked by Mockative:
+```kotlin
+@Mockable
+interface TodoRepository {
+    fun getTodos(): Flow<Result<List<Todo>>>
+}
+```
+
+### Running tests
+```bash
+./gradlew :composeApp:testDebugUnitTest         # Android unit tests (commonTest)
+./gradlew :composeApp:testDebugUnitTest        # iOS tests via multiplatform plugin
+./gradlew :composeApp:connectedAndroidTest     # Instrumented tests (androidInstrumentedTest)
+```
+
+### Test Structure
+```
+composeApp/src/
+├── commonTest/kotlin/com/programovil/aura/
+│   ├── shared/
+│   │   └── ColorUtilsTest.kt              # Pure function tests
+│   ├── todo/domain/usecase/
+│   │   ├── GetTodosUseCaseTest.kt         # Turbine + Mokative mocks
+│   │   └── AddTodoUseCaseTest.kt          # coEvery + coVerify
+│   └── habit/domain/model/
+│       ├── RecurrenceTypeTest.kt          # Enum tests
+│       └── DaySectionTest.kt             # Enum tests
+```
+
+### Pattern examples
+
+**Test with Turbine (Flow):**
+```kotlin
+useCase().test {
+    val result = awaitItem()
+    assertTrue(result.isSuccess)
+    awaitComplete()
+}
+```
+
+**Test with Mokative (blocking):**
+```kotlin
+every { repository.getTodos() } returns flowOf(Result.success(todos))
+```
+
+**Test with Mokative (suspend):**
+```kotlin
+coEvery { repository.addTodo("Buy milk", null) } returns Result.success(Unit)
+coVerify { repository.addTodo("Buy milk", null) }.wasInvoked(exactly = 1)
+```
+
+### Note
+The `mockative` plugin is only applied in `composeApp/build.gradle.kts`, not in the root `build.gradle.kts`. Adding it at root level causes classpath conflicts with the Android Gradle Plugin (AGP).

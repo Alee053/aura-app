@@ -2,8 +2,10 @@ package com.programovil.aura.habit.domain.repository
 
 import com.programovil.aura.habit.domain.model.Habit
 import com.programovil.aura.habit.domain.model.HabitCompletion
+import io.mockative.Mockable
 import kotlinx.coroutines.flow.Flow
 
+@Mockable
 interface HabitRepository {
     fun getHabits(): Flow<Result<List<Habit>>>
     fun getCompletionsForHabit(habitId: String): Flow<Result<List<HabitCompletion>>>

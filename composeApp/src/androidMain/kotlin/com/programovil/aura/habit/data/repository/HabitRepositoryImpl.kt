@@ -1,4 +1,4 @@
-package com.programovil.aura.habit.data.repository
+package com.programovil.aura.habit.domain.repository
 
 import com.programovil.aura.habit.data.mapper.HabitCompletionData
 import com.programovil.aura.habit.data.mapper.HabitData

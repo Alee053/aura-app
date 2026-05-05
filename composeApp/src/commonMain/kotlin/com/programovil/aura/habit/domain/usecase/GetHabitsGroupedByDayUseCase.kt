@@ -12,18 +12,28 @@ import kotlinx.datetime.*
 
 class GetHabitsGroupedByDayUseCase(private val repository: HabitRepository) {
 
-    operator fun invoke(): Flow<Map<DaySection, List<HabitWithStatus>>> {
+    operator fun invoke(): Flow<Result<Map<DaySection, List<HabitWithStatus>>>> {
         val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
         
         return combine(
             repository.getHabits(),
             repository.getAllCompletions()
-        ) { habits, completions ->
-            buildMap {
-                put(DaySection.TODAY, groupHabitsForDate(habits, completions, today))
-                put(DaySection.TOMORROW, groupHabitsForDate(habits, completions, today.plus(1, DateTimeUnit.DAY)))
-                put(DaySection.THIS_WEEK, buildThisWeekHabits(habits, completions, today))
-            }
+        ) { habitsResult, completionsResult ->
+            habitsResult.fold(
+                onSuccess = { habits ->
+                    completionsResult.fold(
+                        onSuccess = { completions ->
+                            Result.success(buildMap {
+                                put(DaySection.TODAY, groupHabitsForDate(habits, completions, today))
+                                put(DaySection.TOMORROW, groupHabitsForDate(habits, completions, today.plus(1, DateTimeUnit.DAY)))
+                                put(DaySection.THIS_WEEK, buildThisWeekHabits(habits, completions, today))
+                            })
+                        },
+                        onFailure = { Result.failure(it) }
+                    )
+                },
+                onFailure = { Result.failure(it) }
+            )
         }
     }
 

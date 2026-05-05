@@ -47,9 +47,6 @@ class HabitViewModel(
     val uiState: StateFlow<HabitListUiState> = _uiState
 
     init {
-        viewModelScope.launch {
-            repository.cleanupOldCompletions(90)
-        }
         loadHabits()
     }
 
@@ -62,13 +59,20 @@ class HabitViewModel(
 
     private fun loadHabits() {
         viewModelScope.launch {
-            getHabitsGroupedByDayUseCase().collect { grouped ->
-                _uiState.value = HabitListUiState(
-                    todayHabits = grouped[DaySection.TODAY] ?: emptyList(),
-                    tomorrowHabits = grouped[DaySection.TOMORROW] ?: emptyList(),
-                    thisWeekHabits = grouped[DaySection.THIS_WEEK] ?: emptyList(),
-                    isLoading = false
-                )
+            getHabitsGroupedByDayUseCase().collect { result ->
+                result.onSuccess { grouped ->
+                    _uiState.value = HabitListUiState(
+                        todayHabits = grouped[DaySection.TODAY] ?: emptyList(),
+                        tomorrowHabits = grouped[DaySection.TOMORROW] ?: emptyList(),
+                        thisWeekHabits = grouped[DaySection.THIS_WEEK] ?: emptyList(),
+                        isLoading = false
+                    )
+                }.onFailure { error ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        error = error.message ?: "Failed to load habits"
+                    )
+                }
             }
         }
     }

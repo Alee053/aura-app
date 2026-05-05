@@ -23,9 +23,7 @@ firebaseFirestore = "25.1.4"
 credentials = "1.3.0"
 googleid = "1.1.1"
 kotlinxCoroutinesPlayServices = "1.9.0"
-room = "2.8.4"
-sqlite = "2.6.2"
-kspVersion = "2.0.21-1.0.25"
+
 compose-material-icons-extended = "1.7.3"
 kotlinxDatetime = "0.6.1"
 workmanager-ktx = "2.9.0"
@@ -69,10 +67,7 @@ credentials = { module = "androidx.credentials:credentials", version.ref = "cred
 credentials-play-services-auth = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
 googleid = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleid" }
 kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinxCoroutinesPlayServices" }
-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
-androidx-sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+
 workmanager-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workmanager-ktx" }
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore-preferences" }
 firebase-messaging-ktx = { module = "com.google.firebase:firebase-messaging-ktx", version.ref = "firebase-messaging-ktx" }
@@ -89,6 +84,4 @@ composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "k
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 googleServices = { id = "com.google.gms.google-services", version = "4.4.2" }
-room = { id = "androidx.room", version.ref = "room" }
-ksp = { id = "com.google.devtools.ksp", version.ref = "kspVersion" }
 mockative = { id = "io.mockative", version.ref = "mockative" }

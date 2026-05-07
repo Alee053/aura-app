@@ -1,6 +1,7 @@
 package com.programovil.aura.regionsync
 
 import android.content.Context
+import androidx.room.Room
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.programovil.aura.regionsync.data.local.RegionalSyncDatabase
@@ -18,7 +19,10 @@ class RegionalSyncWorker(
     override suspend fun doWork(): Result {
         return try {
             // Manual Dependency Injection for the worker. In a real app, consider Hilt/Koin workers.
-            val database = RegionalSyncDatabase.create(applicationContext) // Assuming a static create method
+            val database = Room.databaseBuilder<RegionalSyncDatabase>(
+                context = applicationContext,
+                name = "regional_sync_database.db"
+            ).fallbackToDestructiveMigration(dropAllTables = true).build()
             val regionDataDao = database.regionDataDao()
             val remoteConfigDataSource = FirebaseRemoteConfigDataSource()
             val realtimeDatabaseDataSource = FirebaseRealtimeDatabaseDataSource()

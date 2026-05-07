@@ -117,6 +117,8 @@ room {
 }
 
 dependencies {
+    implementation(libs.firebase.config)
+    implementation(libs.firebase.database)
     // La implementación suelta de database fue eliminada de aquí
     debugImplementation(libs.compose.uiTooling)
     add("kspAndroid", libs.room.compiler)

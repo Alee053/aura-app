@@ -5,14 +5,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed class NavRoute {
     @Serializable
-    data object Todo : NavRoute()
-
-    @Serializable
-    data object NotificationSettings : NavRoute()
-
-    @Serializable
-    data class TodoDetail(val todoId: String) : NavRoute()
-
-    @Serializable
-    data object Habit : NavRoute()
+    data object RegionSync : NavRoute()
 }

@@ -7,3 +7,17 @@ import androidx.room.RoomDatabase
 abstract class RegionalSyncDatabase : RoomDatabase() {
     abstract fun regionDataDao(): RegionDataDao
 }
+
+expect fun getRegionalSyncDatabaseBuilder(): RoomDatabase.Builder<RegionalSyncDatabase>
+
+fun getRegionalSyncDatabase(builder: RoomDatabase.Builder<RegionalSyncDatabase>): RegionalSyncDatabase {
+    return builder
+        .fallbackToDestructiveMigration(true)
+        .setDriver(androidx.sqlite.driver.bundled.BundledSQLiteDriver())
+        .setQueryCoroutineContext(kotlinx.coroutines.Dispatchers.IO)
+        .build()
+}
+
+expect object RegionalSyncDatabaseCompanion {
+    fun create(context: android.content.Context): RegionalSyncDatabase
+}

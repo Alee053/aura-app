@@ -55,6 +55,7 @@ fun HabitScreen(
     }
 
     Scaffold(
+        containerColor = AppTheme.colors.background,
         topBar = {
             TopAppBar(
                 title = {
@@ -62,8 +63,8 @@ fun HabitScreen(
                         Text(stringResource(Res.string.habits_title))
                         Text(
                             text = today.toString(),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            style = AppTheme.typography.labelLarge,
+                            color = AppTheme.colors.textPrimary.copy(alpha = 0.6f)
                         )
                     }
                 },
@@ -166,8 +167,8 @@ fun HabitScreen(
                     item {
                         Text(
                             text = stringResource(Res.string.empty_habits),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = AppTheme.typography.bodyMedium,
+                            color = AppTheme.colors.textPrimary.copy(alpha = 0.6f),
                             modifier = Modifier.padding(32.dp)
                         )
                     }
@@ -196,14 +197,14 @@ private fun HabitSectionHeader(title: String, subtitle: String?) {
     ) {
         Text(
             text = title,
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.primary
+            style = AppTheme.typography.bodyMedium,
+            color = AppTheme.colors.textPrimary
         )
         if (subtitle != null) {
             Text(
                 text = subtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                style = AppTheme.typography.labelLarge,
+                color = AppTheme.colors.textPrimary.copy(alpha = 0.6f)
             )
         }
     }

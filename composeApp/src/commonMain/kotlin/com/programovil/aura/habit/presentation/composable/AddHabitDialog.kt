@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -44,6 +43,7 @@ import aura_app.composeapp.generated.resources.color_label
 import aura_app.composeapp.generated.resources.cancel
 import aura_app.composeapp.generated.resources.save
 import org.jetbrains.compose.resources.stringResource
+import com.programovil.aura.AppTheme
 import com.programovil.aura.habit.domain.model.RecurrenceType
 import com.programovil.aura.shared.parseHexColor
 
@@ -72,14 +72,14 @@ fun AddHabitDialog(
     Dialog(onDismissRequest = onDismiss) {
         Surface(
             shape = RoundedCornerShape(16.dp),
-            color = MaterialTheme.colorScheme.surface
+            color = AppTheme.colors.surface
         ) {
             Column(
                 modifier = Modifier.padding(24.dp)
             ) {
                 Text(
                     text = stringResource(Res.string.new_habit),
-                    style = MaterialTheme.typography.headlineSmall
+                    style = AppTheme.typography.headlineSmall
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -114,7 +114,7 @@ fun AddHabitDialog(
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
                         text = stringResource(Res.string.repeat_on),
-                        style = MaterialTheme.typography.labelMedium
+                        style = AppTheme.typography.labelMedium
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     FlowRow(
@@ -128,8 +128,8 @@ fun AddHabitDialog(
                                     .size(40.dp)
                                     .clip(CircleShape)
                                     .background(
-                                        if (isSelected) MaterialTheme.colorScheme.primary
-                                        else MaterialTheme.colorScheme.surfaceVariant
+                                        if (isSelected) AppTheme.colors.primary
+                                        else AppTheme.colors.surface.copy(alpha = 0.6f)
                                     )
                                     .clickable {
                                         selectedDays = selectedDays xor dayBit
@@ -138,8 +138,8 @@ fun AddHabitDialog(
                             ) {
                                 Text(
                                     text = label,
-                                    color = if (isSelected) MaterialTheme.colorScheme.onPrimary
-                                    else MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = if (isSelected) AppTheme.colors.textPrimary
+                                    else AppTheme.colors.textPrimary.copy(alpha = 0.6f)
                                 )
                             }
                         }
@@ -151,7 +151,7 @@ fun AddHabitDialog(
                 // Color palette
                 Text(
                     text = stringResource(Res.string.color_label),
-                    style = MaterialTheme.typography.labelMedium
+                    style = AppTheme.typography.labelMedium
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(
@@ -165,7 +165,7 @@ fun AddHabitDialog(
                                 .background(parseHexColor(color))
                                 .then(
                                     if (color == selectedColor) {
-                                        Modifier.border(2.dp, MaterialTheme.colorScheme.onSurface, CircleShape)
+                                        Modifier.border(2.dp, AppTheme.colors.textPrimary, CircleShape)
                                     } else Modifier
                                 )
                                 .clickable { selectedColor = color }

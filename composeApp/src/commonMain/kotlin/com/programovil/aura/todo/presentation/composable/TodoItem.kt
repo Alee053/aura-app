@@ -10,7 +10,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
+import com.programovil.aura.designsystem.theme.AppTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -50,7 +50,7 @@ fun TodoItem(
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = todo.title,
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = AppTheme.typography.bodyMedium,
                     textDecoration = if (todo.isCompleted) TextDecoration.LineThrough else null,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
@@ -60,8 +60,8 @@ fun TodoItem(
                         .toLocalDateTime(TimeZone.currentSystemDefault()).date
                     Text(
                         text = stringResource(Res.string.due_label, date.toString()),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = AppTheme.typography.bodyMedium,
+                        color = AppTheme.colors.textPrimary.copy(alpha = 0.6f),
                         maxLines = 1
                     )
                 }
@@ -69,7 +69,7 @@ fun TodoItem(
             IconButton(onClick = onDelete) {
                 Text(
                     stringResource(Res.string.delete),
-                    color = MaterialTheme.colorScheme.error,
+                    color = AppTheme.colors.primary.copy(alpha = 0.7f),
                     fontSize = 16.sp
                 )
             }

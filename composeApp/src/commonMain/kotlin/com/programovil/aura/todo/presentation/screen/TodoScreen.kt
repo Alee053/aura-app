@@ -18,7 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.programovil.aura.designsystem.theme.AppTheme
 import com.programovil.aura.todo.presentation.composable.TodoItem
 import com.programovil.aura.todo.presentation.viewmodel.TodoViewModel
 import aura_app.composeapp.generated.resources.Res
@@ -82,6 +82,7 @@ fun TodoScreen(
     }
 
     Scaffold(
+        containerColor = AppTheme.colors.background,
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(Res.string.todos_title)) },
@@ -124,7 +125,7 @@ fun TodoScreen(
                         Icon(
                             imageVector = Icons.Default.CalendarToday,
                             contentDescription = stringResource(Res.string.select_due_date),
-                            tint = if (selectedDueDate != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                            tint = if (selectedDueDate != null) AppTheme.colors.primary else AppTheme.colors.textPrimary.copy(alpha = 0.6f)
                         )
                     }
                 }

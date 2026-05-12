@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import com.programovil.aura.AppTheme
 import com.programovil.aura.habit.domain.model.HabitWithStatus
 import com.programovil.aura.shared.parseHexColor
 
@@ -48,12 +49,12 @@ fun HabitItem(
         // Name
         Text(
             text = habit.name,
-            style = MaterialTheme.typography.bodyLarge.copy(
+            style = AppTheme.typography.bodyMedium.copy(
                 textDecoration = if (isDone) TextDecoration.LineThrough else null,
                 color = when {
-                    isDone -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                    isMissed -> MaterialTheme.colorScheme.error.copy(alpha = 0.7f)
-                    else -> MaterialTheme.colorScheme.onSurface
+                    isDone -> AppTheme.colors.textPrimary.copy(alpha = 0.6f)
+                    isMissed -> AppTheme.colors.primary.copy(alpha = 0.7f)
+                    else -> AppTheme.colors.textPrimary
                 }
             ),
             modifier = Modifier.weight(1f)
@@ -63,8 +64,8 @@ fun HabitItem(
         if (habitWithStatus.streak > 0) {
             Text(
                 text = "${habitWithStatus.streak}",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.primary
+                style = AppTheme.typography.labelLarge,
+                color = AppTheme.colors.primary
             )
         }
 

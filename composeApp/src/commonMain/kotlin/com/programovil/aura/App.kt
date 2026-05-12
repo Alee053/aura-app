@@ -1,16 +1,18 @@
 package com.programovil.aura
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -25,6 +27,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -36,6 +39,10 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.programovil.aura.auth.presentation.AuthViewModel
+import com.programovil.aura.designsystem.theme.AppTheme
+import com.programovil.aura.designsystem.theme.DsTheme
+import com.programovil.aura.designsystem.theme.ThemeMode
+import com.programovil.aura.home.presentation.viewmodel.SettingsViewModel
 import com.programovil.aura.navigation.AppNavHost
 import com.programovil.aura.navigation.NavRoute
 import com.programovil.aura.shared.FeatureFlag
@@ -49,18 +56,24 @@ import org.koin.compose.viewmodel.koinViewModel
 fun App(
     onSignInClick: () -> Unit = {}
 ) {
-    MaterialTheme {
+    val settingsViewModel = koinViewModel<SettingsViewModel>()
+    val settingsState by settingsViewModel.uiState.collectAsState()
+    val currentThemeMode = settingsState.themeMode
+
+    DsTheme(mode = currentThemeMode) {
         val authViewModel: AuthViewModel = koinViewModel()
         val authState by authViewModel.authState.collectAsState()
 
         when (val state = authState) {
             is AuthViewModel.AuthState.Loading -> {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
+                    CircularProgressIndicator(color = AppTheme.colors.primary)
                 }
             }
             is AuthViewModel.AuthState.SignedIn -> {
                 AuthenticatedApp(
+                    currentThemeMode = currentThemeMode,
+                    onThemeChange = { settingsViewModel.setThemeMode(it) },
                     onSignOut = { authViewModel.signOut() }
                 )
             }
@@ -77,6 +90,8 @@ fun App(
 
 @Composable
 fun AuthenticatedApp(
+    currentThemeMode: ThemeMode,
+    onThemeChange: (ThemeMode) -> Unit,
     onSignOut: () -> Unit
 ) {
     val navController = rememberNavController()
@@ -96,20 +111,24 @@ fun AuthenticatedApp(
     val showHabits by remember(featureFlags) {
         mutableStateOf(featureFlags[FeatureFlag.HABITS_ENABLED] ?: true)
     }
-    val showNotifications by remember(featureFlags) {
-        mutableStateOf(featureFlags[FeatureFlag.NOTIFICATIONS_ENABLED] ?: true)
-    }
+
+    val isHome = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Home>() } == true
 
     Scaffold(
+        containerColor = AppTheme.colors.background,
+        contentWindowInsets = WindowInsets.safeDrawing,
         bottomBar = {
-            NavigationBar {
-                if (showTodos) {
+            if (!isHome) {
+                NavigationBar(
+                    containerColor = AppTheme.colors.surface,
+                    contentColor = AppTheme.colors.primary
+                ) {
                     NavigationBarItem(
-                        icon = { Icon(Icons.Default.Checklist, contentDescription = "Todos") },
-                        label = { Text("Todos") },
-                        selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Todo>() } == true,
+                        icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+                        label = { Text("Home") },
+                        selected = isHome,
                         onClick = {
-                            navController.navigate(NavRoute.Todo) {
+                            navController.navigate(NavRoute.Home) {
                                 popUpTo(navController.graph.findStartDestination().id) {
                                     saveState = true
                                 }
@@ -118,46 +137,50 @@ fun AuthenticatedApp(
                             }
                         }
                     )
-                }
-                if (showHabits) {
-                    NavigationBarItem(
-                        icon = { Icon(Icons.Default.DateRange, contentDescription = "Habits") },
-                        label = { Text("Habits") },
-                        selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Habit>() } == true,
-                        onClick = {
-                            navController.navigate(NavRoute.Habit) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
+                    if (showTodos) {
+                        NavigationBarItem(
+                            icon = { Icon(Icons.Default.Checklist, contentDescription = "Todos") },
+                            label = { Text("Todos") },
+                            selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Todo>() } == true,
+                            onClick = {
+                                navController.navigate(NavRoute.Todo) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
                                 }
-                                launchSingleTop = true
-                                restoreState = true
                             }
-                        }
-                    )
-                }
-                if (showNotifications) {
-                    NavigationBarItem(
-                        icon = { Icon(Icons.Default.Notifications, contentDescription = "Notifications") },
-                        label = { Text("Notifs") },
-                        selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.NotificationSettings>() } == true,
-                        onClick = {
-                            navController.navigate(NavRoute.NotificationSettings) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
+                        )
+                    }
+                    if (showHabits) {
+                        NavigationBarItem(
+                            icon = { Icon(Icons.Default.DateRange, contentDescription = "Habits") },
+                            label = { Text("Habits") },
+                            selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Habit>() } == true,
+                            onClick = {
+                                navController.navigate(NavRoute.Habit) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
                                 }
-                                launchSingleTop = true
-                                restoreState = true
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }
     ) { padding ->
-        Box(Modifier.padding(padding)) {
+        Box(
+            Modifier.padding(if (isHome) WindowInsets(0, 0, 0, 0).asPaddingValues() else padding)
+        ) {
             AppNavHost(
                 navController = navController,
                 todoViewModel = todoViewModel,
+                currentThemeMode = currentThemeMode,
+                onThemeChange = onThemeChange,
                 onSignOut = onSignOut
             )
         }
@@ -170,23 +193,29 @@ fun SignInScreen(
     onSignInClick: () -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
     ) {
         Text(
             "Aura",
-            style = MaterialTheme.typography.headlineLarge
+            style = AppTheme.typography.headlineLarge,
+            color = AppTheme.colors.textPrimary
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             "Sign in to sync your todos",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = AppTheme.typography.bodyMedium,
+            color = AppTheme.colors.textPrimary.copy(alpha = 0.7f),
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(32.dp))
-        Button(onClick = onSignInClick) {
+        Button(
+            onClick = onSignInClick,
+            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                containerColor = AppTheme.colors.primary
+            )
+        ) {
             Text("Sign in with Google")
         }
         errorMessage?.let {
@@ -194,7 +223,7 @@ fun SignInScreen(
             Text(
                 it,
                 color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall,
+                style = AppTheme.typography.labelLarge,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 32.dp)
             )

@@ -2,6 +2,7 @@ package com.programovil.aura.di
 
 import com.programovil.aura.auth.di.authModule
 import com.programovil.aura.habit.di.habitModule
+import com.programovil.aura.home.di.homeModule
 import com.programovil.aura.notification.di.notificationModule
 import com.programovil.aura.shared.FeatureFlagManager
 import com.programovil.aura.shared.RemoteConfigService
@@ -13,6 +14,7 @@ fun getModules(remoteConfigService: RemoteConfigService) = listOf(
     todoModule,
     habitModule,
     notificationModule,
+    homeModule,
     module {
         single<RemoteConfigService> { remoteConfigService }
         single { FeatureFlagManager(get()) }

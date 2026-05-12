@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.programovil.aura.habit.presentation.composable.AddHabitDialog
 import com.programovil.aura.habit.presentation.composable.HabitItem
-import com.programovil.aura.theme.AppTheme
+import com.programovil.aura.designsystem.theme.AppTheme
 import com.programovil.aura.habit.presentation.viewmodel.HabitEvent
 import com.programovil.aura.habit.presentation.viewmodel.HabitViewModel
 import kotlinx.datetime.*

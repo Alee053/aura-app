@@ -42,7 +42,7 @@ class GetHabitsGroupedByDayUseCase(private val repository: HabitRepository) {
         completions: List<HabitCompletion>,
         date: LocalDate
     ): List<HabitWithStatus> {
-        val dayOfWeek = date.dayOfWeek.isoDayNumber // 1=Monday, 7=Sunday
+        val dayOfWeek = date.dayOfWeek.ordinal + 1 // 1=Monday, 7=Sunday
         val dateStr = date.toString()
 
         return habits

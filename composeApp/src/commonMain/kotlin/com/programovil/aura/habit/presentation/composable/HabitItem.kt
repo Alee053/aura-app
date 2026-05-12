@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
-import com.programovil.aura.AppTheme
+import com.programovil.aura.designsystem.theme.AppTheme
 import com.programovil.aura.habit.domain.model.HabitWithStatus
 import com.programovil.aura.shared.parseHexColor
 

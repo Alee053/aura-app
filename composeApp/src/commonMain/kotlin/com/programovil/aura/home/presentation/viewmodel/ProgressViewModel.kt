@@ -80,7 +80,7 @@ class ProgressViewModel(
         val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
         repeat(90) {
             if (habit.recurrenceType == com.programovil.aura.habit.domain.model.RecurrenceType.DAILY ||
-                habit.daysOfWeek.contains(currentDate.dayOfWeek.isoDayNumber)
+                habit.daysOfWeek.contains(currentDate.dayOfWeek.ordinal + 1)
             ) {
                 val dateStr = currentDate.toString()
                 if (completedDates.contains(dateStr)) {

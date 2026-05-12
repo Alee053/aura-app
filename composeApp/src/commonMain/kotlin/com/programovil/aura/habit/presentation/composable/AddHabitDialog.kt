@@ -43,7 +43,7 @@ import aura_app.composeapp.generated.resources.color_label
 import aura_app.composeapp.generated.resources.cancel
 import aura_app.composeapp.generated.resources.save
 import org.jetbrains.compose.resources.stringResource
-import com.programovil.aura.AppTheme
+import com.programovil.aura.designsystem.theme.AppTheme
 import com.programovil.aura.habit.domain.model.RecurrenceType
 import com.programovil.aura.shared.parseHexColor
 

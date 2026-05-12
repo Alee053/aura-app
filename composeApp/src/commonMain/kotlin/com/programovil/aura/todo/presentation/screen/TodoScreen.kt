@@ -136,8 +136,8 @@ fun TodoScreen(
                     .toLocalDateTime(TimeZone.currentSystemDefault()).date
                 Text(
                     text = stringResource(Res.string.due_date_label, date.toString()),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.primary,
+                    style = AppTheme.typography.labelLarge,
+                    color = AppTheme.colors.primary,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
             }
@@ -152,8 +152,8 @@ fun TodoScreen(
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Text(
                             stringResource(Res.string.empty_todos),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            style = AppTheme.typography.bodyMedium,
+                            color = AppTheme.colors.textPrimary.copy(alpha = 0.6f)
                         )
                     }
                 }

@@ -10,7 +10,9 @@ data class AppColors(
     val surface: Color,
     val textPrimary: Color,
     val accent: Color,
-    val isLight: Boolean
+    val isLight: Boolean,
+    val error: Color = Color(0xFFCF6679),
+    val textSecondary: Color = textPrimary.copy(alpha = 0.6f)
 )
 
 val PurplePalette = AppColors(

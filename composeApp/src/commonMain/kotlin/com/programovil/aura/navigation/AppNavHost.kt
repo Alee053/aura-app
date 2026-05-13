@@ -19,7 +19,8 @@ fun AppNavHost(
     navController: NavHostController,
     todoViewModel: TodoViewModel,
     currentThemeMode: ThemeMode,
-    onThemeChange: (ThemeMode) -> Unit
+    onThemeChange: (ThemeMode) -> Unit,
+    onSignOut: () -> Unit
 ) {
     NavHost(navController = navController, startDestination = NavRoute.Home) {
         composable<NavRoute.Home> {
@@ -44,7 +45,8 @@ fun AppNavHost(
             SettingsScreen(
                 viewModel = settingsViewModel,
                 currentThemeMode = currentThemeMode,
-                onThemeChange = onThemeChange
+                onThemeChange = onThemeChange,
+                onSignOut = onSignOut
             )
         }
     }

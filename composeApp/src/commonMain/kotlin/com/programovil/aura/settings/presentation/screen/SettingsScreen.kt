@@ -12,13 +12,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -39,7 +38,8 @@ import com.programovil.aura.shared.presentation.rememberNotificationPermissionSt
 fun SettingsScreen(
     viewModel: SettingsViewModel,
     currentThemeMode: ThemeMode,
-    onThemeChange: (ThemeMode) -> Unit
+    onThemeChange: (ThemeMode) -> Unit,
+    onSignOut: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -84,7 +84,21 @@ fun SettingsScreen(
                     modifier = Modifier.weight(1f),
                     textAlign = TextAlign.Center
                 )
-                Spacer(modifier = Modifier.size(48.dp))
+                TextButton(onClick = onSignOut) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Logout,
+                        contentDescription = "Sign out",
+                        tint = AppTheme.colors.textSecondary,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.size(4.dp))
+                    Text(
+                        text = "Logout",
+                        style = AppTheme.typography.labelLarge,
+                        color = AppTheme.colors.textSecondary
+                    )
+                }
+                Spacer(modifier = Modifier.size(8.dp))
             }
 
             Spacer(modifier = Modifier.height(24.dp))

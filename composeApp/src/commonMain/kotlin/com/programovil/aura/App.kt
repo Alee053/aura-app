@@ -1,8 +1,8 @@
 package com.programovil.aura
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
@@ -71,7 +71,8 @@ fun App(
             is AuthViewModel.AuthState.SignedIn -> {
                 AuthenticatedApp(
                     currentThemeMode = currentThemeMode,
-                    onThemeChange = { settingsViewModel.setThemeMode(it) }
+                    onThemeChange = { settingsViewModel.setThemeMode(it) },
+                    onSignOut = { authViewModel.signOut() }
                 )
             }
             is AuthViewModel.AuthState.SignedOut,
@@ -88,7 +89,8 @@ fun App(
 @Composable
 fun AuthenticatedApp(
     currentThemeMode: ThemeMode,
-    onThemeChange: (ThemeMode) -> Unit
+    onThemeChange: (ThemeMode) -> Unit,
+    onSignOut: () -> Unit
 ) {
     val navController = rememberNavController()
     val todoViewModel: TodoViewModel = koinViewModel()
@@ -192,7 +194,8 @@ fun AuthenticatedApp(
                 navController = navController,
                 todoViewModel = todoViewModel,
                 currentThemeMode = currentThemeMode,
-                onThemeChange = onThemeChange
+                onThemeChange = onThemeChange,
+                onSignOut = onSignOut
             )
         }
     }

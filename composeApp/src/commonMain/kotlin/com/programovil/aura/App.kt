@@ -1,22 +1,21 @@
 package com.programovil.aura
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,7 +26,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -36,6 +34,10 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.programovil.aura.auth.presentation.AuthViewModel
+import com.programovil.aura.auth.presentation.screen.SignInScreen
+import com.programovil.aura.designsystem.theme.AppTheme
+import com.programovil.aura.designsystem.theme.DsTheme
+import com.programovil.aura.designsystem.theme.ThemeMode
 import com.programovil.aura.navigation.AppNavHost
 import com.programovil.aura.navigation.NavRoute
 import com.programovil.aura.shared.FeatureFlag
@@ -49,18 +51,27 @@ import org.koin.compose.viewmodel.koinViewModel
 fun App(
     onSignInClick: () -> Unit = {}
 ) {
-    MaterialTheme {
+    val settingsViewModel = koinViewModel<com.programovil.aura.settings.presentation.viewmodel.SettingsViewModel>()
+    val settingsState by settingsViewModel.uiState.collectAsState()
+    val currentThemeMode = settingsState.themeMode
+
+    DsTheme(mode = currentThemeMode) {
         val authViewModel: AuthViewModel = koinViewModel()
         val authState by authViewModel.authState.collectAsState()
 
         when (val state = authState) {
             is AuthViewModel.AuthState.Loading -> {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
+                Box(
+                    modifier = Modifier.fillMaxSize().background(AppTheme.colors.background),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = AppTheme.colors.primary)
                 }
             }
             is AuthViewModel.AuthState.SignedIn -> {
                 AuthenticatedApp(
+                    currentThemeMode = currentThemeMode,
+                    onThemeChange = { settingsViewModel.setThemeMode(it) },
                     onSignOut = { authViewModel.signOut() }
                 )
             }
@@ -77,6 +88,8 @@ fun App(
 
 @Composable
 fun AuthenticatedApp(
+    currentThemeMode: ThemeMode,
+    onThemeChange: (ThemeMode) -> Unit,
     onSignOut: () -> Unit
 ) {
     val navController = rememberNavController()
@@ -96,13 +109,37 @@ fun AuthenticatedApp(
     val showHabits by remember(featureFlags) {
         mutableStateOf(featureFlags[FeatureFlag.HABITS_ENABLED] ?: true)
     }
-    val showNotifications by remember(featureFlags) {
-        mutableStateOf(featureFlags[FeatureFlag.NOTIFICATIONS_ENABLED] ?: true)
-    }
+
+    val navItemColors = NavigationBarItemDefaults.colors(
+        selectedIconColor = AppTheme.colors.primary,
+        selectedTextColor = AppTheme.colors.primary,
+        unselectedIconColor = AppTheme.colors.textSecondary,
+        unselectedTextColor = AppTheme.colors.textSecondary,
+        indicatorColor = AppTheme.colors.primary.copy(alpha = 0.15f)
+    )
 
     Scaffold(
+        containerColor = AppTheme.colors.background,
+        contentWindowInsets = WindowInsets.safeDrawing,
         bottomBar = {
-            NavigationBar {
+            NavigationBar(
+                containerColor = AppTheme.colors.surface,
+                contentColor = AppTheme.colors.primary
+            ) {
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+                    label = { Text("Home") },
+                    selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Home>() } == true,
+                    onClick = {
+                        navController.navigate(NavRoute.Home) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                inclusive = false
+                            }
+                            launchSingleTop = true
+                        }
+                    },
+                    colors = navItemColors
+                )
                 if (showTodos) {
                     NavigationBarItem(
                         icon = { Icon(Icons.Default.Checklist, contentDescription = "Todos") },
@@ -111,12 +148,12 @@ fun AuthenticatedApp(
                         onClick = {
                             navController.navigate(NavRoute.Todo) {
                                 popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
+                                    inclusive = false
                                 }
                                 launchSingleTop = true
-                                restoreState = true
                             }
-                        }
+                        },
+                        colors = navItemColors
                     )
                 }
                 if (showHabits) {
@@ -127,30 +164,28 @@ fun AuthenticatedApp(
                         onClick = {
                             navController.navigate(NavRoute.Habit) {
                                 popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
+                                    inclusive = false
                                 }
                                 launchSingleTop = true
-                                restoreState = true
                             }
-                        }
+                        },
+                        colors = navItemColors
                     )
                 }
-                if (showNotifications) {
-                    NavigationBarItem(
-                        icon = { Icon(Icons.Default.Notifications, contentDescription = "Notifications") },
-                        label = { Text("Notifs") },
-                        selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.NotificationSettings>() } == true,
-                        onClick = {
-                            navController.navigate(NavRoute.NotificationSettings) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
+                    label = { Text("Settings") },
+                    selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Settings>() } == true,
+                    onClick = {
+                        navController.navigate(NavRoute.Settings) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                inclusive = false
                             }
+                            launchSingleTop = true
                         }
-                    )
-                }
+                    },
+                    colors = navItemColors
+                )
             }
         }
     ) { padding ->
@@ -158,46 +193,12 @@ fun AuthenticatedApp(
             AppNavHost(
                 navController = navController,
                 todoViewModel = todoViewModel,
+                currentThemeMode = currentThemeMode,
+                onThemeChange = onThemeChange,
                 onSignOut = onSignOut
             )
         }
     }
 }
 
-@Composable
-fun SignInScreen(
-    errorMessage: String?,
-    onSignInClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            "Aura",
-            style = MaterialTheme.typography.headlineLarge
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            "Sign in to sync your todos",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(32.dp))
-        Button(onClick = onSignInClick) {
-            Text("Sign in with Google")
-        }
-        errorMessage?.let {
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                it,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = 32.dp)
-            )
-        }
-    }
-}
+

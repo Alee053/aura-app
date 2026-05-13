@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.programovil.aura.habit.presentation.composable.AddHabitDialog
 import com.programovil.aura.habit.presentation.composable.HabitItem
+import com.programovil.aura.designsystem.theme.AppTheme
 import com.programovil.aura.habit.presentation.viewmodel.HabitEvent
 import com.programovil.aura.habit.presentation.viewmodel.HabitViewModel
 import kotlinx.datetime.*
@@ -36,13 +37,12 @@ import org.koin.compose.koinInject
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HabitScreen(
-    viewModel: HabitViewModel = koinInject(),
-    onSignOut: () -> Unit = {}
+    viewModel: HabitViewModel = koinInject()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
     val snackbarHostState = remember { SnackbarHostState() }
-    
+
     val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
     val tomorrow = today.plus(1, DateTimeUnit.DAY)
 
@@ -54,6 +54,7 @@ fun HabitScreen(
     }
 
     Scaffold(
+        containerColor = AppTheme.colors.background,
         topBar = {
             TopAppBar(
                 title = {
@@ -61,26 +62,31 @@ fun HabitScreen(
                         Text(stringResource(Res.string.habits_title))
                         Text(
                             text = today.toString(),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            style = AppTheme.typography.labelLarge,
+                            color = AppTheme.colors.textSecondary
                         )
                     }
                 },
                 actions = {
                     IconButton(onClick = { showAddDialog = true }) {
-                        Icon(Icons.Default.Add, contentDescription = stringResource(Res.string.add_habit))
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = stringResource(Res.string.add_habit),
+                            tint = AppTheme.colors.primary
+                        )
                     }
-                    IconButton(onClick = onSignOut) {
-                        Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = stringResource(Res.string.sign_out))
-                    }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = AppTheme.colors.surface,
+                    titleContentColor = AppTheme.colors.textPrimary
+                )
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
         if (uiState.isLoading) {
             Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(color = AppTheme.colors.primary)
             }
         } else {
             LazyColumn(
@@ -89,7 +95,6 @@ fun HabitScreen(
                     .padding(padding),
                 contentPadding = PaddingValues(vertical = 8.dp)
             ) {
-                // Today section
                 if (uiState.todayHabits.isNotEmpty()) {
                     item {
                         HabitSectionHeader(
@@ -112,7 +117,6 @@ fun HabitScreen(
                     }
                 }
 
-                // Tomorrow section
                 if (uiState.tomorrowHabits.isNotEmpty()) {
                     item {
                         HabitSectionHeader(
@@ -135,7 +139,6 @@ fun HabitScreen(
                     }
                 }
 
-                // This Week section
                 if (uiState.thisWeekHabits.isNotEmpty()) {
                     item {
                         HabitSectionHeader(
@@ -158,15 +161,14 @@ fun HabitScreen(
                     }
                 }
 
-                // Empty state
                 if (uiState.todayHabits.isEmpty() &&
                     uiState.tomorrowHabits.isEmpty() &&
                     uiState.thisWeekHabits.isEmpty()) {
                     item {
                         Text(
                             text = stringResource(Res.string.empty_habits),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = AppTheme.typography.bodyMedium,
+                            color = AppTheme.colors.textSecondary,
                             modifier = Modifier.padding(32.dp)
                         )
                     }
@@ -195,14 +197,14 @@ private fun HabitSectionHeader(title: String, subtitle: String?) {
     ) {
         Text(
             text = title,
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.primary
+            style = AppTheme.typography.titleMedium,
+            color = AppTheme.colors.textPrimary
         )
         if (subtitle != null) {
             Text(
                 text = subtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                style = AppTheme.typography.labelLarge,
+                color = AppTheme.colors.textSecondary
             )
         }
     }

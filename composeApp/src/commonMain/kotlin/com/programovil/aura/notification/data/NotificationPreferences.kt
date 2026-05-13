@@ -14,6 +14,7 @@ class NotificationPreferences(private val dataStore: DataStore<Preferences>) {
         val DAILY_SUMMARY_ENABLED = booleanPreferencesKey("daily_summary_enabled")
         val NOTIFICATION_HOUR = intPreferencesKey("notification_hour")
         val NOTIFICATION_MINUTE = intPreferencesKey("notification_minute")
+
     }
 
     val dailySummaryEnabled: Flow<Boolean> = dataStore.data
@@ -34,5 +35,9 @@ class NotificationPreferences(private val dataStore: DataStore<Preferences>) {
             prefs[Keys.NOTIFICATION_HOUR] = hour
             prefs[Keys.NOTIFICATION_MINUTE] = minute
         }
+    }
+
+    fun testNotification() {
+        // no-op in common
     }
 }

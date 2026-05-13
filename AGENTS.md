@@ -56,7 +56,7 @@ com.programovil.aura/
 │   ├── data/repository/               # Platform-specific Repository (expect/actual)
 │   ├── presentation/                  # Screen, ViewModel, Composable
 │   └── di/TodoModule.kt
-├── habit/                             # Habit feature - Room KMP backed
+├── habit/                             # Habit feature - Firestore backed (iOS stubs)
 │   ├── domain/                        # Models, Repository Interface, UseCases
 │   ├── data/                          # Shared Repository, Mappers
 │   │   └── repository/                # Platform-specific Repository (expect/actual)
@@ -94,7 +94,7 @@ com.programovil.aura/
 
 ### Data Layer (`/data/`)
 - **Repository implementations**: Concrete implementations of domain interfaces via `expect`/`actual`.
-- **Local Store**: DataStore KMP for preferences, Room KMP for SQLite.
+- **Local Store**: DataStore KMP for preferences.
 - **Remote Source**: Firebase Firestore and Firebase Remote Config (implemented via platform actuals).
 - **Mappers**: DTO/Entity to Domain model transformations.
 
@@ -151,10 +151,11 @@ fun getModules(remoteConfigService: RemoteConfigService) = listOf(
 
 ## Persistence Patterns
 
-### Local Persistence (Room KMP)
-Defined in `commonMain` with `expect fun getHabitDatabaseBuilder()`.
-- **Android**: Uses `AndroidSQLiteDriver`.
-- **iOS**: Uses `BundledSQLiteDriver`.
+### Local Persistence (Room KMP — not yet implemented)
+Room KMP is listed in the tech stack but not currently used. Habit data is stored in Firestore on Android and stubbed on iOS. When local caching is added, the expected pattern is:
+- `commonMain` declares `expect fun getHabitDatabaseBuilder()`.
+- `androidMain` provides `AndroidSQLiteDriver`.
+- `iosMain` provides `BundledSQLiteDriver`.
 
 ### Local Preferences (DataStore KMP)
 Defined in `commonMain` with `expect fun createDataStore()`.

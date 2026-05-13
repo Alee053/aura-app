@@ -39,8 +39,7 @@ import kotlinx.datetime.toLocalDateTime
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TodoScreen(
-    viewModel: TodoViewModel,
-    onSignOut: () -> Unit = {}
+    viewModel: TodoViewModel
 ) {
     val todos by viewModel.todos.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
@@ -85,12 +84,7 @@ fun TodoScreen(
         containerColor = AppTheme.colors.background,
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(Res.string.todos_title)) },
-                actions = {
-                    IconButton(onClick = onSignOut) {
-                        Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = stringResource(Res.string.sign_out))
-                    }
-                }
+                title = { Text(stringResource(Res.string.todos_title)) }
             )
         },
         floatingActionButton = {

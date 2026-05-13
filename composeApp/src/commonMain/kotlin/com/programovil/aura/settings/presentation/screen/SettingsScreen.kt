@@ -38,8 +38,7 @@ import com.programovil.aura.settings.presentation.viewmodel.SettingsViewModel
 fun SettingsScreen(
     viewModel: SettingsViewModel,
     currentThemeMode: ThemeMode,
-    onThemeChange: (ThemeMode) -> Unit,
-    onBackClick: () -> Unit
+    onThemeChange: (ThemeMode) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -68,13 +67,7 @@ fun SettingsScreen(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = onBackClick) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        tint = AppTheme.colors.textPrimary
-                    )
-                }
+                Spacer(modifier = Modifier.size(48.dp))
                 Text(
                     text = "Settings",
                     style = AppTheme.typography.headlineLarge,

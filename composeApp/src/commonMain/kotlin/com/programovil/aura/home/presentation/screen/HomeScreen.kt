@@ -29,15 +29,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.programovil.aura.designsystem.theme.AppTheme
-import com.programovil.aura.home.presentation.composable.HomeButton
 import com.programovil.aura.home.presentation.viewmodel.HomeViewModel
 
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
-    onTasksClick: () -> Unit = {},
-    onFocusClick: () -> Unit = {},
-    onProgressClick: () -> Unit = {},
+    onTodoClick: () -> Unit = {},
+    onHabitClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -56,7 +54,7 @@ fun HomeScreen(
             .draggable(
                 state = rememberDraggableState { delta ->
                     if (delta < -20) {
-                        onTasksClick()
+                        onTodoClick()
                     }
                 },
                 orientation = Orientation.Vertical
@@ -72,7 +70,7 @@ fun HomeScreen(
                     .size(240.dp)
                     .border(1.dp, Color.White.copy(alpha = 0.2f), CircleShape)
                     .background(Color.White.copy(alpha = 0.05f), CircleShape)
-                    .clickable { onTasksClick() },
+                    .clickable { onTodoClick() },
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -98,7 +96,7 @@ fun HomeScreen(
                 style = AppTheme.typography.bodyMedium,
                 color = Color.White.copy(alpha = 0.4f),
                 fontSize = 14.sp,
-                modifier = Modifier.clickable { onTasksClick() }
+                modifier = Modifier.clickable { onTodoClick() }
             )
         }
 
@@ -109,9 +107,12 @@ fun HomeScreen(
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            HomeButton(text = "FOCUS", onClick = onFocusClick)
-            HomeButton(text = "PROGRESS", onClick = onProgressClick)
-            HomeButton(text = "SETTINGS", onClick = onSettingsClick)
+            Text(
+                text = "SETTINGS",
+                style = AppTheme.typography.labelLarge,
+                color = Color.White.copy(alpha = 0.7f),
+                modifier = Modifier.clickable { onSettingsClick() }
+            )
         }
     }
 }

@@ -73,8 +73,7 @@ fun App(
             is AuthViewModel.AuthState.SignedIn -> {
                 AuthenticatedApp(
                     currentThemeMode = currentThemeMode,
-                    onThemeChange = { settingsViewModel.setThemeMode(it) },
-                    onSignOut = { authViewModel.signOut() }
+                    onThemeChange = { settingsViewModel.setThemeMode(it) }
                 )
             }
             is AuthViewModel.AuthState.SignedOut,
@@ -91,8 +90,7 @@ fun App(
 @Composable
 fun AuthenticatedApp(
     currentThemeMode: ThemeMode,
-    onThemeChange: (ThemeMode) -> Unit,
-    onSignOut: () -> Unit
+    onThemeChange: (ThemeMode) -> Unit
 ) {
     val navController = rememberNavController()
     val todoViewModel: TodoViewModel = koinViewModel()
@@ -180,8 +178,7 @@ fun AuthenticatedApp(
                 navController = navController,
                 todoViewModel = todoViewModel,
                 currentThemeMode = currentThemeMode,
-                onThemeChange = onThemeChange,
-                onSignOut = onSignOut
+                onThemeChange = onThemeChange
             )
         }
     }

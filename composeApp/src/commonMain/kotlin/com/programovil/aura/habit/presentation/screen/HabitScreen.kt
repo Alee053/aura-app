@@ -37,8 +37,7 @@ import org.koin.compose.koinInject
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HabitScreen(
-    viewModel: HabitViewModel = koinInject(),
-    onSignOut: () -> Unit = {}
+    viewModel: HabitViewModel = koinInject()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showAddDialog by remember { mutableStateOf(false) }
@@ -71,9 +70,6 @@ fun HabitScreen(
                 actions = {
                     IconButton(onClick = { showAddDialog = true }) {
                         Icon(Icons.Default.Add, contentDescription = stringResource(Res.string.add_habit))
-                    }
-                    IconButton(onClick = onSignOut) {
-                        Icon(Icons.AutoMirrored.Filled.ExitToApp, contentDescription = stringResource(Res.string.sign_out))
                     }
                 }
             )

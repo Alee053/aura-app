@@ -69,7 +69,11 @@ fun HabitScreen(
                 },
                 actions = {
                     IconButton(onClick = { showAddDialog = true }) {
-                        Icon(Icons.Default.Add, contentDescription = stringResource(Res.string.add_habit))
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = stringResource(Res.string.add_habit),
+                            tint = AppTheme.colors.primary
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

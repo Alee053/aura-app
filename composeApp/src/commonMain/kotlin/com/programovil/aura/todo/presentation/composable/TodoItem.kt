@@ -5,11 +5,15 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -78,11 +82,12 @@ fun TodoItem(
                     )
                 }
             }
-            IconButton(onClick = onDelete) {
-                Text(
-                    stringResource(Res.string.delete),
-                    style = AppTheme.typography.labelLarge,
-                    color = AppTheme.colors.primary
+            IconButton(onClick = onDelete, modifier = Modifier.size(40.dp)) {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = stringResource(Res.string.delete),
+                    tint = AppTheme.colors.textSecondary,
+                    modifier = Modifier.size(20.dp)
                 )
             }
         }

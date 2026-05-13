@@ -77,7 +77,7 @@ fun HomeScreen(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = uiState.tasksToday.toString(),
+                        text = uiState.dashboardData.incompleteTodos.toString(),
                         fontSize = 80.sp,
                         fontWeight = FontWeight.Light,
                         color = Color.White

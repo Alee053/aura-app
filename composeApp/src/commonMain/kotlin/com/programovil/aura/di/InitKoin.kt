@@ -15,8 +15,8 @@ fun getModules(remoteConfigService: RemoteConfigService) = listOf(
     todoModule,
     habitModule,
     notificationModule,
-    settingsModule,
     homeModule,
+    settingsModule,
     module {
         single<RemoteConfigService> { remoteConfigService }
         single { FeatureFlagManager(get()) }

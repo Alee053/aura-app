@@ -72,10 +72,10 @@ home/
 settings/
 ├── di/SettingsModule.kt
 ├── data/
-│   ├── ThemeRepository.kt          # Interface (moved from home/data/)
 │   └── ThemeRepositoryImpl.kt
 ├── domain/
-│   └── (use cases not needed — simple CRUD via repository)
+│   └── repository/
+│       └── ThemeRepository.kt      # Interface (moved from home/data/, now in domain/ per Clean Architecture)
 └── presentation/
     ├── composable/
     │   ├── ThemeCard.kt
@@ -84,7 +84,8 @@ settings/
     └── viewmodel/SettingsViewModel.kt
 ```
 
-- `ThemeRepository` interface moves from `home/data/` to `settings/data/` (implementation stays with it)
+- `ThemeRepository` interface moves from `home/data/` to `settings/domain/repository/` per Clean Architecture (interfaces in domain, implementations in data)
+- `ThemeRepositoryImpl` stays in `settings/data/`
 - `SettingsModule` replaces the settings-related DI in `HomeModule`
 - Single `SettingsViewModel` instance scoped at app level (remove duplicate from `AppNavHost`)
 
@@ -312,7 +313,7 @@ Add `settingsModule` to the module list.
 | File | Purpose |
 |------|---------|
 | `settings/di/SettingsModule.kt` | DI for settings feature |
-| `settings/data/ThemeRepository.kt` | Moved from `home/data/` |
+| `settings/domain/repository/ThemeRepository.kt` | Moved from `home/data/`, now in domain/ per Clean Architecture |
 | `settings/data/ThemeRepositoryImpl.kt` | Moved from `home/data/` |
 | `settings/presentation/composable/ThemeCard.kt` | Moved from `home/presentation/composable/` |
 | `settings/presentation/composable/PreferenceItem.kt` | Moved from `home/presentation/composable/` |
@@ -320,8 +321,7 @@ Add `settingsModule` to the module list.
 | `settings/presentation/viewmodel/SettingsViewModel.kt` | Moved from `home/presentation/viewmodel/` |
 | `home/domain/model/DashboardData.kt` | Dashboard data models |
 | `home/domain/usecase/GetDashboardDataUseCase.kt` | Dashboard data aggregation |
-| `home/presentation/composable/DashboardCard.kt` | New dashboard card component |
-| `designsystem/components/card/DashboardCard.kt` | Or here if design-system-level component |
+| `home/presentation/composable/DashboardCard.kt` | New dashboard card component (app-specific, in home feature) |
 
 ## 9. Files to Modify
 

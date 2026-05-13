@@ -2,8 +2,8 @@ package com.programovil.aura.home.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.programovil.aura.todo.domain.model.Todo
-import com.programovil.aura.todo.domain.repository.TodoRepository
+import com.programovil.aura.home.domain.model.DashboardData
+import com.programovil.aura.home.domain.usecase.GetDashboardDataUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,12 +11,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 data class HomeUiState(
-    val tasksToday: Int = 0,
-    val isLoading: Boolean = false
+    val dashboardData: DashboardData = DashboardData(),
+    val isLoading: Boolean = true
 )
 
 class HomeViewModel(
-    private val todoRepository: TodoRepository
+    private val getDashboardDataUseCase: GetDashboardDataUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -24,15 +24,9 @@ class HomeViewModel(
 
     init {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            todoRepository.getTodos().collect { result ->
-                result.onSuccess { todos ->
-                    _uiState.update {
-                        it.copy(
-                            tasksToday = todos.count { todo -> !todo.isCompleted },
-                            isLoading = false
-                        )
-                    }
+            getDashboardDataUseCase().collect { result ->
+                result.onSuccess { data ->
+                    _uiState.update { it.copy(dashboardData = data, isLoading = false) }
                 }.onFailure {
                     _uiState.update { it.copy(isLoading = false) }
                 }

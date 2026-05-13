@@ -73,7 +73,7 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(32.dp))
 
         DashboardCard(
-            title = "TASKS TODAY",
+            title = "TODOS TODAY",
             value = if (uiState.isLoading) "..." else uiState.dashboardData.incompleteTodos.toString(),
             subtitle = "${uiState.dashboardData.incompleteTodos} remaining",
             onClick = onTodoClick

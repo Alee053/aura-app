@@ -133,10 +133,9 @@ fun AuthenticatedApp(
                     onClick = {
                         navController.navigate(NavRoute.Home) {
                             popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
+                                inclusive = false
                             }
                             launchSingleTop = true
-                            restoreState = true
                         }
                     },
                     colors = navItemColors
@@ -149,10 +148,9 @@ fun AuthenticatedApp(
                         onClick = {
                             navController.navigate(NavRoute.Todo) {
                                 popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
+                                    inclusive = false
                                 }
                                 launchSingleTop = true
-                                restoreState = true
                             }
                         },
                         colors = navItemColors
@@ -166,10 +164,9 @@ fun AuthenticatedApp(
                         onClick = {
                             navController.navigate(NavRoute.Habit) {
                                 popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
+                                    inclusive = false
                                 }
                                 launchSingleTop = true
-                                restoreState = true
                             }
                         },
                         colors = navItemColors
@@ -182,10 +179,9 @@ fun AuthenticatedApp(
                     onClick = {
                         navController.navigate(NavRoute.Settings) {
                             popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
+                                inclusive = false
                             }
                             launchSingleTop = true
-                            restoreState = true
                         }
                     },
                     colors = navItemColors

@@ -1,4 +1,4 @@
-package com.programovil.aura.home.presentation.screen
+package com.programovil.aura.settings.presentation.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -22,32 +22,26 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.programovil.aura.designsystem.theme.AppTheme
 import com.programovil.aura.designsystem.theme.ThemeMode
-import com.programovil.aura.home.presentation.composable.PreferenceItem
-import com.programovil.aura.home.presentation.composable.ThemeCard
-import com.programovil.aura.home.presentation.viewmodel.SettingsViewModel
+import com.programovil.aura.settings.presentation.composable.PreferenceItem
+import com.programovil.aura.settings.presentation.composable.ThemeCard
+import com.programovil.aura.settings.presentation.viewmodel.SettingsViewModel
 
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel,
     currentThemeMode: ThemeMode,
     onThemeChange: (ThemeMode) -> Unit,
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var soundsEnabled by remember { mutableStateOf(false) }
-    var vibrationEnabled by remember { mutableStateOf(true) }
 
     Box(
         modifier = Modifier
@@ -68,72 +62,79 @@ fun SettingsScreen(
                 .padding(horizontal = 24.dp)
                 .verticalScroll(rememberScrollState())
         ) {
+            Spacer(modifier = Modifier.height(16.dp))
+
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp),
+                modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(
-                    onClick = onBackClick,
-                    modifier = Modifier
-                        .background(Color.White.copy(alpha = 0.1f), CircleShape)
-                        .size(40.dp)
-                ) {
+                IconButton(onClick = onBackClick) {
                     Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
+                        tint = AppTheme.colors.textPrimary
                     )
                 }
                 Text(
                     text = "Settings",
+                    style = AppTheme.typography.headlineLarge,
+                    color = AppTheme.colors.textPrimary,
                     modifier = Modifier.weight(1f),
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                    style = AppTheme.typography.bodyMedium,
-                    color = Color.White.copy(alpha = 0.7f),
-                    fontSize = 20.sp
+                    textAlign = TextAlign.Center
                 )
-                Spacer(modifier = Modifier.size(40.dp))
+                Spacer(modifier = Modifier.size(48.dp))
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             Text(
                 text = "Themes",
-                color = Color.White.copy(alpha = 0.6f),
-                fontSize = 16.sp,
+                style = AppTheme.typography.titleMedium,
+                color = AppTheme.colors.textSecondary,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
             ThemeCard(
                 name = "Arctic Night",
-                colors = listOf(Color(0xFF1A237E), Color(0xFF6C5CE7)),
+                colors = listOf(androidx.compose.ui.graphics.Color(0xFF1A237E), androidx.compose.ui.graphics.Color(0xFF6C5CE7)),
                 isSelected = currentThemeMode == ThemeMode.PURPLE,
                 onSelect = { onThemeChange(ThemeMode.PURPLE) }
             )
             Spacer(modifier = Modifier.height(12.dp))
             ThemeCard(
                 name = "Forest Dawn",
-                colors = listOf(Color(0xFF0A2B23), Color(0xFF16A085)),
+                colors = listOf(androidx.compose.ui.graphics.Color(0xFF0A2B23), androidx.compose.ui.graphics.Color(0xFF16A085)),
                 isSelected = currentThemeMode == ThemeMode.GREEN,
                 onSelect = { onThemeChange(ThemeMode.GREEN) }
             )
             Spacer(modifier = Modifier.height(12.dp))
             ThemeCard(
                 name = "Silent Desert",
-                colors = listOf(Color(0xFF2C0B0B), Color(0xFFB33939)),
+                colors = listOf(androidx.compose.ui.graphics.Color(0xFF2C0B0B), androidx.compose.ui.graphics.Color(0xFFB33939)),
                 isSelected = currentThemeMode == ThemeMode.RED,
                 onSelect = { onThemeChange(ThemeMode.RED) }
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            ThemeCard(
+                name = "Midnight",
+                colors = listOf(androidx.compose.ui.graphics.Color(0xFF121212), androidx.compose.ui.graphics.Color(0xFFBB86EC)),
+                isSelected = currentThemeMode == ThemeMode.DARK,
+                onSelect = { onThemeChange(ThemeMode.DARK) }
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            ThemeCard(
+                name = "High Contrast",
+                colors = listOf(androidx.compose.ui.graphics.Color(0xFF000000), androidx.compose.ui.graphics.Color(0xFFFFFF00)),
+                isSelected = currentThemeMode == ThemeMode.HIGH_CONTRAST,
+                onSelect = { onThemeChange(ThemeMode.HIGH_CONTRAST) }
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
             Text(
                 text = "Preferences",
-                color = Color.White.copy(alpha = 0.6f),
-                fontSize = 16.sp,
+                style = AppTheme.typography.titleMedium,
+                color = AppTheme.colors.textSecondary,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
 
@@ -147,15 +148,15 @@ fun SettingsScreen(
             PreferenceItem(
                 title = "Sounds",
                 subtitle = "Subtle sound effects",
-                checked = soundsEnabled,
-                onCheckedChange = { soundsEnabled = it }
+                checked = uiState.soundsEnabled,
+                onCheckedChange = { viewModel.setSoundsEnabled(it) }
             )
             Spacer(modifier = Modifier.height(12.dp))
             PreferenceItem(
                 title = "Vibration",
                 subtitle = "Haptic feedback",
-                checked = vibrationEnabled,
-                onCheckedChange = { vibrationEnabled = it }
+                checked = uiState.vibrationEnabled,
+                onCheckedChange = { viewModel.setVibrationEnabled(it) }
             )
 
             Spacer(modifier = Modifier.weight(1f))
@@ -168,20 +169,20 @@ fun SettingsScreen(
             ) {
                 Text(
                     "AURA",
-                    fontSize = 10.sp,
-                    color = Color.White.copy(alpha = 0.4f),
+                    style = AppTheme.typography.labelSmall,
+                    color = AppTheme.colors.textSecondary.copy(alpha = 0.7f),
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     "Version 1.0.0",
-                    fontSize = 10.sp,
-                    color = Color.White.copy(alpha = 0.3f)
+                    style = AppTheme.typography.labelSmall,
+                    color = AppTheme.colors.textSecondary.copy(alpha = 0.5f)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     "Made with love for mindful productivity",
-                    fontSize = 10.sp,
-                    color = Color.White.copy(alpha = 0.2f)
+                    style = AppTheme.typography.labelSmall,
+                    color = AppTheme.colors.textSecondary.copy(alpha = 0.3f)
                 )
             }
         }

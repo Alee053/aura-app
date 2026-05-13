@@ -1,11 +1,11 @@
-package com.programovil.aura.home.presentation.viewmodel
+package com.programovil.aura.settings.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.programovil.aura.designsystem.theme.ThemeMode
-import com.programovil.aura.home.data.ThemeRepository
 import com.programovil.aura.notification.data.NotificationPreferences
 import com.programovil.aura.notification.domain.NotificationScheduler
+import com.programovil.aura.settings.domain.repository.ThemeRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,7 +16,9 @@ data class SettingsUiState(
     val themeMode: ThemeMode = ThemeMode.PURPLE,
     val notificationsEnabled: Boolean = false,
     val notificationHour: Int = 8,
-    val notificationMinute: Int = 0
+    val notificationMinute: Int = 0,
+    val soundsEnabled: Boolean = false,
+    val vibrationEnabled: Boolean = true
 )
 
 class SettingsViewModel(
@@ -46,19 +48,13 @@ class SettingsViewModel(
             }
         }
         viewModelScope.launch {
-            notificationPreferences.notificationHour.collect { hour ->
-                _uiState.update { it.copy(notificationHour = hour) }
-                if (_uiState.value.notificationsEnabled) {
-                    notificationScheduler.scheduleDailySummary(hour, _uiState.value.notificationMinute)
-                }
+            notificationPreferences.soundsEnabled.collect { enabled ->
+                _uiState.update { it.copy(soundsEnabled = enabled) }
             }
         }
         viewModelScope.launch {
-            notificationPreferences.notificationMinute.collect { minute ->
-                _uiState.update { it.copy(notificationMinute = minute) }
-                if (_uiState.value.notificationsEnabled) {
-                    notificationScheduler.scheduleDailySummary(_uiState.value.notificationHour, minute)
-                }
+            notificationPreferences.vibrationEnabled.collect { enabled ->
+                _uiState.update { it.copy(vibrationEnabled = enabled) }
             }
         }
     }
@@ -75,13 +71,15 @@ class SettingsViewModel(
         }
     }
 
-    fun setNotificationTime(hour: Int, minute: Int) {
+    fun setSoundsEnabled(enabled: Boolean) {
         viewModelScope.launch {
-            notificationPreferences.setNotificationTime(hour, minute)
+            notificationPreferences.setSoundsEnabled(enabled)
         }
     }
 
-    fun testNotification() {
-        notificationScheduler.testNotification()
+    fun setVibrationEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            notificationPreferences.setVibrationEnabled(enabled)
+        }
     }
 }

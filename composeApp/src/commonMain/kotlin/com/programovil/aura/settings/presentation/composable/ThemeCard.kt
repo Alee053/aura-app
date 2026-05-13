@@ -1,4 +1,4 @@
-package com.programovil.aura.home.presentation.composable
+package com.programovil.aura.settings.presentation.composable
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -18,23 +18,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.programovil.aura.designsystem.theme.AppTheme
 
 @Composable
 fun ThemeCard(
     name: String,
-    colors: List<Color>,
+    colors: List<androidx.compose.ui.graphics.Color>,
     isSelected: Boolean,
     onSelect: () -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = Color.White.copy(alpha = 0.05f),
+        color = AppTheme.colors.surface,
         shape = RoundedCornerShape(24.dp),
-        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.1f)),
+        border = BorderStroke(1.dp, AppTheme.colors.textPrimary.copy(alpha = 0.1f)),
         onClick = onSelect
     ) {
         Row(
@@ -42,7 +40,11 @@ fun ThemeCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(text = name, color = Color.White, fontSize = 16.sp)
+                Text(
+                    text = name,
+                    style = AppTheme.typography.bodyMedium,
+                    color = AppTheme.colors.textPrimary
+                )
                 Spacer(modifier = Modifier.height(12.dp))
                 Box(
                     modifier = Modifier
@@ -58,10 +60,10 @@ fun ThemeCard(
                 checked = isSelected,
                 onCheckedChange = { if (it) onSelect() },
                 colors = SwitchDefaults.colors(
-                    checkedThumbColor = Color.White,
+                    checkedThumbColor = AppTheme.colors.textPrimary,
                     checkedTrackColor = AppTheme.colors.primary,
-                    uncheckedThumbColor = Color.White,
-                    uncheckedTrackColor = Color.White.copy(alpha = 0.1f)
+                    uncheckedThumbColor = AppTheme.colors.textPrimary,
+                    uncheckedTrackColor = AppTheme.colors.textPrimary.copy(alpha = 0.1f)
                 )
             )
         }

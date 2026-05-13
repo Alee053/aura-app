@@ -1,4 +1,4 @@
-package com.programovil.aura.home.data
+package com.programovil.aura.settings.domain.repository
 
 import com.programovil.aura.designsystem.theme.ThemeMode
 import kotlinx.coroutines.flow.Flow

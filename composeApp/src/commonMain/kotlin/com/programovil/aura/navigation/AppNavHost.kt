@@ -10,12 +10,12 @@ import com.programovil.aura.habit.presentation.screen.HabitScreen
 import com.programovil.aura.home.presentation.screen.FocusScreen
 import com.programovil.aura.home.presentation.screen.HomeScreen
 import com.programovil.aura.home.presentation.screen.ProgressScreen
-import com.programovil.aura.home.presentation.screen.SettingsScreen
+import com.programovil.aura.settings.presentation.screen.SettingsScreen
 import com.programovil.aura.home.presentation.screen.TasksScreen
 import com.programovil.aura.home.presentation.viewmodel.HomeViewModel
 import com.programovil.aura.home.presentation.viewmodel.FocusViewModel
 import com.programovil.aura.home.presentation.viewmodel.ProgressViewModel
-import com.programovil.aura.home.presentation.viewmodel.SettingsViewModel
+import com.programovil.aura.settings.presentation.viewmodel.SettingsViewModel
 import com.programovil.aura.todo.presentation.screen.TodoScreen
 import com.programovil.aura.todo.presentation.viewmodel.TodoViewModel
 import org.koin.compose.viewmodel.koinViewModel

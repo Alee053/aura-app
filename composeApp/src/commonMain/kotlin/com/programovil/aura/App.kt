@@ -42,7 +42,7 @@ import com.programovil.aura.auth.presentation.AuthViewModel
 import com.programovil.aura.designsystem.theme.AppTheme
 import com.programovil.aura.designsystem.theme.DsTheme
 import com.programovil.aura.designsystem.theme.ThemeMode
-import com.programovil.aura.home.presentation.viewmodel.SettingsViewModel
+import com.programovil.aura.settings.presentation.viewmodel.SettingsViewModel
 import com.programovil.aura.navigation.AppNavHost
 import com.programovil.aura.navigation.NavRoute
 import com.programovil.aura.shared.FeatureFlag

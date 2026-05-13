@@ -204,3 +204,84 @@ coVerify { repository.addTodo("Buy milk", null) }.wasInvoked(exactly = 1)
 
 ### Note
 The `mockative` plugin is only applied in `composeApp/build.gradle.kts`, not in the root `build.gradle.kts`. Adding it at root level causes classpath conflicts with the Android Gradle Plugin (AGP).
+
+---
+
+## Design System
+
+The app uses a custom design-system module (`designsystem/`) that provides theme tokens via `CompositionLocal`. All UI code in `composeApp/` must consume these tokens instead of hardcoded values or `MaterialTheme.colorScheme`.
+
+### Entry Point
+Wrap the app (or a screen) with `DsTheme`:
+```kotlin
+import com.programovil.aura.designsystem.theme.DsTheme
+import com.programovil.aura.designsystem.theme.ThemeMode
+
+DsTheme(mode = ThemeMode.PURPLE) {
+    // composables here
+}
+```
+
+### Accessing Tokens
+Use the `AppTheme` object inside any `@Composable`:
+```kotlin
+import com.programovil.aura.designsystem.theme.AppTheme
+
+Text(
+    text = "Hello",
+    style = AppTheme.typography.bodyMedium,
+    color = AppTheme.colors.textPrimary
+)
+```
+
+### Color Tokens (`AppColors`)
+| Token | Role |
+|-------|------|
+| `primary` | Brand color — buttons, active states, FABs |
+| `accent` | Secondary accent — gradients, highlights |
+| `background` | Root screen background |
+| `surface` | Cards, dialogs, bottom sheets, nav bar |
+| `textPrimary` | Main text, icons |
+| `textSecondary` | Subtitles, hints, disabled text (default = `textPrimary` @ 60%) |
+| `error` | Validation errors, destructive actions (default = `#CF6679`) |
+| `isLight` | Palette metadata for adaptive decisions |
+
+### Typography Tokens (`AppTypography`)
+| Token | Size / Weight | Usage |
+|-------|---------------|-------|
+| `displayLarge` | 80sp / Light | Dashboard KPIs, large numbers |
+| `headlineLarge` | 32sp / Bold | Screen titles, "AURA" branding |
+| `headlineSmall` | 24sp / SemiBold | Section headers, top-app-bar titles |
+| `titleMedium` | 20sp / SemiBold | Card titles, section labels |
+| `bodyLarge` | 18sp / Normal | Primary readable body text |
+| `bodyMedium` | 16sp / Normal | Default body text, list items |
+| `labelLarge` | 14sp / Medium | Buttons, captions, metadata |
+| `labelMedium` | 12sp / Medium | Timestamps, small labels |
+| `labelSmall` | 10sp / Medium | Version strings, footers |
+
+### Available Palettes
+| `ThemeMode` | Name | Mood |
+|-------------|------|------|
+| `PURPLE` | Arctic Night | Default dark purple |
+| `GREEN` | Forest Dawn | Calm green |
+| `RED` | Silent Desert | Warm red/brown |
+| `DARK` | Midnight | Neutral dark |
+| `HIGH_CONTRAST` | High Contrast | Accessibility black/yellow |
+
+### Rules
+1. **Never** hardcode `Color.White`, `Color.Black`, or `MaterialTheme.colorScheme` in `composeApp/`.
+2. **Never** hardcode `fontSize = …sp` — use `AppTheme.typography.*` instead.
+3. **Always** theme Material components with token overrides (e.g. `TopAppBarDefaults.topAppBarColors(containerColor = AppTheme.colors.surface)`).
+4. **Prefer** `AppTheme.colors.primary` for interactive/accent elements and `AppTheme.colors.textSecondary` for muted content.
+5. The design-system module lives at `designsystem/src/commonMain/kotlin/com/programovil/aura/designsystem/`. Tokens are defined in `theme/Color.kt`, `theme/Type.kt`, and `theme/DsTheme.kt`.
+
+### Design System Components
+Reusable components are also provided in the `designsystem` module under `components/`:
+- `PrimaryButton` — themed filled button
+- `BasicInput` — themed text field (no `trailingIcon`; use `OutlinedTextField` directly if an icon is needed)
+
+Import pattern:
+```kotlin
+import com.programovil.aura.designsystem.components.button.PrimaryButton
+import com.programovil.aura.designsystem.components.input.BasicInput
+```

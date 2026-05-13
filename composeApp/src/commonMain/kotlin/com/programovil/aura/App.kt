@@ -20,6 +20,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -109,6 +110,14 @@ fun AuthenticatedApp(
         mutableStateOf(featureFlags[FeatureFlag.HABITS_ENABLED] ?: true)
     }
 
+    val navItemColors = NavigationBarItemDefaults.colors(
+        selectedIconColor = AppTheme.colors.primary,
+        selectedTextColor = AppTheme.colors.primary,
+        unselectedIconColor = AppTheme.colors.textSecondary,
+        unselectedTextColor = AppTheme.colors.textSecondary,
+        indicatorColor = AppTheme.colors.primary.copy(alpha = 0.15f)
+    )
+
     Scaffold(
         containerColor = AppTheme.colors.background,
         contentWindowInsets = WindowInsets.safeDrawing,
@@ -129,7 +138,8 @@ fun AuthenticatedApp(
                             launchSingleTop = true
                             restoreState = true
                         }
-                    }
+                    },
+                    colors = navItemColors
                 )
                 if (showTodos) {
                     NavigationBarItem(
@@ -144,7 +154,8 @@ fun AuthenticatedApp(
                                 launchSingleTop = true
                                 restoreState = true
                             }
-                        }
+                        },
+                        colors = navItemColors
                     )
                 }
                 if (showHabits) {
@@ -160,7 +171,8 @@ fun AuthenticatedApp(
                                 launchSingleTop = true
                                 restoreState = true
                             }
-                        }
+                        },
+                        colors = navItemColors
                     )
                 }
                 NavigationBarItem(
@@ -175,7 +187,8 @@ fun AuthenticatedApp(
                             launchSingleTop = true
                             restoreState = true
                         }
-                    }
+                    },
+                    colors = navItemColors
                 )
             }
         }

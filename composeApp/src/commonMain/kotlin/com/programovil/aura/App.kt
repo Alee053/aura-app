@@ -1,21 +1,16 @@
 package com.programovil.aura
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -31,7 +26,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hasRoute
@@ -40,6 +34,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.programovil.aura.auth.presentation.AuthViewModel
+import com.programovil.aura.auth.presentation.screen.SignInScreen
 import com.programovil.aura.designsystem.theme.AppTheme
 import com.programovil.aura.designsystem.theme.DsTheme
 import com.programovil.aura.designsystem.theme.ThemeMode
@@ -200,42 +195,4 @@ fun AuthenticatedApp(
     }
 }
 
-@Composable
-fun SignInScreen(
-    errorMessage: String?,
-    onSignInClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
-    ) {
-        Text(
-            "Aura",
-            style = AppTheme.typography.headlineLarge,
-            color = AppTheme.colors.textPrimary
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            "Sign in to sync your todos",
-            style = AppTheme.typography.bodyMedium,
-            color = AppTheme.colors.textSecondary,
-            textAlign = TextAlign.Center
-        )
-        Spacer(modifier = Modifier.height(32.dp))
-        com.programovil.aura.designsystem.components.button.PrimaryButton(
-            text = "Sign in with Google",
-            onClick = onSignInClick
-        )
-        errorMessage?.let {
-            Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                it,
-                color = AppTheme.colors.error,
-                style = AppTheme.typography.labelLarge,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = 32.dp)
-            )
-        }
-    }
-}
+

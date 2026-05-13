@@ -16,9 +16,7 @@ data class SettingsUiState(
     val themeMode: ThemeMode = ThemeMode.PURPLE,
     val notificationsEnabled: Boolean = false,
     val notificationHour: Int = 8,
-    val notificationMinute: Int = 0,
-    val soundsEnabled: Boolean = false,
-    val vibrationEnabled: Boolean = true
+    val notificationMinute: Int = 0
 )
 
 class SettingsViewModel(
@@ -47,16 +45,7 @@ class SettingsViewModel(
                 }
             }
         }
-        viewModelScope.launch {
-            notificationPreferences.soundsEnabled.collect { enabled ->
-                _uiState.update { it.copy(soundsEnabled = enabled) }
-            }
-        }
-        viewModelScope.launch {
-            notificationPreferences.vibrationEnabled.collect { enabled ->
-                _uiState.update { it.copy(vibrationEnabled = enabled) }
-            }
-        }
+
     }
 
     fun setThemeMode(mode: ThemeMode) {
@@ -71,15 +60,5 @@ class SettingsViewModel(
         }
     }
 
-    fun setSoundsEnabled(enabled: Boolean) {
-        viewModelScope.launch {
-            notificationPreferences.setSoundsEnabled(enabled)
-        }
-    }
 
-    fun setVibrationEnabled(enabled: Boolean) {
-        viewModelScope.launch {
-            notificationPreferences.setVibrationEnabled(enabled)
-        }
-    }
 }

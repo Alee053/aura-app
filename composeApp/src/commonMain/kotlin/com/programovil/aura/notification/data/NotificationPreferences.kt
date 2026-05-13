@@ -14,8 +14,7 @@ class NotificationPreferences(private val dataStore: DataStore<Preferences>) {
         val DAILY_SUMMARY_ENABLED = booleanPreferencesKey("daily_summary_enabled")
         val NOTIFICATION_HOUR = intPreferencesKey("notification_hour")
         val NOTIFICATION_MINUTE = intPreferencesKey("notification_minute")
-        val SOUNDS_ENABLED = booleanPreferencesKey("sounds_enabled")
-        val VIBRATION_ENABLED = booleanPreferencesKey("vibration_enabled")
+
     }
 
     val dailySummaryEnabled: Flow<Boolean> = dataStore.data
@@ -27,12 +26,6 @@ class NotificationPreferences(private val dataStore: DataStore<Preferences>) {
     val notificationMinute: Flow<Int> = dataStore.data
         .map { prefs -> prefs[Keys.NOTIFICATION_MINUTE] ?: 0 }
 
-    val soundsEnabled: Flow<Boolean> = dataStore.data
-        .map { prefs -> prefs[Keys.SOUNDS_ENABLED] ?: false }
-
-    val vibrationEnabled: Flow<Boolean> = dataStore.data
-        .map { prefs -> prefs[Keys.VIBRATION_ENABLED] ?: true }
-
     suspend fun setDailySummaryEnabled(enabled: Boolean) {
         dataStore.edit { prefs -> prefs[Keys.DAILY_SUMMARY_ENABLED] = enabled }
     }
@@ -42,14 +35,6 @@ class NotificationPreferences(private val dataStore: DataStore<Preferences>) {
             prefs[Keys.NOTIFICATION_HOUR] = hour
             prefs[Keys.NOTIFICATION_MINUTE] = minute
         }
-    }
-
-    suspend fun setSoundsEnabled(enabled: Boolean) {
-        dataStore.edit { prefs -> prefs[Keys.SOUNDS_ENABLED] = enabled }
-    }
-
-    suspend fun setVibrationEnabled(enabled: Boolean) {
-        dataStore.edit { prefs -> prefs[Keys.VIBRATION_ENABLED] = enabled }
     }
 
     fun testNotification() {

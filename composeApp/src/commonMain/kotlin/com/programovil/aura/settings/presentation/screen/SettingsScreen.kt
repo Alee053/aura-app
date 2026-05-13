@@ -33,6 +33,7 @@ import com.programovil.aura.designsystem.theme.ThemeMode
 import com.programovil.aura.settings.presentation.composable.PreferenceItem
 import com.programovil.aura.settings.presentation.composable.ThemeCard
 import com.programovil.aura.settings.presentation.viewmodel.SettingsViewModel
+import com.programovil.aura.shared.presentation.rememberNotificationPermissionState
 
 @Composable
 fun SettingsScreen(
@@ -41,6 +42,14 @@ fun SettingsScreen(
     onThemeChange: (ThemeMode) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    val permissionState = rememberNotificationPermissionState(
+        onPermissionResult = { granted ->
+            if (granted) {
+                viewModel.setNotificationsEnabled(true)
+            }
+        }
+    )
 
     Box(
         modifier = Modifier
@@ -135,21 +144,17 @@ fun SettingsScreen(
                 title = "Notifications",
                 subtitle = "Receive daily task reminders",
                 checked = uiState.notificationsEnabled,
-                onCheckedChange = { viewModel.setNotificationsEnabled(it) }
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            PreferenceItem(
-                title = "Sounds",
-                subtitle = "Subtle sound effects",
-                checked = uiState.soundsEnabled,
-                onCheckedChange = { viewModel.setSoundsEnabled(it) }
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-            PreferenceItem(
-                title = "Vibration",
-                subtitle = "Haptic feedback",
-                checked = uiState.vibrationEnabled,
-                onCheckedChange = { viewModel.setVibrationEnabled(it) }
+                onCheckedChange = { enabled ->
+                    if (enabled) {
+                        if (permissionState.hasPermission) {
+                            viewModel.setNotificationsEnabled(true)
+                        } else {
+                            permissionState.launchPermissionRequest()
+                        }
+                    } else {
+                        viewModel.setNotificationsEnabled(false)
+                    }
+                }
             )
 
             Spacer(modifier = Modifier.weight(1f))

@@ -2,6 +2,8 @@
 
 This project follows a strict Clean Architecture pattern optimized for Kotlin Multiplatform (KMP), inspired by `ucbp26`.
 
+> For KMP-specific architecture decisions (source sets, `expect`/`actual`, compilation flow, layer rules), see [`docs/KMP_ARCHITECTURE.md`](docs/KMP_ARCHITECTURE.md).
+
 ## Package Structure
 
 ```
@@ -274,6 +276,15 @@ Text(
 3. **Always** theme Material components with token overrides (e.g. `TopAppBarDefaults.topAppBarColors(containerColor = AppTheme.colors.surface)`).
 4. **Prefer** `AppTheme.colors.primary` for interactive/accent elements and `AppTheme.colors.textSecondary` for muted content.
 5. The design-system module lives at `designsystem/src/commonMain/kotlin/com/programovil/aura/designsystem/`. Tokens are defined in `theme/Color.kt`, `theme/Type.kt`, and `theme/DsTheme.kt`.
+
+### Design System Migration Checklist (for agents)
+When reviewing or migrating any screen, verify:
+- [ ] **Backgrounds**: Every root screen uses `AppTheme.colors.background` or a gradient starting from it. Transparent backgrounds default to white and break the theme.
+- [ ] **Loading states**: The `Loading` state composable (CircularProgressIndicator) must sit on a `Box` with `.background(AppTheme.colors.background)`.
+- [ ] **Icons**: All `Icon` composables use an explicit `tint` token (`primary` for action icons, `textSecondary` for muted icons, `textPrimary` for standard). Never rely on default Material tints — they do not adapt to all five palettes.
+- [ ] **Buttons & actions**: Destructive or secondary actions should use `textSecondary` or `error`, not `primary`.
+- [ ] **Text strings as icons**: Replace any character-based icons (e.g., "x", "+") with actual Material `Icons.*` composables.
+- [ ] **Unreferenced settings**: If a toggle exists in settings but nothing in the app consumes its DataStore value, remove both the UI toggle and the preference key to avoid dead code.
 
 ### Design System Components
 Reusable components are also provided in the `designsystem` module under `components/`:

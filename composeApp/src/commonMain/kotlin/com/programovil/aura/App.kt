@@ -13,10 +13,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
@@ -25,9 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -42,7 +41,6 @@ import com.programovil.aura.auth.presentation.AuthViewModel
 import com.programovil.aura.designsystem.theme.AppTheme
 import com.programovil.aura.designsystem.theme.DsTheme
 import com.programovil.aura.designsystem.theme.ThemeMode
-import com.programovil.aura.settings.presentation.viewmodel.SettingsViewModel
 import com.programovil.aura.navigation.AppNavHost
 import com.programovil.aura.navigation.NavRoute
 import com.programovil.aura.shared.FeatureFlag
@@ -56,7 +54,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun App(
     onSignInClick: () -> Unit = {}
 ) {
-    val settingsViewModel = koinViewModel<SettingsViewModel>()
+    val settingsViewModel = koinViewModel<com.programovil.aura.settings.presentation.viewmodel.SettingsViewModel>()
     val settingsState by settingsViewModel.uiState.collectAsState()
     val currentThemeMode = settingsState.themeMode
 
@@ -110,23 +108,35 @@ fun AuthenticatedApp(
         mutableStateOf(featureFlags[FeatureFlag.HABITS_ENABLED] ?: true)
     }
 
-    val isHome = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Home>() } == true
-
     Scaffold(
         containerColor = AppTheme.colors.background,
         contentWindowInsets = WindowInsets.safeDrawing,
         bottomBar = {
-            if (!isHome) {
-                NavigationBar(
-                    containerColor = AppTheme.colors.surface,
-                    contentColor = AppTheme.colors.primary
-                ) {
+            NavigationBar(
+                containerColor = AppTheme.colors.surface,
+                contentColor = AppTheme.colors.primary
+            ) {
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+                    label = { Text("Home") },
+                    selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Home>() } == true,
+                    onClick = {
+                        navController.navigate(NavRoute.Home) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                )
+                if (showTodos) {
                     NavigationBarItem(
-                        icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-                        label = { Text("Home") },
-                        selected = isHome,
+                        icon = { Icon(Icons.Default.Checklist, contentDescription = "Todos") },
+                        label = { Text("Todos") },
+                        selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Todo>() } == true,
                         onClick = {
-                            navController.navigate(NavRoute.Home) {
+                            navController.navigate(NavRoute.Todo) {
                                 popUpTo(navController.graph.findStartDestination().id) {
                                     saveState = true
                                 }
@@ -135,45 +145,41 @@ fun AuthenticatedApp(
                             }
                         }
                     )
-                    if (showTodos) {
-                        NavigationBarItem(
-                            icon = { Icon(Icons.Default.Checklist, contentDescription = "Todos") },
-                            label = { Text("Todos") },
-                            selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Todo>() } == true,
-                            onClick = {
-                                navController.navigate(NavRoute.Todo) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            }
-                        )
-                    }
-                    if (showHabits) {
-                        NavigationBarItem(
-                            icon = { Icon(Icons.Default.DateRange, contentDescription = "Habits") },
-                            label = { Text("Habits") },
-                            selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Habit>() } == true,
-                            onClick = {
-                                navController.navigate(NavRoute.Habit) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
-                                    }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            }
-                        )
-                    }
                 }
+                if (showHabits) {
+                    NavigationBarItem(
+                        icon = { Icon(Icons.Default.DateRange, contentDescription = "Habits") },
+                        label = { Text("Habits") },
+                        selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Habit>() } == true,
+                        onClick = {
+                            navController.navigate(NavRoute.Habit) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+                    )
+                }
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
+                    label = { Text("Settings") },
+                    selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Settings>() } == true,
+                    onClick = {
+                        navController.navigate(NavRoute.Settings) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+                )
             }
         }
     ) { padding ->
-        Box(
-            Modifier.padding(if (isHome) WindowInsets(0, 0, 0, 0).asPaddingValues() else padding)
-        ) {
+        Box(Modifier.padding(padding)) {
             AppNavHost(
                 navController = navController,
                 todoViewModel = todoViewModel,
@@ -203,23 +209,19 @@ fun SignInScreen(
         Text(
             "Sign in to sync your todos",
             style = AppTheme.typography.bodyMedium,
-            color = AppTheme.colors.textPrimary.copy(alpha = 0.7f),
+            color = AppTheme.colors.textSecondary,
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(32.dp))
-        Button(
-            onClick = onSignInClick,
-            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                containerColor = AppTheme.colors.primary
-            )
-        ) {
-            Text("Sign in with Google")
-        }
+        com.programovil.aura.designsystem.components.button.PrimaryButton(
+            text = "Sign in with Google",
+            onClick = onSignInClick
+        )
         errorMessage?.let {
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 it,
-                color = MaterialTheme.colorScheme.error,
+                color = AppTheme.colors.error,
                 style = AppTheme.typography.labelLarge,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.padding(horizontal = 32.dp)

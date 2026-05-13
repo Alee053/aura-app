@@ -61,7 +61,10 @@ fun App(
 
         when (val state = authState) {
             is AuthViewModel.AuthState.Loading -> {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Box(
+                    modifier = Modifier.fillMaxSize().background(AppTheme.colors.background),
+                    contentAlignment = Alignment.Center
+                ) {
                     CircularProgressIndicator(color = AppTheme.colors.primary)
                 }
             }

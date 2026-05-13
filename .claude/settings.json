@@ -1,8 +1,0 @@
-{
-  "enabledPlugins": {
-    "superpowers@claude-plugins-official": true,
-    "code-simplifier@claude-plugins-official": true,
-    "kotlin-lsp@claude-plugins-official": true,
-    "firebase@claude-plugins-official": true
-  }
-}

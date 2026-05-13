@@ -28,6 +28,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.programovil.aura.designsystem.theme.AppTheme
+import com.programovil.aura.designsystem.theme.DarkPalette
+import com.programovil.aura.designsystem.theme.GreenPalette
+import com.programovil.aura.designsystem.theme.HighContrastPalette
+import com.programovil.aura.designsystem.theme.PurplePalette
+import com.programovil.aura.designsystem.theme.RedPalette
 import com.programovil.aura.designsystem.theme.ThemeMode
 import com.programovil.aura.settings.presentation.composable.PreferenceItem
 import com.programovil.aura.settings.presentation.composable.ThemeCard
@@ -112,35 +117,35 @@ fun SettingsScreen(
 
             ThemeCard(
                 name = "Arctic Night",
-                colors = listOf(androidx.compose.ui.graphics.Color(0xFF1A237E), androidx.compose.ui.graphics.Color(0xFF6C5CE7)),
+                colors = listOf(PurplePalette.background, PurplePalette.primary),
                 isSelected = currentThemeMode == ThemeMode.PURPLE,
                 onSelect = { onThemeChange(ThemeMode.PURPLE) }
             )
             Spacer(modifier = Modifier.height(12.dp))
             ThemeCard(
                 name = "Forest Dawn",
-                colors = listOf(androidx.compose.ui.graphics.Color(0xFF0A2B23), androidx.compose.ui.graphics.Color(0xFF16A085)),
+                colors = listOf(GreenPalette.background, GreenPalette.primary),
                 isSelected = currentThemeMode == ThemeMode.GREEN,
                 onSelect = { onThemeChange(ThemeMode.GREEN) }
             )
             Spacer(modifier = Modifier.height(12.dp))
             ThemeCard(
                 name = "Silent Desert",
-                colors = listOf(androidx.compose.ui.graphics.Color(0xFF2C0B0B), androidx.compose.ui.graphics.Color(0xFFB33939)),
+                colors = listOf(RedPalette.background, RedPalette.primary),
                 isSelected = currentThemeMode == ThemeMode.RED,
                 onSelect = { onThemeChange(ThemeMode.RED) }
             )
             Spacer(modifier = Modifier.height(12.dp))
             ThemeCard(
                 name = "Midnight",
-                colors = listOf(androidx.compose.ui.graphics.Color(0xFF121212), androidx.compose.ui.graphics.Color(0xFFBB86EC)),
+                colors = listOf(DarkPalette.background, DarkPalette.primary),
                 isSelected = currentThemeMode == ThemeMode.DARK,
                 onSelect = { onThemeChange(ThemeMode.DARK) }
             )
             Spacer(modifier = Modifier.height(12.dp))
             ThemeCard(
                 name = "High Contrast",
-                colors = listOf(androidx.compose.ui.graphics.Color(0xFF000000), androidx.compose.ui.graphics.Color(0xFFFFFF00)),
+                colors = listOf(HighContrastPalette.background, HighContrastPalette.primary),
                 isSelected = currentThemeMode == ThemeMode.HIGH_CONTRAST,
                 onSelect = { onThemeChange(ThemeMode.HIGH_CONTRAST) }
             )

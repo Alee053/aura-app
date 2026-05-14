@@ -45,7 +45,22 @@ class SettingsViewModel(
                 }
             }
         }
-
+        viewModelScope.launch {
+            notificationPreferences.notificationHour.collect { hour ->
+                _uiState.update { it.copy(notificationHour = hour) }
+                if (_uiState.value.notificationsEnabled) {
+                    notificationScheduler.scheduleDailySummary(hour, _uiState.value.notificationMinute)
+                }
+            }
+        }
+        viewModelScope.launch {
+            notificationPreferences.notificationMinute.collect { minute ->
+                _uiState.update { it.copy(notificationMinute = minute) }
+                if (_uiState.value.notificationsEnabled) {
+                    notificationScheduler.scheduleDailySummary(_uiState.value.notificationHour, minute)
+                }
+            }
+        }
     }
 
     fun setThemeMode(mode: ThemeMode) {
@@ -60,5 +75,9 @@ class SettingsViewModel(
         }
     }
 
-
+    fun setNotificationTime(hour: Int, minute: Int) {
+        viewModelScope.launch {
+            notificationPreferences.setNotificationTime(hour, minute)
+        }
+    }
 }

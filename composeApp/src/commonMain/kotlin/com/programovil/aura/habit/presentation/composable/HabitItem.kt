@@ -20,6 +20,9 @@ import androidx.compose.ui.unit.dp
 import com.programovil.aura.designsystem.theme.AppTheme
 import com.programovil.aura.habit.domain.model.HabitWithStatus
 import com.programovil.aura.shared.parseHexColor
+import aura_app.composeapp.generated.resources.Res
+import aura_app.composeapp.generated.resources.streak_format
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun HabitItem(
@@ -63,7 +66,7 @@ fun HabitItem(
         // Streak badge
         if (habitWithStatus.streak > 0) {
             Text(
-                text = "${habitWithStatus.streak}",
+                text = stringResource(Res.string.streak_format, habitWithStatus.streak),
                 style = AppTheme.typography.labelLarge,
                 color = AppTheme.colors.primary
             )

@@ -45,6 +45,12 @@ import com.programovil.aura.shared.FeatureFlagManager
 import com.programovil.aura.todo.presentation.viewmodel.TodoViewModel
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
+import aura_app.composeapp.generated.resources.Res
+import aura_app.composeapp.generated.resources.nav_home
+import aura_app.composeapp.generated.resources.nav_todos
+import aura_app.composeapp.generated.resources.nav_habits
+import aura_app.composeapp.generated.resources.nav_settings
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 @Preview
@@ -128,7 +134,7 @@ fun AuthenticatedApp(
             ) {
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-                    label = { Text("Home") },
+                    label = { Text(stringResource(Res.string.nav_home)) },
                     selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Home>() } == true,
                     onClick = {
                         navController.navigate(NavRoute.Home) {
@@ -143,7 +149,7 @@ fun AuthenticatedApp(
                 if (showTodos) {
                     NavigationBarItem(
                         icon = { Icon(Icons.Default.Checklist, contentDescription = "Todos") },
-                        label = { Text("Todos") },
+                        label = { Text(stringResource(Res.string.nav_todos)) },
                         selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Todo>() } == true,
                         onClick = {
                             navController.navigate(NavRoute.Todo) {
@@ -159,7 +165,7 @@ fun AuthenticatedApp(
                 if (showHabits) {
                     NavigationBarItem(
                         icon = { Icon(Icons.Default.DateRange, contentDescription = "Habits") },
-                        label = { Text("Habits") },
+                        label = { Text(stringResource(Res.string.nav_habits)) },
                         selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Habit>() } == true,
                         onClick = {
                             navController.navigate(NavRoute.Habit) {
@@ -174,7 +180,7 @@ fun AuthenticatedApp(
                 }
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
-                    label = { Text("Settings") },
+                    label = { Text(stringResource(Res.string.nav_settings)) },
                     selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Settings>() } == true,
                     onClick = {
                         navController.navigate(NavRoute.Settings) {

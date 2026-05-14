@@ -24,6 +24,14 @@ import androidx.compose.ui.unit.dp
 import com.programovil.aura.designsystem.theme.AppTheme
 import com.programovil.aura.home.presentation.composable.DashboardCard
 import com.programovil.aura.home.presentation.viewmodel.HomeViewModel
+import aura_app.composeapp.generated.resources.Res
+import aura_app.composeapp.generated.resources.app_name_label
+import aura_app.composeapp.generated.resources.home_dashboard_todos_title
+import aura_app.composeapp.generated.resources.home_dashboard_habits_title
+import aura_app.composeapp.generated.resources.home_dashboard_todos_subtitle
+import aura_app.composeapp.generated.resources.home_dashboard_habits_subtitle
+import aura_app.composeapp.generated.resources.settings_content_description
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun HomeScreen(
@@ -57,14 +65,14 @@ fun HomeScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "AURA",
+                text = stringResource(Res.string.app_name_label),
                 style = AppTheme.typography.headlineLarge,
                 color = AppTheme.colors.textPrimary
             )
             IconButton(onClick = onSettingsClick) {
                 Icon(
                     imageVector = Icons.Default.Settings,
-                    contentDescription = "Settings",
+                    contentDescription = stringResource(Res.string.settings_content_description),
                     tint = AppTheme.colors.textSecondary
                 )
             }
@@ -73,18 +81,18 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(32.dp))
 
         DashboardCard(
-            title = "TODOS TODAY",
+            title = stringResource(Res.string.home_dashboard_todos_title),
             value = if (uiState.isLoading) "..." else uiState.dashboardData.incompleteTodos.toString(),
-            subtitle = "${uiState.dashboardData.incompleteTodos} remaining",
+            subtitle = if (uiState.isLoading) "" else stringResource(Res.string.home_dashboard_todos_subtitle, uiState.dashboardData.incompleteTodos),
             onClick = onTodoClick
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         DashboardCard(
-            title = "HABIT STREAK",
-            value = if (uiState.isLoading) "..." else "${uiState.dashboardData.currentStreak}",
-            subtitle = "${uiState.dashboardData.completedHabitsToday}/${uiState.dashboardData.totalHabitsToday} done today",
+            title = stringResource(Res.string.home_dashboard_habits_title),
+            value = if (uiState.isLoading) "..." else uiState.dashboardData.currentStreak.toString(),
+            subtitle = if (uiState.isLoading) "" else stringResource(Res.string.home_dashboard_habits_subtitle, uiState.dashboardData.completedHabitsToday, uiState.dashboardData.totalHabitsToday),
             onClick = onHabitClick
         )
     }

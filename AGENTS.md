@@ -1,65 +1,148 @@
 # Architecture Specification
 
-This project follows a strict Clean Architecture pattern optimized for Kotlin Multiplatform (KMP), inspired by `ucbp26`.
+This project follows a strict Clean Architecture pattern optimized for Kotlin Multiplatform (KMP).
 
 > For KMP-specific architecture decisions (source sets, `expect`/`actual`, compilation flow, layer rules), see [`docs/KMP_ARCHITECTURE.md`](docs/KMP_ARCHITECTURE.md).
+> For implementation guides, see `docs/guides/`.
 
-## Package Structure
+## Project Structure
+
+```
+aura-app/
+├── composeApp/                     # KMP module - all shared & platform code
+│   ├── src/
+│   │   ├── commonMain/             # Platform-neutral Kotlin code
+│   │   ├── commonTest/             # Unit tests for common logic
+│   │   ├── androidMain/            # Android-specific implementations
+│   │   └── iosMain/                # iOS-specific implementations
+│   └── build.gradle.kts
+├── designsystem/                   # Design system module (colors, typography, components)
+│   ├── src/commonMain/
+│   └── build.gradle.kts
+├── iosApp/                         # Native iOS host app (Swift/Xcode)
+├── functions/                      # Firebase Cloud Functions (TypeScript)
+│   └── src/index.ts                # push notification test endpoint
+├── gradle/
+│   └── libs.versions.toml          # Centralized version catalog
+├── docs/
+│   ├── KMP_ARCHITECTURE.md         # KMP architecture reference
+│   ├── TECH-STACK.md               # Full technology stack
+│   └── guides/                     # Implementation guides
+│       ├── KOIN_IN_KMP.md
+│       ├── NAVIGATION_IN_KMP.md
+│       ├── FIREBASE_IN_KMP.md
+│       └── WORKMANAGER_IN_KMP.md
+├── build.gradle.kts
+├── settings.gradle.kts
+└── README.md
+```
+
+## Package Structure (`composeApp/src/commonMain/`)
 
 ```
 com.programovil.aura/
-├── App.kt                          # Root entry point with Bottom Navigation
+├── App.kt                             # Root entry point with Bottom Navigation
 ├── di/
-│   └── InitKoin.kt                # Shared Koin initialization for all features
+│   └── InitKoin.kt                    # Shared Koin initialization (composes all feature modules)
 ├── navigation/
-│   ├── AppNavHost.kt              # Shared NavHost with cross-platform routes
-│   └── NavRoute.kt                # Type-safe routes via kotlinx-serialization
-├── auth/                          # Auth feature - abstracted for KMP
-│   ├── domain/AuthService.kt      # Interface for platform-specific auth
-│   ├── presentation/              # AuthViewModel (Shared logic)
+│   ├── AppNavHost.kt                  # Shared NavHost with cross-platform routes
+│   └── NavRoute.kt                    # Type-safe routes (Home, Todo, Habit, Settings)
+├── auth/                              # Auth feature
+│   ├── domain/AuthService.kt          # Interface for platform-specific auth
+│   ├── presentation/                  # AuthViewModel, SignInScreen
 │   └── di/AuthModule.kt
-├── todo/                          # Todo feature - Firestore backed
-│   ├── domain/                    # Models, Repository Interface, UseCases
-│   ├── data/repository/           # Platform-specific Repository (expect/actual)
-│   ├── presentation/              # Screen, ViewModel, Composable
+├── todo/                              # Todo feature - Firestore backed
+│   ├── domain/                        # Models, Repository Interface, UseCases
+│   ├── data/repository/               # Platform-specific Repository (expect/actual)
+│   ├── presentation/                  # Screen, ViewModel, Composable
 │   └── di/TodoModule.kt
-├── habit/                         # Habit feature - Room KMP backed
-│   ├── domain/                    # Models, Repository Interface, UseCases
-│   ├── data/                      # Shared Repository, DAOs, Entities
-│   │   ├── local/HabitDatabase.kt # Shared DB definition & expect builder
-│   │   └── repository/            # Shared Repository implementation
-│   ├── presentation/              # Screen, ViewModel, Composable
+├── habit/                             # Habit feature - Firestore backed (iOS stubs)
+│   ├── domain/                        # Models, Repository Interface, UseCases
+│   ├── data/                          # Shared Repository, Mappers
+│   │   └── repository/                # Platform-specific Repository (expect/actual)
+│   ├── presentation/                  # Screen, ViewModel, Composable
 │   └── di/HabitModule.kt
-├── notification/                  # Notification feature
+├── home/                              # Home/Dashboard feature
+│   ├── domain/                        # DashboardData model, GetDashboardDataUseCase
+│   ├── presentation/                  # HomeScreen, HomeViewModel, DashboardCard
+│   └── di/HomeModule.kt
+├── notification/                      # Notification feature
 │   ├── domain/NotificationScheduler.kt # Interface for scheduling
-│   ├── presentation/              # ViewModel, Settings Screen
+│   ├── data/NotificationPreferences.kt # Notification preference keys
+│   ├── presentation/                  # NotificationViewModel
 │   └── di/NotificationModule.kt
-└── shared/                        # Cross-cutting concerns
-    ├── data/DataStoreFactory.kt   # Shared KMP DataStore
-    └── ColorUtils.kt              # KMP Color parsing utilities
+├── settings/                          # Settings feature
+│   ├── domain/repository/ThemeRepository.kt # Theme preference interface
+│   ├── data/ThemeRepositoryImpl.kt    # DataStore-backed implementation
+│   ├── presentation/                  # SettingsScreen, SettingsViewModel, composables
+│   └── di/SettingsModule.kt
+└── shared/                            # Cross-cutting concerns
+    ├── data/DataStoreFactory.kt       # expect DataStore builder
+    ├── ColorUtils.kt                  # KMP Color parsing utilities
+    ├── FeatureFlags.kt                # Feature flag enum definitions
+    ├── FeatureFlagManager.kt          # Feature flag state management
+    ├── RemoteConfigService.kt         # Interface for remote config
+    └── presentation/NotificationPermissionHandler.kt # expect composable for permissions
 ```
 
 ## Layer Definitions
 
 ### Domain Layer (`/domain/`)
-- **Models**: Pure data classes (e.g., `Habit.kt`).
+- **Models**: Pure data classes (e.g., `Habit.kt`, `Todo.kt`, `DashboardData.kt`).
 - **Interfaces**: Service or Repository definitions (e.g., `AuthService.kt`, `HabitRepository.kt`).
-- **Use cases**: Single-responsibility logic (e.g., `GetHabitsGroupedByDayUseCase.kt`).
+- **Use cases**: Single-responsibility logic (e.g., `GetHabitsGroupedByDayUseCase.kt`, `GetDashboardDataUseCase.kt`).
 
 ### Data Layer (`/data/`)
-- **Repository implementations**: Concrete implementations of domain interfaces.
-- **Local Source**: Room KMP (`HabitDatabase`), platform `actual` builders.
-- **Remote Source**: Firebase Firestore (implemented via platform actuals).
+- **Repository implementations**: Concrete implementations of domain interfaces via `expect`/`actual`.
+- **Local Store**: DataStore KMP for preferences.
+- **Remote Source**: Firebase Firestore and Firebase Remote Config (implemented via platform actuals).
 - **Mappers**: DTO/Entity to Domain model transformations.
 
 ### Presentation Layer (`/presentation/`)
 - **Screens**: Composables representing full navigation destinations.
-- **ViewModels**: Manage UI state (Shared logic).
-- **Composables**: Reusable UI units (e.g., `HabitItem.kt`).
+- **ViewModels**: Manage UI state (shared logic in `commonMain`).
+- **Composables**: Reusable UI units (e.g., `HabitItem.kt`, `TodoItem.kt`, `DashboardCard.kt`).
+
+### Shared Layer (`/shared/`)
+- Cross-cutting infrastructure: DataStore, feature flags, remote config, color utilities, notification permissions.
+
+## Feature Flags Architecture
+
+Feature flags are toggled via Firebase Remote Config and managed through:
+
+```
+commonMain/
+├── shared/FeatureFlags.kt             # Enum: HABITS_ENABLED, TODOS_ENABLED, NOTIFICATIONS_ENABLED
+├── shared/RemoteConfigService.kt      # Interface: fetchAndActivate(), getBoolean()
+└── shared/FeatureFlagManager.kt       # StateFlow<Map<FeatureFlag, Boolean>>, initialize()
+
+androidMain/
+└── shared/FirebaseRemoteConfigService.kt  # Firebase Remote Config implementation
+
+iosMain/
+└── shared/StubRemoteConfigService.kt      # iOS stub (returns defaults)
+```
+
+`App.kt` reads feature flags to conditionally show/hide bottom nav tabs (e.g., the **Todos** and **Habits** tabs are toggled by `FeatureFlags.TODOS_ENABLED` and `FeatureFlags.HABITS_ENABLED`).
 
 ## DI Architecture (Per-Feature)
 
-Features are self-contained. Their modules are composed in `di/InitKoin.kt`.
+Features are self-contained. Their modules are composed in `di/InitKoin.kt`:
+
+```kotlin
+fun getModules(remoteConfigService: RemoteConfigService) = listOf(
+    authModule,
+    todoModule,
+    habitModule,
+    notificationModule,
+    homeModule,
+    settingsModule,
+    module {
+        single<RemoteConfigService> { remoteConfigService }
+        single { FeatureFlagManager(get()) }
+    }
+)
+```
 
 ### Koin Patterns
 - **`singleOf` / `factoryOf`**: Preferred for automatic constructor injection.
@@ -68,13 +151,35 @@ Features are self-contained. Their modules are composed in `di/InitKoin.kt`.
 
 ## Persistence Patterns
 
-### Local Persistence (Room KMP)
-Defined in `commonMain` with `expect fun getHabitDatabaseBuilder()`.
-- **Android**: Stores in app database path using `AndroidSQLiteDriver`.
-- **iOS**: Stores in `NSHomeDirectory` using `BundledSQLiteDriver`.
+### Local Persistence (Room KMP — not yet implemented)
+Room KMP is listed in the tech stack but not currently used. Habit data is stored in Firestore on Android and stubbed on iOS. When local caching is added, the expected pattern is:
+- `commonMain` declares `expect fun getHabitDatabaseBuilder()`.
+- `androidMain` provides `AndroidSQLiteDriver`.
+- `iosMain` provides `BundledSQLiteDriver`.
+
+### Local Preferences (DataStore KMP)
+Defined in `commonMain` with `expect fun createDataStore()`.
+- **Settings**: Theme preference (`ThemeMode`) stored via DataStore in `settings/`.
+- **Notifications**: Notification preferences stored in `notification/data/NotificationPreferences.kt`.
 
 ### Cloud Persistence (Firestore)
 Abstracted behind repository interfaces to handle platform-specific SDK behavior.
+- **Android**: `TodoRepositoryImpl` uses `FirebaseFirestore`.
+- **iOS**: `TodoRepositoryImpl` uses Firebase iOS SDK.
+
+## Navigation
+
+Type-safe navigation using `androidx-navigation` with `kotlinx-serialization`.
+
+**Routes** (in `NavRoute.kt`):
+- `NavRoute.Home` — Dashboard
+- `NavRoute.Todo` — Todo list
+- `NavRoute.Habit` — Habit tracker
+- `NavRoute.Settings` — Theme & preferences
+
+**Pattern**:
+- `@Serializable data object` for parameterless routes.
+- `@Serializable data class` for routes with parameters.
 
 ## Naming Conventions
 - **Files**: PascalCase.
@@ -83,16 +188,11 @@ Abstracted behind repository interfaces to handle platform-specific SDK behavior
 - **Date Handling**: Strictly use `kotlinx-datetime`.
 - **UUID**: Use custom KMP-compliant random string generators.
 
-## Navigation
-Type-safe navigation using `androidx-navigation`.
-- **Object Routes**: For simple destinations.
-- **Data Class Routes**: For destinations with parameters.
-
 ## Testing
 
 ### Stack
 - **kotlin-test**: Unit testing framework for Kotlin Multiplatform.
-- **Turbine**: Flow testing library for coroutines (`app.cash.turbine:turbine`).
+- **Turbine**: Flow testing library (`app.cash.turbine:turbine`).
 - **Mockative**: Mocking library with KSP code generation (`io.mockative:mockative`).
 - **compose-ui-test-junit4**: Android instrumented tests for Compose UI.
 
@@ -113,10 +213,10 @@ compose-ui-test-junit4 = { module = "org.jetbrains.compose.ui:ui-test-junit4", v
 mockative = { id = "io.mockative", version.ref = "mockative" }
 ```
 
-### Gradle Configuration (composeApp/build.gradle.kts)
+### Gradle Configuration (`composeApp/build.gradle.kts`)
 ```kotlin
 plugins {
-    alias(libs.plugins.mockative)  // Applied in composeApp only (not root — conflicts with AGP classpath)
+    alias(libs.plugins.mockative)  // Applied in composeApp only (not root -- conflicts with AGP classpath)
 }
 
 kotlin {
@@ -135,21 +235,6 @@ kotlin {
         }
     }
 }
-
-android {
-    defaultConfig {
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-}
-```
-
-### gradle.properties (required for mockative)
-```properties
-# KSP2 required by Mockative
-ksp.useKSP2=true
-ksp.incremental=false
-# Configuration cache disabled — Mockative plugin incompatible with it
-org.gradle.configuration-cache=false
 ```
 
 ### @Mockable annotation
@@ -164,8 +249,7 @@ interface TodoRepository {
 ### Running tests
 ```bash
 ./gradlew :composeApp:testDebugUnitTest         # Android unit tests (commonTest)
-./gradlew :composeApp:testDebugUnitTest        # iOS tests via multiplatform plugin
-./gradlew :composeApp:connectedAndroidTest     # Instrumented tests (androidInstrumentedTest)
+./gradlew :composeApp:connectedAndroidTest      # Instrumented tests (androidInstrumentedTest)
 ```
 
 ### Test Structure
@@ -175,7 +259,7 @@ composeApp/src/
 │   ├── shared/
 │   │   └── ColorUtilsTest.kt              # Pure function tests
 │   ├── todo/domain/usecase/
-│   │   ├── GetTodosUseCaseTest.kt         # Turbine + Mokative mocks
+│   │   ├── GetTodosUseCaseTest.kt         # Turbine + Mockative mocks
 │   │   └── AddTodoUseCaseTest.kt          # coEvery + coVerify
 │   └── habit/domain/model/
 │       ├── RecurrenceTypeTest.kt          # Enum tests
@@ -193,12 +277,12 @@ useCase().test {
 }
 ```
 
-**Test with Mokative (blocking):**
+**Test with Mockative (blocking):**
 ```kotlin
 every { repository.getTodos() } returns flowOf(Result.success(todos))
 ```
 
-**Test with Mokative (suspend):**
+**Test with Mockative (suspend):**
 ```kotlin
 coEvery { repository.addTodo("Buy milk", null) } returns Result.success(Unit)
 coVerify { repository.addTodo("Buy milk", null) }.wasInvoked(exactly = 1)
@@ -219,7 +303,9 @@ Wrap the app (or a screen) with `DsTheme`:
 import com.programovil.aura.designsystem.theme.DsTheme
 import com.programovil.aura.designsystem.theme.ThemeMode
 
-DsTheme(mode = ThemeMode.PURPLE) {
+// ThemeMode follows system dark preference by default:
+// if (isSystemInDarkTheme()) ThemeMode.DARK else ThemeMode.PURPLE
+DsTheme(mode = currentThemeMode) {
     // composables here
 }
 ```
@@ -239,8 +325,8 @@ Text(
 ### Color Tokens (`AppColors`)
 | Token | Role |
 |-------|------|
-| `primary` | Brand color — buttons, active states, FABs |
-| `accent` | Secondary accent — gradients, highlights |
+| `primary` | Brand color -- buttons, active states, FABs |
+| `accent` | Secondary accent -- gradients, highlights |
 | `background` | Root screen background |
 | `surface` | Cards, dialogs, bottom sheets, nav bar |
 | `textPrimary` | Main text, icons |
@@ -272,7 +358,7 @@ Text(
 
 ### Rules
 1. **Never** hardcode `Color.White`, `Color.Black`, or `MaterialTheme.colorScheme` in `composeApp/`.
-2. **Never** hardcode `fontSize = …sp` — use `AppTheme.typography.*` instead.
+2. **Never** hardcode `fontSize = ...sp` -- use `AppTheme.typography.*` instead.
 3. **Always** theme Material components with token overrides (e.g. `TopAppBarDefaults.topAppBarColors(containerColor = AppTheme.colors.surface)`).
 4. **Prefer** `AppTheme.colors.primary` for interactive/accent elements and `AppTheme.colors.textSecondary` for muted content.
 5. The design-system module lives at `designsystem/src/commonMain/kotlin/com/programovil/aura/designsystem/`. Tokens are defined in `theme/Color.kt`, `theme/Type.kt`, and `theme/DsTheme.kt`.
@@ -280,19 +366,37 @@ Text(
 ### Design System Migration Checklist (for agents)
 When reviewing or migrating any screen, verify:
 - [ ] **Backgrounds**: Every root screen uses `AppTheme.colors.background` or a gradient starting from it. Transparent backgrounds default to white and break the theme.
-- [ ] **Loading states**: The `Loading` state composable (CircularProgressIndicator) must sit on a `Box` with `.background(AppTheme.colors.background)`.
-- [ ] **Icons**: All `Icon` composables use an explicit `tint` token (`primary` for action icons, `textSecondary` for muted icons, `textPrimary` for standard). Never rely on default Material tints — they do not adapt to all five palettes.
+- [ ] **Loading states**: The `Loading` state composable (`CircularProgressIndicator`) must sit on a `Box` with `.background(AppTheme.colors.background)`.
+- [ ] **Icons**: All `Icon` composables use an explicit `tint` token (`primary` for action icons, `textSecondary` for muted icons, `textPrimary` for standard). Never rely on default Material tints -- they do not adapt to all five palettes.
 - [ ] **Buttons & actions**: Destructive or secondary actions should use `textSecondary` or `error`, not `primary`.
 - [ ] **Text strings as icons**: Replace any character-based icons (e.g., "x", "+") with actual Material `Icons.*` composables.
 - [ ] **Unreferenced settings**: If a toggle exists in settings but nothing in the app consumes its DataStore value, remove both the UI toggle and the preference key to avoid dead code.
 
 ### Design System Components
-Reusable components are also provided in the `designsystem` module under `components/`:
-- `PrimaryButton` — themed filled button
-- `BasicInput` — themed text field (no `trailingIcon`; use `OutlinedTextField` directly if an icon is needed)
+Reusable components are provided in the `designsystem` module under `components/`:
+- `PrimaryButton` -- themed filled button (`components/button/`)
+- `BasicInput` -- themed text field (`components/input/`) (no `trailingIcon`; use `OutlinedTextField` directly if an icon is needed)
+- `AuraHorizontalDivider` -- themed horizontal divider (`components/divider/`)
 
 Import pattern:
 ```kotlin
 import com.programovil.aura.designsystem.components.button.PrimaryButton
 import com.programovil.aura.designsystem.components.input.BasicInput
+import com.programovil.aura.designsystem.components.divider.AuraHorizontalDivider
 ```
+
+## Firebase Cloud Functions
+
+Located in `functions/` (TypeScript), used for server-side push notification dispatch:
+
+```typescript
+// functions/src/index.ts
+export const sendTestNotification = functions.https.onRequest(async (req, res) => {
+    await admin.messaging().send({
+        notification: { title, body },
+        topic: 'test-notifications'
+    });
+});
+```
+
+Used during development to test FCM push delivery. Not required for production builds.

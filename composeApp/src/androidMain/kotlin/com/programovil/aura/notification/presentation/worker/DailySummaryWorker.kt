@@ -6,6 +6,7 @@ import androidx.work.WorkerParameters
 import com.programovil.aura.notification.NotificationHelper
 import com.programovil.aura.shared.FirebaseConfig
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withTimeout
 
 class DailySummaryWorker(
     context: Context,
@@ -19,13 +20,14 @@ class DailySummaryWorker(
                 return Result.failure()
             }
 
-            val snapshot = FirebaseConfig.firestore
-                .collection("users").document(userId).collection("todos")
-                .whereEqualTo("isCompleted", false)
-                .get()
-                .await()
-
-            val incompleteCount = snapshot.size()
+            val incompleteCount = withTimeout(30_000) {
+                FirebaseConfig.firestore
+                    .collection("users").document(userId).collection("todos")
+                    .whereEqualTo("isCompleted", false)
+                    .get()
+                    .await()
+                    .size()
+            }
             NotificationHelper.showDailySummaryNotification(applicationContext, incompleteCount)
             Result.success()
         } catch (e: Exception) {

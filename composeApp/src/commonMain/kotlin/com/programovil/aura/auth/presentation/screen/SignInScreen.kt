@@ -22,6 +22,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.programovil.aura.designsystem.components.button.PrimaryButton
 import com.programovil.aura.designsystem.theme.AppTheme
+import aura_app.composeapp.generated.resources.Res
+import aura_app.composeapp.generated.resources.sign_in_title
+import aura_app.composeapp.generated.resources.sign_in_subtitle
+import aura_app.composeapp.generated.resources.sign_in_button
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun SignInScreen(
@@ -57,7 +62,7 @@ fun SignInScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Aura",
+                text = stringResource(Res.string.sign_in_title),
                 style = AppTheme.typography.headlineLarge,
                 color = AppTheme.colors.textPrimary,
                 textAlign = TextAlign.Center
@@ -66,7 +71,7 @@ fun SignInScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = "Sign in to sync your todos across devices",
+                text = stringResource(Res.string.sign_in_subtitle),
                 style = AppTheme.typography.bodyMedium,
                 color = AppTheme.colors.textSecondary,
                 textAlign = TextAlign.Center
@@ -75,7 +80,7 @@ fun SignInScreen(
             Spacer(modifier = Modifier.height(48.dp))
 
             PrimaryButton(
-                text = "Sign in with Google",
+                text = stringResource(Res.string.sign_in_button),
                 onClick = onSignInClick
             )
 

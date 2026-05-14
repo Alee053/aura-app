@@ -43,6 +43,13 @@ import com.programovil.aura.designsystem.components.button.PrimaryButton
 import com.programovil.aura.designsystem.components.input.BasicInput
 import com.programovil.aura.designsystem.theme.AppTheme
 import com.programovil.aura.habit.domain.model.RecurrenceType
+import aura_app.composeapp.generated.resources.day_fri
+import aura_app.composeapp.generated.resources.day_mon
+import aura_app.composeapp.generated.resources.day_sat
+import aura_app.composeapp.generated.resources.day_sun
+import aura_app.composeapp.generated.resources.day_thu
+import aura_app.composeapp.generated.resources.day_tue
+import aura_app.composeapp.generated.resources.day_wed
 import com.programovil.aura.shared.parseHexColor
 import org.jetbrains.compose.resources.stringResource
 
@@ -50,7 +57,18 @@ private val colorPalette = listOf(
     "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7", "#DDA0DD"
 )
 
-private val dayLabels = listOf("M", "T", "W", "T", "F", "S", "S")
+@Composable
+private fun getDayLabels(): List<String> {
+    return listOf(
+        stringResource(Res.string.day_mon),
+        stringResource(Res.string.day_tue),
+        stringResource(Res.string.day_wed),
+        stringResource(Res.string.day_thu),
+        stringResource(Res.string.day_fri),
+        stringResource(Res.string.day_sat),
+        stringResource(Res.string.day_sun)
+    )
+}
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -120,7 +138,7 @@ fun AddHabitDialog(
                     FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        dayLabels.forEachIndexed { index, label ->
+                        getDayLabels().forEachIndexed { index, label ->
                             val dayBit = 1 shl index
                             val isSelected = (selectedDays and dayBit) != 0
                             Box(

@@ -3,7 +3,6 @@ package com.programovil.aura.todo.presentation.composable
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -143,48 +142,42 @@ fun TodoDialog(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                Box(
+                Surface(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp))
-                        .clickable { showDatePicker = true }
-                        .padding(12.dp)
+                        .clickable { showDatePicker = true },
+                    shape = RoundedCornerShape(8.dp),
+                    color = Color.Transparent,
+                    border = BorderStroke(1.dp, AppTheme.colors.textSecondary.copy(alpha = 0.5f))
                 ) {
-                    Surface(
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(8.dp),
-                        color = Color.Transparent,
-                        border = BorderStroke(1.dp, AppTheme.colors.textSecondary.copy(alpha = 0.3f))
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Row(
-                            modifier = Modifier.padding(0.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            val dateText = dueDate?.let { millis ->
-                                val date = Instant.fromEpochMilliseconds(millis)
-                                    .toLocalDateTime(TimeZone.currentSystemDefault()).date
-                                date.toString()
-                            } ?: stringResource(Res.string.add_due_date)
+                        val dateText = dueDate?.let { millis ->
+                            val date = Instant.fromEpochMilliseconds(millis)
+                                .toLocalDateTime(TimeZone.currentSystemDefault()).date
+                            date.toString()
+                        } ?: stringResource(Res.string.add_due_date)
 
-                            Text(
-                                text = dateText,
-                                style = AppTheme.typography.bodyMedium,
-                                color = if (dueDate != null) AppTheme.colors.textPrimary else AppTheme.colors.textSecondary
-                            )
+                        Text(
+                            text = dateText,
+                            style = AppTheme.typography.bodyMedium,
+                            color = if (dueDate != null) AppTheme.colors.textPrimary else AppTheme.colors.textSecondary
+                        )
 
-                            if (dueDate != null) {
-                                IconButton(
-                                    onClick = { dueDate = null },
-                                    modifier = Modifier.size(24.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Close,
-                                        contentDescription = stringResource(Res.string.clear_due_date),
-                                        tint = AppTheme.colors.textSecondary,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                }
+                        if (dueDate != null) {
+                            IconButton(
+                                onClick = { dueDate = null },
+                                modifier = Modifier.size(24.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = stringResource(Res.string.clear_due_date),
+                                    tint = AppTheme.colors.textSecondary,
+                                    modifier = Modifier.size(16.dp)
+                                )
                             }
                         }
                     }

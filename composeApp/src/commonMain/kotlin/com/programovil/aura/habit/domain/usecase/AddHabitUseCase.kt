@@ -9,7 +9,7 @@ class AddHabitUseCase(private val repository: HabitRepository) {
     suspend operator fun invoke(
         name: String,
         recurrenceType: RecurrenceType,
-        daysOfWeek: List<Int>,
+        targetCount: Int,
         color: String
     ): Result<Unit> {
         if (name.isBlank()) return Result.failure(IllegalArgumentException("Name cannot be empty"))
@@ -17,7 +17,7 @@ class AddHabitUseCase(private val repository: HabitRepository) {
             id = randomUUID(),
             name = name.trim(),
             recurrenceType = recurrenceType,
-            daysOfWeek = if (recurrenceType == RecurrenceType.WEEKLY) daysOfWeek else emptyList(),
+            targetCount = targetCount,
             color = color,
             createdAt = Clock.System.now().toEpochMilliseconds()
         )

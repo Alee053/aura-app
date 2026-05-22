@@ -16,22 +16,22 @@ class AddTodoUseCaseTest {
 
     @Test
     fun `invoke adds todo successfully`() = runTest {
-        coEvery { repository.addTodo("Buy milk", null) } returns Result.success(Unit)
+        coEvery { repository.addTodo("Buy milk", null, null) } returns Result.success(Unit)
 
         val result = useCase("Buy milk")
 
         assertTrue(result.isSuccess)
-        coVerify { repository.addTodo("Buy milk", null) }.wasInvoked(exactly = 1)
+        coVerify { repository.addTodo("Buy milk", null, null) }.wasInvoked(exactly = 1)
     }
 
     @Test
-    fun `invoke forwards due date to repository`() = runTest {
+    fun `invoke forwards due date and description to repository`() = runTest {
         val dueDate = 1_700_000_000_000L
-        coEvery { repository.addTodo("Meeting", dueDate) } returns Result.success(Unit)
+        coEvery { repository.addTodo("Meeting", "Discuss Q1", dueDate) } returns Result.success(Unit)
 
-        val result = useCase("Meeting", dueDate)
+        val result = useCase("Meeting", "Discuss Q1", dueDate)
 
         assertTrue(result.isSuccess)
-        coVerify { repository.addTodo("Meeting", dueDate) }.wasInvoked(exactly = 1)
+        coVerify { repository.addTodo("Meeting", "Discuss Q1", dueDate) }.wasInvoked(exactly = 1)
     }
 }

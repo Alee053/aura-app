@@ -34,7 +34,7 @@
     <string name="today">Today</string>
     <string name="tomorrow">Tomorrow</string>
     <string name="this_week">This Week</string>
-    <string name="empty_habits">No habits yet. Tap + to add one!</string>
+    <string name="empty_habits">No habits yet. Add your first one!</string>
 
     <!-- Add Habit Dialog -->
     <string name="new_habit">New Habit</string>

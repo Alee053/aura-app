@@ -104,6 +104,17 @@ private class HabitRepositoryImpl : HabitRepository {
         userHabitsCollection().document(habit.id).set(data).await()
     }
 
+    override suspend fun updateHabit(habit: Habit): Result<Unit> = runCatching {
+        val data = mapOf(
+            "name" to habit.name,
+            "recurrenceType" to habit.recurrenceType.name,
+            "daysOfWeek" to habit.daysOfWeek,
+            "color" to habit.color,
+            "createdAt" to habit.createdAt
+        )
+        userHabitsCollection().document(habit.id).set(data).await()
+    }
+
     override suspend fun deleteHabit(habitId: String): Result<Unit> = runCatching {
         userHabitsCollection().document(habitId).delete().await()
     }

@@ -12,6 +12,7 @@ private class IosHabitRepositoryImpl : HabitRepository {
     override fun getCompletionsForHabit(habitId: String): Flow<Result<List<HabitCompletion>>> = flowOf(Result.success(emptyList()))
     override fun getAllCompletions(): Flow<Result<List<HabitCompletion>>> = flowOf(Result.success(emptyList()))
     override suspend fun addHabit(habit: Habit): Result<Unit> = Result.success(Unit)
+    override suspend fun updateHabit(habit: Habit): Result<Unit> = Result.success(Unit)
     override suspend fun deleteHabit(habitId: String): Result<Unit> = Result.success(Unit)
     override suspend fun toggleCompletion(habitId: String, date: String): Result<Unit> = Result.success(Unit)
 }

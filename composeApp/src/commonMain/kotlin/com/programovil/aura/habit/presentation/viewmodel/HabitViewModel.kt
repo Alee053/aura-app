@@ -8,6 +8,7 @@ import com.programovil.aura.habit.domain.model.RecurrenceType
 import com.programovil.aura.habit.domain.repository.HabitRepository
 import com.programovil.aura.habit.domain.model.Habit
 import com.programovil.aura.habit.domain.usecase.AddHabitUseCase
+import com.programovil.aura.habit.domain.usecase.DeleteHabitUseCase
 import com.programovil.aura.habit.domain.usecase.GetHabitHistoryUseCase
 import com.programovil.aura.habit.domain.usecase.GetHabitsGroupedByDayUseCase
 import com.programovil.aura.habit.domain.usecase.ToggleHabitCompletionUseCase
@@ -45,7 +46,8 @@ class HabitViewModel(
     private val addHabitUseCase: AddHabitUseCase,
     private val updateHabitUseCase: UpdateHabitUseCase,
     private val toggleHabitCompletionUseCase: ToggleHabitCompletionUseCase,
-    private val getHabitHistoryUseCase: GetHabitHistoryUseCase
+    private val getHabitHistoryUseCase: GetHabitHistoryUseCase,
+    private val deleteHabitUseCase: DeleteHabitUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HabitListUiState())
@@ -107,7 +109,7 @@ class HabitViewModel(
 
     private fun deleteHabit(habitId: String) {
         viewModelScope.launch {
-            repository.deleteHabit(habitId)
+            deleteHabitUseCase(habitId)
                 .onFailure { _uiState.value = _uiState.value.copy(error = "Failed to delete habit") }
         }
     }

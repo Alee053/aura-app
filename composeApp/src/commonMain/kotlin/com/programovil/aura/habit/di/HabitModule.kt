@@ -3,6 +3,7 @@ package com.programovil.aura.habit.di
 import com.programovil.aura.habit.domain.repository.HabitRepository
 import com.programovil.aura.habit.domain.repository.createHabitRepository
 import com.programovil.aura.habit.domain.usecase.AddHabitUseCase
+import com.programovil.aura.habit.domain.usecase.DeleteHabitUseCase
 import com.programovil.aura.habit.domain.usecase.GetHabitHistoryUseCase
 import com.programovil.aura.habit.domain.usecase.GetHabitsGroupedByDayUseCase
 import com.programovil.aura.habit.domain.usecase.ToggleHabitCompletionUseCase
@@ -21,6 +22,7 @@ val habitModule = module {
     factoryOf(::GetHabitsGroupedByDayUseCase)
     factoryOf(::ToggleHabitCompletionUseCase)
     factoryOf(::GetHabitHistoryUseCase)
+    factoryOf(::DeleteHabitUseCase)
     factoryOf(::UpdateHabitUseCase)
 
     // Presentation layer

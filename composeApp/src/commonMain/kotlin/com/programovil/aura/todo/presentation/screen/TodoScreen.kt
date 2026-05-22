@@ -166,7 +166,7 @@ fun TodoScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(top = 8.dp)
+                            .padding(top = 16.dp)
                     ) {
                         items(activeTodos, key = { it.id }) { todo ->
                             TodoItem(

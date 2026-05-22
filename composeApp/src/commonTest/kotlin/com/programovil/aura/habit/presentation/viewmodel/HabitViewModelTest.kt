@@ -1,13 +1,11 @@
 package com.programovil.aura.habit.presentation.viewmodel
 
 import com.programovil.aura.habit.domain.model.Habit
-import com.programovil.aura.habit.domain.model.HabitWithStatus
 import com.programovil.aura.habit.domain.model.RecurrenceType
 import com.programovil.aura.habit.domain.repository.HabitRepository
 import com.programovil.aura.habit.domain.usecase.AddHabitUseCase
 import com.programovil.aura.habit.domain.usecase.DeleteHabitUseCase
-import com.programovil.aura.habit.domain.usecase.GetHabitHistoryUseCase
-import com.programovil.aura.habit.domain.usecase.GetHabitsGroupedByDayUseCase
+import com.programovil.aura.habit.domain.usecase.GetHabitsWithStatusUseCase
 import com.programovil.aura.habit.domain.usecase.ToggleHabitCompletionUseCase
 import com.programovil.aura.habit.domain.usecase.UpdateHabitUseCase
 import io.mockative.classOf
@@ -31,19 +29,18 @@ import kotlin.test.assertEquals
 class HabitViewModelTest {
 
     private val repository = mock(classOf<HabitRepository>())
-    private val getHabitsGroupedByDayUseCase = mock(classOf<GetHabitsGroupedByDayUseCase>())
+    private val getHabitsWithStatusUseCase = mock(classOf<GetHabitsWithStatusUseCase>())
     private val addHabitUseCase = mock(classOf<AddHabitUseCase>())
     private val updateHabitUseCase = mock(classOf<UpdateHabitUseCase>())
     private val deleteHabitUseCase = mock(classOf<DeleteHabitUseCase>())
     private val toggleHabitCompletionUseCase = mock(classOf<ToggleHabitCompletionUseCase>())
-    private val getHabitHistoryUseCase = mock(classOf<GetHabitHistoryUseCase>())
 
     private val testDispatcher = StandardTestDispatcher()
 
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(testDispatcher)
-        every { getHabitsGroupedByDayUseCase.invoke() } returns flowOf(Result.success(emptyMap()))
+        every { getHabitsWithStatusUseCase.invoke() } returns flowOf(Result.success(emptyList()))
     }
 
     @AfterTest
@@ -53,23 +50,22 @@ class HabitViewModelTest {
 
     private fun createViewModel(): HabitViewModel = HabitViewModel(
         repository = repository,
-        getHabitsGroupedByDayUseCase = getHabitsGroupedByDayUseCase,
+        getHabitsWithStatusUseCase = getHabitsWithStatusUseCase,
         addHabitUseCase = addHabitUseCase,
         updateHabitUseCase = updateHabitUseCase,
         deleteHabitUseCase = deleteHabitUseCase,
-        toggleHabitCompletionUseCase = toggleHabitCompletionUseCase,
-        getHabitHistoryUseCase = getHabitHistoryUseCase
+        toggleHabitCompletionUseCase = toggleHabitCompletionUseCase
     )
 
     @Test
     fun `addHabit invokes use case with correct parameters`() = runTest(testDispatcher) {
-        coEvery { addHabitUseCase("Exercise", RecurrenceType.DAILY, emptyList(), "#FF6B6B") } returns Result.success(Unit)
+        coEvery { addHabitUseCase("Exercise", RecurrenceType.DAILY, 1, "#FF6B6B") } returns Result.success(Unit)
 
         val viewModel = createViewModel()
-        viewModel.onEvent(HabitEvent.AddHabit("Exercise", RecurrenceType.DAILY, emptyList(), "#FF6B6B"))
+        viewModel.onEvent(HabitEvent.AddHabit("Exercise", RecurrenceType.DAILY, 1, "#FF6B6B"))
 
         testDispatcher.scheduler.advanceUntilIdle()
-        coVerify { addHabitUseCase("Exercise", RecurrenceType.DAILY, emptyList(), "#FF6B6B") }.wasInvoked(exactly = 1)
+        coVerify { addHabitUseCase("Exercise", RecurrenceType.DAILY, 1, "#FF6B6B") }.wasInvoked(exactly = 1)
     }
 
     @Test
@@ -78,7 +74,7 @@ class HabitViewModelTest {
             id = "h1",
             name = "Exercise",
             recurrenceType = RecurrenceType.DAILY,
-            daysOfWeek = emptyList(),
+            targetCount = 1,
             color = "#FF6B6B"
         )
         coEvery { updateHabitUseCase(habit) } returns Result.success(Unit)

@@ -1,4 +1,4 @@
-package com.programovil.aura.todo.domain.repository
+package com.programovil.aura.todo.data.repository
 
 import com.programovil.aura.todo.domain.model.Todo
 import com.programovil.aura.todo.domain.repository.TodoRepository
@@ -9,7 +9,8 @@ actual fun createTodoRepository(): TodoRepository = IosTodoRepositoryImpl()
 
 private class IosTodoRepositoryImpl : TodoRepository {
     override fun getTodos(): Flow<Result<List<Todo>>> = flowOf(Result.success(emptyList()))
-    override suspend fun addTodo(title: String): Result<Unit> = Result.success(Unit)
+    override suspend fun addTodo(title: String, description: String?, dueDate: Long?): Result<Unit> = Result.success(Unit)
+    override suspend fun updateTodo(todo: Todo): Result<Unit> = Result.success(Unit)
     override suspend fun toggleTodo(todoId: String, isCompleted: Boolean): Result<Unit> = Result.success(Unit)
     override suspend fun deleteTodo(todoId: String): Result<Unit> = Result.success(Unit)
 }

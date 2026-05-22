@@ -1,5 +1,6 @@
 package com.programovil.aura.habit.domain.usecase
 
+import com.programovil.aura.habit.domain.model.DayCompletion
 import com.programovil.aura.habit.domain.model.DaySection
 import com.programovil.aura.habit.domain.model.Habit
 import com.programovil.aura.habit.domain.model.HabitCompletion
@@ -55,7 +56,8 @@ class GetHabitsGroupedByDayUseCase(private val repository: HabitRepository) {
                     isDone = isDone,
                     isMissed = !isDone && date < Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date,
                     streak = streak,
-                    targetDate = dateStr
+                    targetDate = dateStr,
+                    weeklyCompletions = computeWeeklyCompletions(habit, completions, date)
                 )
             }
     }
@@ -72,6 +74,26 @@ class GetHabitsGroupedByDayUseCase(private val repository: HabitRepository) {
             result.addAll(groupHabitsForDate(habits, completions, date))
         }
         return result
+    }
+
+    private fun computeWeeklyCompletions(
+        habit: Habit,
+        completions: List<HabitCompletion>,
+        targetDate: LocalDate
+    ): List<DayCompletion> {
+        val completedDates = completions
+            .filter { it.habitId == habit.id }
+            .map { it.completedDate }
+            .toSet()
+
+        return (0..6).map { daysAgo ->
+            val date = targetDate.minus(daysAgo, DateTimeUnit.DAY)
+            val dateStr = date.toString()
+            val dayOfWeek = date.dayOfWeek.isoDayNumber
+            val isScheduled = habit.isScheduledFor(dayOfWeek)
+            val isCompleted = completedDates.contains(dateStr)
+            DayCompletion(dateStr, isCompleted, isScheduled)
+        }.reversed()
     }
 
     private fun calculateStreak(habit: Habit, completions: List<HabitCompletion>, fromDate: LocalDate): Int {

@@ -8,7 +8,7 @@ import com.programovil.aura.habit.domain.usecase.DeleteHabitUseCase
 import com.programovil.aura.habit.domain.usecase.GetHabitsWithStatusUseCase
 import com.programovil.aura.habit.domain.usecase.ToggleHabitCompletionUseCase
 import com.programovil.aura.habit.domain.usecase.UpdateHabitUseCase
-import io.mockative.classOf
+import io.mockative.of
 import io.mockative.coEvery
 import io.mockative.coVerify
 import io.mockative.every
@@ -28,12 +28,12 @@ import kotlin.test.assertEquals
 @OptIn(ExperimentalCoroutinesApi::class)
 class HabitViewModelTest {
 
-    private val repository = mock(classOf<HabitRepository>())
-    private val getHabitsWithStatusUseCase = mock(classOf<GetHabitsWithStatusUseCase>())
-    private val addHabitUseCase = mock(classOf<AddHabitUseCase>())
-    private val updateHabitUseCase = mock(classOf<UpdateHabitUseCase>())
-    private val deleteHabitUseCase = mock(classOf<DeleteHabitUseCase>())
-    private val toggleHabitCompletionUseCase = mock(classOf<ToggleHabitCompletionUseCase>())
+    private val repository = mock(of<HabitRepository>())
+    private val getHabitsWithStatusUseCase = mock(of<GetHabitsWithStatusUseCase>())
+    private val addHabitUseCase = mock(of<AddHabitUseCase>())
+    private val updateHabitUseCase = mock(of<UpdateHabitUseCase>())
+    private val deleteHabitUseCase = mock(of<DeleteHabitUseCase>())
+    private val toggleHabitCompletionUseCase = mock(of<ToggleHabitCompletionUseCase>())
 
     private val testDispatcher = StandardTestDispatcher()
 

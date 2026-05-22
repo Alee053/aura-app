@@ -22,7 +22,7 @@ class UpdateHabitUseCaseTest {
             id = "h1",
             name = "Exercise",
             recurrenceType = RecurrenceType.DAILY,
-            daysOfWeek = emptyList(),
+            targetCount = 1,
             color = "#FF6B6B"
         )
         coEvery { repository.updateHabit(habit) } returns Result.success(Unit)
@@ -39,7 +39,7 @@ class UpdateHabitUseCaseTest {
             id = "h1",
             name = "Exercise",
             recurrenceType = RecurrenceType.DAILY,
-            daysOfWeek = emptyList(),
+            targetCount = 1,
             color = "#FF6B6B"
         )
         coEvery { repository.updateHabit(habit) } returns Result.failure(Exception("DB error"))

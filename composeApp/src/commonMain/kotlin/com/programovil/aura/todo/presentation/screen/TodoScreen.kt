@@ -183,9 +183,9 @@ fun TodoScreen(
                             item {
                                 Text(
                                     text = stringResource(Res.string.completed_section),
-                                    style = AppTheme.typography.titleMedium,
-                                    color = AppTheme.colors.textSecondary,
-                                    modifier = Modifier.padding(vertical = 16.dp)
+                                    style = AppTheme.typography.labelLarge,
+                                    color = AppTheme.colors.textSecondary.copy(alpha = 0.6f),
+                                    modifier = Modifier.padding(vertical = 8.dp)
                                 )
                             }
                             items(completedTodos, key = { it.id }) { todo ->

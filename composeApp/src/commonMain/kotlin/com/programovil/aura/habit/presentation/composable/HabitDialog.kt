@@ -6,17 +6,20 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Switch
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -41,44 +44,104 @@ import aura_app.composeapp.generated.resources.Res
 import aura_app.composeapp.generated.resources.cancel
 import aura_app.composeapp.generated.resources.color_label
 import aura_app.composeapp.generated.resources.daily
+import aura_app.composeapp.generated.resources.delete_habit
 import aura_app.composeapp.generated.resources.edit_habit
 import aura_app.composeapp.generated.resources.habit_name
+import aura_app.composeapp.generated.resources.monthly
 import aura_app.composeapp.generated.resources.new_habit
-import aura_app.composeapp.generated.resources.repeat_on
+import aura_app.composeapp.generated.resources.per_month
+import aura_app.composeapp.generated.resources.per_week
 import aura_app.composeapp.generated.resources.save
 import aura_app.composeapp.generated.resources.weekly
-import aura_app.composeapp.generated.resources.day_fri
-import aura_app.composeapp.generated.resources.day_mon
-import aura_app.composeapp.generated.resources.day_sat
-import aura_app.composeapp.generated.resources.day_sun
-import aura_app.composeapp.generated.resources.day_thu
-import aura_app.composeapp.generated.resources.day_tue
-import aura_app.composeapp.generated.resources.day_wed
-import aura_app.composeapp.generated.resources.delete_habit
 import org.jetbrains.compose.resources.stringResource
 
 private val colorPalette = listOf(
     "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7", "#DDA0DD"
 )
 
-private fun bitmaskFromDays(daysOfWeek: List<Int>): Int {
-    return daysOfWeek.fold(0) { acc, day -> acc or (1 shl (day - 1)) }
+@Composable
+private fun RecurrenceSelector(
+    selected: RecurrenceType,
+    onSelect: (RecurrenceType) -> Unit
+) {
+    val options = listOf(
+        RecurrenceType.DAILY to stringResource(Res.string.daily),
+        RecurrenceType.WEEKLY to stringResource(Res.string.weekly),
+        RecurrenceType.MONTHLY to stringResource(Res.string.monthly)
+    )
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        options.forEach { (type, label) ->
+            val isSelected = type == selected
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(
+                        if (isSelected) AppTheme.colors.primary
+                        else AppTheme.colors.surface.copy(alpha = 0.6f)
+                    )
+                    .clickable { onSelect(type) }
+                    .padding(vertical = 10.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = label,
+                    style = AppTheme.typography.labelLarge,
+                    color = if (isSelected) AppTheme.colors.textPrimary else AppTheme.colors.textSecondary
+                )
+            }
+        }
+    }
 }
 
 @Composable
-private fun getDayLabels(): List<String> {
-    return listOf(
-        stringResource(Res.string.day_mon),
-        stringResource(Res.string.day_tue),
-        stringResource(Res.string.day_wed),
-        stringResource(Res.string.day_thu),
-        stringResource(Res.string.day_fri),
-        stringResource(Res.string.day_sat),
-        stringResource(Res.string.day_sun)
-    )
+private fun TargetCountStepper(
+    count: Int,
+    max: Int,
+    onCountChange: (Int) -> Unit
+) {
+    val label = if (max == 7) stringResource(Res.string.per_week) else stringResource(Res.string.per_month)
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        IconButton(
+            onClick = { if (count > 1) onCountChange(count - 1) },
+            modifier = Modifier
+                .size(32.dp)
+                .clip(CircleShape)
+                .background(AppTheme.colors.surface.copy(alpha = 0.6f))
+        ) {
+            Icon(
+                imageVector = Icons.Default.Remove,
+                contentDescription = null,
+                tint = AppTheme.colors.textPrimary
+            )
+        }
+        Text(
+            text = "$count $label",
+            style = AppTheme.typography.bodyMedium,
+            color = AppTheme.colors.textPrimary
+        )
+        IconButton(
+            onClick = { if (count < max) onCountChange(count + 1) },
+            modifier = Modifier
+                .size(32.dp)
+                .clip(CircleShape)
+                .background(AppTheme.colors.surface.copy(alpha = 0.6f))
+        ) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = null,
+                tint = AppTheme.colors.textPrimary
+            )
+        }
+    }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun HabitDialog(
     habit: Habit?,
@@ -87,8 +150,12 @@ fun HabitDialog(
     onDelete: (() -> Unit)? = null
 ) {
     var name by remember { mutableStateOf(habit?.name ?: "") }
-    var isDaily by remember { mutableStateOf(habit?.recurrenceType != RecurrenceType.WEEKLY) }
-    var selectedDays by remember { mutableIntStateOf(habit?.let { bitmaskFromDays(it.daysOfWeek) } ?: 0) }
+    var recurrenceType by remember {
+        mutableStateOf(habit?.recurrenceType ?: RecurrenceType.DAILY)
+    }
+    var targetCount by remember {
+        mutableIntStateOf(habit?.targetCount ?: 1)
+    }
     var selectedColor by remember { mutableStateOf(habit?.color ?: colorPalette[0]) }
 
     val isEditMode = habit != null
@@ -103,7 +170,8 @@ fun HabitDialog(
             ) {
                 Text(
                     text = stringResource(if (isEditMode) Res.string.edit_habit else Res.string.new_habit),
-                    style = AppTheme.typography.headlineSmall
+                    style = AppTheme.typography.headlineSmall,
+                    color = AppTheme.colors.textPrimary
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -118,63 +186,19 @@ fun HabitDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        stringResource(Res.string.daily),
-                        style = AppTheme.typography.bodyMedium,
-                        color = AppTheme.colors.textPrimary
-                    )
-                    Switch(
-                        checked = !isDaily,
-                        onCheckedChange = { isDaily = !it }
-                    )
-                    Text(
-                        stringResource(Res.string.weekly),
-                        style = AppTheme.typography.bodyMedium,
-                        color = AppTheme.colors.textPrimary
-                    )
-                }
+                RecurrenceSelector(
+                    selected = recurrenceType,
+                    onSelect = { recurrenceType = it }
+                )
 
-                if (!isDaily) {
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Text(
-                        text = stringResource(Res.string.repeat_on),
-                        style = AppTheme.typography.labelMedium,
-                        color = AppTheme.colors.textSecondary
+                Spacer(modifier = Modifier.height(12.dp))
+
+                if (recurrenceType != RecurrenceType.DAILY) {
+                    TargetCountStepper(
+                        count = targetCount,
+                        max = if (recurrenceType == RecurrenceType.WEEKLY) 7 else 31,
+                        onCountChange = { targetCount = it }
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    FlowRow(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        getDayLabels().forEachIndexed { index, label ->
-                            val dayBit = 1 shl index
-                            val isSelected = (selectedDays and dayBit) != 0
-                            Box(
-                                modifier = Modifier
-                                    .size(40.dp)
-                                    .clip(CircleShape)
-                                    .background(
-                                        if (isSelected) AppTheme.colors.primary
-                                        else AppTheme.colors.surface.copy(alpha = 0.6f)
-                                    )
-                                    .clickable {
-                                        selectedDays = selectedDays xor dayBit
-                                    },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = label,
-                                    style = AppTheme.typography.labelLarge,
-                                    color = if (isSelected) AppTheme.colors.textPrimary
-                                    else AppTheme.colors.textSecondary
-                                )
-                            }
-                        }
-                    }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -185,9 +209,7 @@ fun HabitDialog(
                     color = AppTheme.colors.textSecondary
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     colorPalette.forEach { color ->
                         Box(
                             modifier = Modifier
@@ -236,14 +258,11 @@ fun HabitDialog(
                         text = stringResource(Res.string.save),
                         onClick = {
                             if (name.isNotBlank()) {
-                                val daysOfWeek = if (isDaily) emptyList()
-                                else (0..6).filter { (selectedDays and (1 shl it)) != 0 }.map { it + 1 }
-
                                 val habitToSave = Habit(
                                     id = habit?.id ?: java.util.UUID.randomUUID().toString(),
                                     name = name.trim(),
-                                    recurrenceType = if (isDaily) RecurrenceType.DAILY else RecurrenceType.WEEKLY,
-                                    daysOfWeek = daysOfWeek,
+                                    recurrenceType = recurrenceType,
+                                    targetCount = if (recurrenceType == RecurrenceType.DAILY) 1 else targetCount,
                                     color = selectedColor,
                                     createdAt = habit?.createdAt ?: System.currentTimeMillis()
                                 )

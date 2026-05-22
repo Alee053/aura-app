@@ -4,8 +4,7 @@ import com.programovil.aura.habit.domain.repository.HabitRepository
 import com.programovil.aura.habit.domain.repository.createHabitRepository
 import com.programovil.aura.habit.domain.usecase.AddHabitUseCase
 import com.programovil.aura.habit.domain.usecase.DeleteHabitUseCase
-import com.programovil.aura.habit.domain.usecase.GetHabitHistoryUseCase
-import com.programovil.aura.habit.domain.usecase.GetHabitsGroupedByDayUseCase
+import com.programovil.aura.habit.domain.usecase.GetHabitsWithStatusUseCase
 import com.programovil.aura.habit.domain.usecase.ToggleHabitCompletionUseCase
 import com.programovil.aura.habit.domain.usecase.UpdateHabitUseCase
 import com.programovil.aura.habit.presentation.viewmodel.HabitViewModel
@@ -19,9 +18,8 @@ val habitModule = module {
 
     // Domain layer - use cases
     factoryOf(::AddHabitUseCase)
-    factoryOf(::GetHabitsGroupedByDayUseCase)
+    factoryOf(::GetHabitsWithStatusUseCase)
     factoryOf(::ToggleHabitCompletionUseCase)
-    factoryOf(::GetHabitHistoryUseCase)
     factoryOf(::DeleteHabitUseCase)
     factoryOf(::UpdateHabitUseCase)
 

@@ -14,10 +14,13 @@ class GetDashboardDataUseCase(
 ) {
     operator fun invoke(): Flow<Result<DashboardData>> {
         return combine(getTodosUseCase(), getHabitsGroupedByDayUseCase()) { todosResult, habitsResult ->
-            val incompleteTodos = todosResult.getOrNull()?.count { !it.isCompleted } ?: 0
-            val todayHabits = habitsResult.getOrNull()?.get(DaySection.TODAY) ?: emptyList()
+            val todos = todosResult.getOrNull()
+            val habits = habitsResult.getOrNull()
+            val incompleteTodos = todos?.count { !it.isCompleted } ?: 0
+            val todayHabits = habits?.get(DaySection.TODAY) ?: emptyList()
             val completedHabitsToday = todayHabits.count { it.isDone }
-            val currentStreak = todayHabits.maxOfOrNull { it.streak } ?: 0
+            val streakValues = todayHabits.map { h -> h.streak }
+            val currentStreak = if (streakValues.isEmpty()) 0 else streakValues.maxOrNull() ?: 0
 
             Result.success(
                 DashboardData(

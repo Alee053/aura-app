@@ -44,6 +44,9 @@
     <string name="daily">Daily</string>
     <string name="daily_badge">Daily</string>
     <string name="weekly">Weekly</string>
+    <string name="monthly">Monthly</string>
+    <string name="per_week">/ week</string>
+    <string name="per_month">/ month</string>
     <string name="repeat_on">Repeat on:</string>
     <string name="color_label">Color:</string>
     <string name="save">Save</string>

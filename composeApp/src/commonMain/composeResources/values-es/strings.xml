@@ -25,6 +25,7 @@
     <string name="add_due_date">Agregar fecha</string>
     <string name="clear_due_date">Borrar</string>
     <string name="add_first_todo">Agregar primera tarea</string>
+    <string name="completed_section">Completadas</string>
 
     <!-- Habit Screen -->
     <string name="habits_title">Hábitos</string>

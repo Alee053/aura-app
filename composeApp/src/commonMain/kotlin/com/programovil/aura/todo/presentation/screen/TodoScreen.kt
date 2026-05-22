@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -39,6 +38,7 @@ import com.programovil.aura.todo.presentation.viewmodel.TodoViewModel
 import aura_app.composeapp.generated.resources.Res
 import aura_app.composeapp.generated.resources.add_first_todo
 import aura_app.composeapp.generated.resources.add_todo
+import aura_app.composeapp.generated.resources.completed_section
 import aura_app.composeapp.generated.resources.empty_todos
 import aura_app.composeapp.generated.resources.todos_title
 import org.jetbrains.compose.resources.stringResource
@@ -159,11 +159,16 @@ fun TodoScreen(
                     }
                 }
                 else -> {
+                    val activeTodos = todos.filter { !it.isCompleted }
+                    val completedTodos = todos.filter { it.isCompleted }
+
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = 8.dp)
                     ) {
-                        items(todos, key = { it.id }) { todo ->
+                        items(activeTodos, key = { it.id }) { todo ->
                             TodoItem(
                                 todo = todo,
                                 onToggle = { viewModel.toggleTodo(todo.id, !todo.isCompleted) },
@@ -172,6 +177,27 @@ fun TodoScreen(
                                     showDialog = true
                                 }
                             )
+                        }
+
+                        if (completedTodos.isNotEmpty()) {
+                            item {
+                                Text(
+                                    text = stringResource(Res.string.completed_section),
+                                    style = AppTheme.typography.titleMedium,
+                                    color = AppTheme.colors.textSecondary,
+                                    modifier = Modifier.padding(vertical = 16.dp)
+                                )
+                            }
+                            items(completedTodos, key = { it.id }) { todo ->
+                                TodoItem(
+                                    todo = todo,
+                                    onToggle = { viewModel.toggleTodo(todo.id, !todo.isCompleted) },
+                                    onClick = {
+                                        editingTodo = todo
+                                        showDialog = true
+                                    }
+                                )
+                            }
                         }
                     }
                 }

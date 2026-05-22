@@ -42,11 +42,11 @@ class TodoViewModel(
         }
     }
 
-    fun addTodo(title: String, dueDate: Long? = null) {
+    fun addTodo(title: String, description: String? = null, dueDate: Long? = null) {
         if (title.isBlank()) return
         _error.value = null
         viewModelScope.launch {
-            addTodoUseCase(title.trim(), dueDate)
+            addTodoUseCase(title.trim(), description?.trim(), dueDate)
                 .onFailure { _error.value = "Failed to add todo" }
         }
     }

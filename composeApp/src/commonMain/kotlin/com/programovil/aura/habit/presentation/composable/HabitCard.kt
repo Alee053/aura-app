@@ -97,7 +97,7 @@ fun HabitCard(
                 val todayCompleted = last7Days.lastOrNull()?.isCompleted == true
                 Checkbox(
                     checked = todayCompleted,
-                    onCheckedChange = { onToggle(today.toString()) },
+                    onCheckedChange = { _ -> onToggle(today.toString()) },  // toggle is symmetric: check=add, uncheck=remove
                     colors = CheckboxDefaults.colors(
                         checkedColor = habitColor,
                         uncheckedColor = AppTheme.colors.textSecondary

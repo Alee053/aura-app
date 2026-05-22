@@ -30,6 +30,7 @@
     <!-- Habit Screen -->
     <string name="habits_title">Habits</string>
     <string name="add_habit">Add habit</string>
+    <string name="add_first_habit">Add first habit</string>
     <string name="today">Today</string>
     <string name="tomorrow">Tomorrow</string>
     <string name="this_week">This Week</string>

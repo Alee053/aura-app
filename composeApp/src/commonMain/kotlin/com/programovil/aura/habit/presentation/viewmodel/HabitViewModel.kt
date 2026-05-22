@@ -6,10 +6,12 @@ import com.programovil.aura.habit.domain.model.DaySection
 import com.programovil.aura.habit.domain.model.HabitWithStatus
 import com.programovil.aura.habit.domain.model.RecurrenceType
 import com.programovil.aura.habit.domain.repository.HabitRepository
+import com.programovil.aura.habit.domain.model.Habit
 import com.programovil.aura.habit.domain.usecase.AddHabitUseCase
 import com.programovil.aura.habit.domain.usecase.GetHabitHistoryUseCase
 import com.programovil.aura.habit.domain.usecase.GetHabitsGroupedByDayUseCase
 import com.programovil.aura.habit.domain.usecase.ToggleHabitCompletionUseCase
+import com.programovil.aura.habit.domain.usecase.UpdateHabitUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -33,12 +35,15 @@ sealed class HabitEvent {
         val daysOfWeek: List<Int>,
         val color: String
     ) : HabitEvent()
+    data class UpdateHabit(val habit: Habit) : HabitEvent()
+    data class DeleteHabit(val habitId: String) : HabitEvent()
 }
 
 class HabitViewModel(
     private val repository: HabitRepository,
     private val getHabitsGroupedByDayUseCase: GetHabitsGroupedByDayUseCase,
     private val addHabitUseCase: AddHabitUseCase,
+    private val updateHabitUseCase: UpdateHabitUseCase,
     private val toggleHabitCompletionUseCase: ToggleHabitCompletionUseCase,
     private val getHabitHistoryUseCase: GetHabitHistoryUseCase
 ) : ViewModel() {
@@ -54,6 +59,8 @@ class HabitViewModel(
         when (event) {
             is HabitEvent.ToggleCompletion -> toggleCompletion(event.habitId, event.date)
             is HabitEvent.AddHabit -> addHabit(event.name, event.recurrenceType, event.daysOfWeek, event.color)
+            is HabitEvent.UpdateHabit -> updateHabit(event.habit)
+            is HabitEvent.DeleteHabit -> deleteHabit(event.habitId)
         }
     }
 
@@ -88,6 +95,20 @@ class HabitViewModel(
         viewModelScope.launch {
             addHabitUseCase(name, recurrenceType, daysOfWeek, color)
                 .onFailure { _uiState.value = _uiState.value.copy(error = "Failed to add habit") }
+        }
+    }
+
+    private fun updateHabit(habit: Habit) {
+        viewModelScope.launch {
+            updateHabitUseCase(habit)
+                .onFailure { _uiState.value = _uiState.value.copy(error = "Failed to update habit") }
+        }
+    }
+
+    private fun deleteHabit(habitId: String) {
+        viewModelScope.launch {
+            repository.deleteHabit(habitId)
+                .onFailure { _uiState.value = _uiState.value.copy(error = "Failed to delete habit") }
         }
     }
 

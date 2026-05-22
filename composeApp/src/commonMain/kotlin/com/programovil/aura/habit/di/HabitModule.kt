@@ -6,6 +6,7 @@ import com.programovil.aura.habit.domain.usecase.AddHabitUseCase
 import com.programovil.aura.habit.domain.usecase.GetHabitHistoryUseCase
 import com.programovil.aura.habit.domain.usecase.GetHabitsGroupedByDayUseCase
 import com.programovil.aura.habit.domain.usecase.ToggleHabitCompletionUseCase
+import com.programovil.aura.habit.domain.usecase.UpdateHabitUseCase
 import com.programovil.aura.habit.presentation.viewmodel.HabitViewModel
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.viewModelOf
@@ -20,6 +21,7 @@ val habitModule = module {
     factoryOf(::GetHabitsGroupedByDayUseCase)
     factoryOf(::ToggleHabitCompletionUseCase)
     factoryOf(::GetHabitHistoryUseCase)
+    factoryOf(::UpdateHabitUseCase)
 
     // Presentation layer
     viewModelOf(::HabitViewModel)

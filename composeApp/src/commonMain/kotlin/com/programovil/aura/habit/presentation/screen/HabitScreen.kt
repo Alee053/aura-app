@@ -90,18 +90,24 @@ fun HabitScreen(
             }
         }
     ) { padding ->
-        if (uiState.isLoading) {
-            Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = AppTheme.colors.primary)
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-                contentPadding = PaddingValues(vertical = 8.dp)
-            ) {
-                items(uiState.habits, key = { it.habit.id }) { habitItem ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(horizontal = 16.dp)
+        ) {
+            if (uiState.isLoading) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(color = AppTheme.colors.primary)
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(uiState.habits, key = { it.habit.id }) { habitItem ->
                         HabitCard(
                             habitWithStatus = habitItem,
                             onToggle = { date ->
@@ -119,28 +125,29 @@ fun HabitScreen(
                         )
                     }
 
-                if (uiState.habits.isEmpty()) {
-                    item {
-                        Box(
-                            modifier = Modifier.fillMaxSize().padding(32.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                    if (uiState.habits.isEmpty()) {
+                        item {
+                            Box(
+                                modifier = Modifier.fillMaxSize().padding(32.dp),
+                                contentAlignment = Alignment.Center
                             ) {
-                                Text(
-                                    text = stringResource(Res.string.empty_habits),
-                                    style = AppTheme.typography.bodyMedium,
-                                    color = AppTheme.colors.textSecondary
-                                )
-                                PrimaryButton(
-                                    text = stringResource(Res.string.add_first_habit),
-                                    onClick = {
-                                        editingHabit = null
-                                        showDialog = true
-                                    }
-                                )
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                                ) {
+                                    Text(
+                                        text = stringResource(Res.string.empty_habits),
+                                        style = AppTheme.typography.bodyMedium,
+                                        color = AppTheme.colors.textSecondary
+                                    )
+                                    PrimaryButton(
+                                        text = stringResource(Res.string.add_first_habit),
+                                        onClick = {
+                                            editingHabit = null
+                                            showDialog = true
+                                        }
+                                    )
+                                }
                             }
                         }
                     }

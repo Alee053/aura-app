@@ -6,6 +6,7 @@ import com.programovil.aura.todo.domain.usecase.AddTodoUseCase
 import com.programovil.aura.todo.domain.usecase.DeleteTodoUseCase
 import com.programovil.aura.todo.domain.usecase.GetTodosUseCase
 import com.programovil.aura.todo.domain.usecase.ToggleTodoUseCase
+import com.programovil.aura.todo.domain.usecase.UpdateTodoUseCase
 import com.programovil.aura.todo.presentation.viewmodel.TodoViewModel
 import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.viewModel
@@ -18,9 +19,10 @@ val todoModule = module {
     // Domain layer - use cases
     factoryOf(::GetTodosUseCase)
     factoryOf(::AddTodoUseCase)
+    factoryOf(::UpdateTodoUseCase)
     factoryOf(::ToggleTodoUseCase)
     factoryOf(::DeleteTodoUseCase)
 
     // Presentation layer
-    viewModel { TodoViewModel(get(), get(), get(), get()) }
+    viewModel { TodoViewModel(get(), get(), get(), get(), get()) }
 }

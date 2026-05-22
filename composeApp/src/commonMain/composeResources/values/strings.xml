@@ -7,7 +7,7 @@
 
     <!-- Todo Screen -->
     <string name="todos_title">My Todos</string>
-    <string name="add_todo">+</string>
+    <string name="add_todo">Add todo</string>
     <string name="new_todo_hint">New todo</string>
     <string name="empty_todos">No todos yet. Add your first one!</string>
     <string name="delete">X</string>
@@ -17,19 +17,36 @@
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
 
+    <!-- Todo Dialog -->
+    <string name="new_todo">New Todo</string>
+    <string name="edit_todo">Edit Todo</string>
+    <string name="todo_name_hint">Todo name</string>
+    <string name="todo_description_hint">Description (optional)</string>
+    <string name="add_due_date">Add due date</string>
+    <string name="clear_due_date">Clear</string>
+    <string name="add_first_todo">Add first todo</string>
+    <string name="completed_section">Completed</string>
+
     <!-- Habit Screen -->
     <string name="habits_title">Habits</string>
     <string name="add_habit">Add habit</string>
+    <string name="add_first_habit">Add first habit</string>
     <string name="today">Today</string>
     <string name="tomorrow">Tomorrow</string>
     <string name="this_week">This Week</string>
-    <string name="empty_habits">No habits yet. Tap + to add one!</string>
+    <string name="empty_habits">No habits yet. Add your first one!</string>
 
     <!-- Add Habit Dialog -->
     <string name="new_habit">New Habit</string>
+    <string name="edit_habit">Edit Habit</string>
+    <string name="delete_habit">Delete</string>
     <string name="habit_name">Habit name</string>
     <string name="daily">Daily</string>
+    <string name="daily_badge">Daily</string>
     <string name="weekly">Weekly</string>
+    <string name="monthly">Monthly</string>
+    <string name="per_week">/ week</string>
+    <string name="per_month">/ month</string>
     <string name="repeat_on">Repeat on:</string>
     <string name="color_label">Color:</string>
     <string name="save">Save</string>

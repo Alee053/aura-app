@@ -7,6 +7,7 @@ import com.programovil.aura.todo.domain.usecase.AddTodoUseCase
 import com.programovil.aura.todo.domain.usecase.DeleteTodoUseCase
 import com.programovil.aura.todo.domain.usecase.GetTodosUseCase
 import com.programovil.aura.todo.domain.usecase.ToggleTodoUseCase
+import com.programovil.aura.todo.domain.usecase.UpdateTodoUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -14,6 +15,7 @@ import kotlinx.coroutines.launch
 class TodoViewModel(
     private val getTodosUseCase: GetTodosUseCase,
     private val addTodoUseCase: AddTodoUseCase,
+    private val updateTodoUseCase: UpdateTodoUseCase,
     private val toggleTodoUseCase: ToggleTodoUseCase,
     private val deleteTodoUseCase: DeleteTodoUseCase
 ) : ViewModel() {
@@ -40,11 +42,11 @@ class TodoViewModel(
         }
     }
 
-    fun addTodo(title: String, dueDate: Long? = null) {
+    fun addTodo(title: String, description: String? = null, dueDate: Long? = null) {
         if (title.isBlank()) return
         _error.value = null
         viewModelScope.launch {
-            addTodoUseCase(title.trim(), dueDate)
+            addTodoUseCase(title.trim(), description?.trim(), dueDate)
                 .onFailure { _error.value = "Failed to add todo" }
         }
     }
@@ -62,6 +64,14 @@ class TodoViewModel(
         viewModelScope.launch {
             deleteTodoUseCase(todoId)
                 .onFailure { _error.value = "Failed to delete todo" }
+        }
+    }
+
+    fun updateTodo(todo: Todo) {
+        _error.value = null
+        viewModelScope.launch {
+            updateTodoUseCase(todo)
+                .onFailure { _error.value = "Failed to update todo" }
         }
     }
 

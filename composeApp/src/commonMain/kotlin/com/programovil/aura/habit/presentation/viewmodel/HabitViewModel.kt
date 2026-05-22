@@ -1,15 +1,18 @@
+@file:OptIn(kotlin.time.ExperimentalTime::class)
+
 package com.programovil.aura.habit.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.programovil.aura.habit.domain.model.DaySection
 import com.programovil.aura.habit.domain.model.HabitWithStatus
 import com.programovil.aura.habit.domain.model.RecurrenceType
 import com.programovil.aura.habit.domain.repository.HabitRepository
+import com.programovil.aura.habit.domain.model.Habit
 import com.programovil.aura.habit.domain.usecase.AddHabitUseCase
-import com.programovil.aura.habit.domain.usecase.GetHabitHistoryUseCase
-import com.programovil.aura.habit.domain.usecase.GetHabitsGroupedByDayUseCase
+import com.programovil.aura.habit.domain.usecase.DeleteHabitUseCase
+import com.programovil.aura.habit.domain.usecase.GetHabitsWithStatusUseCase
 import com.programovil.aura.habit.domain.usecase.ToggleHabitCompletionUseCase
+import com.programovil.aura.habit.domain.usecase.UpdateHabitUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -18,9 +21,7 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
 data class HabitListUiState(
-    val todayHabits: List<HabitWithStatus> = emptyList(),
-    val tomorrowHabits: List<HabitWithStatus> = emptyList(),
-    val thisWeekHabits: List<HabitWithStatus> = emptyList(),
+    val habits: List<HabitWithStatus> = emptyList(),
     val isLoading: Boolean = true,
     val error: String? = null
 )
@@ -30,17 +31,20 @@ sealed class HabitEvent {
     data class AddHabit(
         val name: String,
         val recurrenceType: RecurrenceType,
-        val daysOfWeek: List<Int>,
+        val targetCount: Int,
         val color: String
     ) : HabitEvent()
+    data class UpdateHabit(val habit: Habit) : HabitEvent()
+    data class DeleteHabit(val habitId: String) : HabitEvent()
 }
 
 class HabitViewModel(
     private val repository: HabitRepository,
-    private val getHabitsGroupedByDayUseCase: GetHabitsGroupedByDayUseCase,
+    private val getHabitsWithStatusUseCase: GetHabitsWithStatusUseCase,
     private val addHabitUseCase: AddHabitUseCase,
+    private val updateHabitUseCase: UpdateHabitUseCase,
     private val toggleHabitCompletionUseCase: ToggleHabitCompletionUseCase,
-    private val getHabitHistoryUseCase: GetHabitHistoryUseCase
+    private val deleteHabitUseCase: DeleteHabitUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HabitListUiState())
@@ -53,18 +57,18 @@ class HabitViewModel(
     fun onEvent(event: HabitEvent) {
         when (event) {
             is HabitEvent.ToggleCompletion -> toggleCompletion(event.habitId, event.date)
-            is HabitEvent.AddHabit -> addHabit(event.name, event.recurrenceType, event.daysOfWeek, event.color)
+            is HabitEvent.AddHabit -> addHabit(event.name, event.recurrenceType, event.targetCount, event.color)
+            is HabitEvent.UpdateHabit -> updateHabit(event.habit)
+            is HabitEvent.DeleteHabit -> deleteHabit(event.habitId)
         }
     }
 
     private fun loadHabits() {
         viewModelScope.launch {
-            getHabitsGroupedByDayUseCase().collect { result ->
-                result.onSuccess { grouped ->
+            getHabitsWithStatusUseCase().collect { result ->
+                result.onSuccess { habits ->
                     _uiState.value = HabitListUiState(
-                        todayHabits = grouped[DaySection.TODAY] ?: emptyList(),
-                        tomorrowHabits = grouped[DaySection.TOMORROW] ?: emptyList(),
-                        thisWeekHabits = grouped[DaySection.THIS_WEEK] ?: emptyList(),
+                        habits = habits,
                         isLoading = false
                     )
                 }.onFailure { error ->
@@ -84,10 +88,24 @@ class HabitViewModel(
         }
     }
 
-    private fun addHabit(name: String, recurrenceType: RecurrenceType, daysOfWeek: List<Int>, color: String) {
+    private fun addHabit(name: String, recurrenceType: RecurrenceType, targetCount: Int, color: String) {
         viewModelScope.launch {
-            addHabitUseCase(name, recurrenceType, daysOfWeek, color)
+            addHabitUseCase(name, recurrenceType, targetCount, color)
                 .onFailure { _uiState.value = _uiState.value.copy(error = "Failed to add habit") }
+        }
+    }
+
+    private fun updateHabit(habit: Habit) {
+        viewModelScope.launch {
+            updateHabitUseCase(habit)
+                .onFailure { _uiState.value = _uiState.value.copy(error = "Failed to update habit") }
+        }
+    }
+
+    private fun deleteHabit(habitId: String) {
+        viewModelScope.launch {
+            deleteHabitUseCase(habitId)
+                .onFailure { _uiState.value = _uiState.value.copy(error = "Failed to delete habit") }
         }
     }
 

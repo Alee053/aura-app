@@ -16,7 +16,12 @@ class RecurrenceTypeTest {
     }
 
     @Test
-    fun `enum has exactly two values`() {
-        assertEquals(2, RecurrenceType.entries.size)
+    fun `MONTHLY has correct name`() {
+        assertEquals("MONTHLY", RecurrenceType.MONTHLY.name)
+    }
+
+    @Test
+    fun `enum has exactly three values`() {
+        assertEquals(3, RecurrenceType.entries.size)
     }
 }

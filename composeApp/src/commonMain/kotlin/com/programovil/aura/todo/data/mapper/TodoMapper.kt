@@ -5,6 +5,7 @@ import com.programovil.aura.todo.domain.model.Todo
 data class TodoData(
     val id: String,
     val title: String,
+    val description: String? = null,
     val isCompleted: Boolean,
     val dueDate: Long? = null
 )
@@ -12,6 +13,7 @@ data class TodoData(
 fun TodoData.toDomain(): Todo = Todo(
     id = id,
     title = title,
+    description = description,
     isCompleted = isCompleted,
     dueDate = dueDate
 )

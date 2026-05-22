@@ -362,6 +362,8 @@ Text(
 3. **Always** theme Material components with token overrides (e.g. `TopAppBarDefaults.topAppBarColors(containerColor = AppTheme.colors.surface)`).
 4. **Prefer** `AppTheme.colors.primary` for interactive/accent elements and `AppTheme.colors.textSecondary` for muted content.
 5. The design-system module lives at `designsystem/src/commonMain/kotlin/com/programovil/aura/designsystem/`. Tokens are defined in `theme/Color.kt`, `theme/Type.kt`, and `theme/DsTheme.kt`.
+6. **DRY Principle**: Before creating any new UI component, check if an equivalent already exists in `designsystem/components/`. Do not duplicate components -- reuse or extend existing ones. If a component is missing, add it to the design system so all features can benefit.
+7. **No Inline Styling**: Do not apply ad-hoc modifiers (custom padding, shapes, colors) directly in screens. Extract reusable patterns into the design system.
 
 ### Design System Migration Checklist (for agents)
 When reviewing or migrating any screen, verify:
@@ -384,6 +386,81 @@ import com.programovil.aura.designsystem.components.button.PrimaryButton
 import com.programovil.aura.designsystem.components.input.BasicInput
 import com.programovil.aura.designsystem.components.divider.AuraHorizontalDivider
 ```
+
+---
+
+## String Resources
+
+All user-facing strings **must** be defined in `composeApp/src/commonMain/composeResources/values/strings.xml` and referenced via the Compose Multiplatform resource API. **Hardcoding UI strings directly in composables or ViewModels is strictly prohibited.**
+
+### Why
+- **Internationalization (i18n)**: Centralized strings make future translation trivial.
+- **Consistency**: Prevents typos and divergent wording across the app.
+- **KMP Compliance**: `composeResources` works on both Android and iOS without platform-specific string files.
+
+### Location
+```
+composeApp/src/commonMain/composeResources/values/strings.xml
+```
+
+### Usage Pattern
+```xml
+<!-- strings.xml -->
+<resources>
+    <string name="app_name">AURA</string>
+    <string name="home_greeting">Good morning</string>
+    <string name="todo_empty_state">No todos yet. Add one!</string>
+    <string name="habit_streak">%1$d day streak</string>
+</resources>
+```
+
+```kotlin
+import aura.composeapp.generated.resources.Res
+import aura.composeapp.generated.resources.app_name
+import aura.composeapp.generated.resources.home_greeting
+import org.jetbrains.compose.resources.stringResource
+
+@Composable
+fun Greeting() {
+    Text(text = stringResource(Res.string.home_greeting))
+}
+```
+
+### Enforcement Rules
+1. **Zero hardcoded strings in `@Composable` functions** -- every `Text()`, `Button()`, `OutlinedTextField(label = ...)`, `placeholder`, `contentDescription`, `Toast`, `Snackbar`, and dialog title/message must use `stringResource()`.
+2. **Zero hardcoded strings in ViewModels** -- error messages shown to the user (e.g., `Result.failure(Exception(string))`) must also be resolved from resources. If the ViewModel cannot access resources, emit a sealed class / string key and let the UI layer map it to a string resource.
+3. **Plural support**: Use `<plurals>` in `strings.xml` for count-dependent text (e.g., "1 habit" vs "5 habits").
+4. **Formatting**: Use positional format specifiers (`%1$s`, `%2$d`) to ensure correct ordering across languages.
+5. **Naming convention**: Use `snake_case` keys grouped by feature prefix (`home_`, `todo_`, `habit_`, `settings_`, `common_`).
+
+### Migration Checklist (for agents)
+When reviewing any screen or feature:
+- [ ] **No literal strings**: Search for `"` inside `@Composable` bodies -- any user-visible text must be a `stringResource()` call.
+- [ ] **No string concatenation**: `"Hello, " + name` is forbidden; use `stringResource(Res.string.hello_user, name)` instead.
+- [ ] **Error messages**: User-facing exceptions and error states resolve strings via resources, not hardcoded English.
+- [ ] **Accessibility**: All `contentDescription` values for icons and images use `stringResource()`.
+
+---
+
+## Design System Enforcement & DRY
+
+The design system is not optional. It is the **single source of truth** for all visual and interactive patterns in the app.
+
+### Philosophy
+- **Follow the system**: If a token, component, or pattern exists in `designsystem/`, use it.
+- **Extend the system**: If a required component or style is missing, add it to `designsystem/` so every feature benefits.
+- **Never repeat yourself**: Do not create one-off buttons, inputs, cards, or modifiers in feature screens.
+
+### Enforcement Rules
+1. **Mandatory DsTheme wrapper**: Every screen and preview must be wrapped in `DsTheme`. Never test or preview composables outside the theme context.
+2. **Token-only styling**: All colors, typography, shapes, and spacing must come from `AppTheme`. No inline `Modifier.padding(16.dp)` without a token equivalent; if a spacing value is reused, define it in the design system.
+3. **Component reuse**: Before writing a custom button, card, or input, verify the design system does not already provide one. The allowed components are:
+   - `PrimaryButton`
+   - `BasicInput`
+   - `AuraHorizontalDivider`
+   - Any future component added under `designsystem/components/`
+4. **No ad-hoc theming**: Do not override `colors` or `typography` locally to "match" a screen. If the screen needs a different look, the design system must provide a variant (e.g., `PrimaryButtonVariant.Ghost`).
+5. **Review gate**: Every PR touching UI must pass the Design System Migration Checklist (see above) and the String Resources Migration Checklist.
 
 ## Firebase Cloud Functions
 

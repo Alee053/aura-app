@@ -17,9 +17,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.programovil.aura.habit.presentation.composable.AddHabitDialog
+import com.programovil.aura.habit.presentation.composable.HabitDialog
 import com.programovil.aura.habit.presentation.composable.HabitItem
 import com.programovil.aura.designsystem.theme.AppTheme
+import com.programovil.aura.habit.domain.model.Habit
 import com.programovil.aura.habit.presentation.viewmodel.HabitEvent
 import com.programovil.aura.habit.presentation.viewmodel.HabitViewModel
 import kotlinx.datetime.*
@@ -40,7 +41,7 @@ fun HabitScreen(
     viewModel: HabitViewModel = koinInject()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    var showAddDialog by remember { mutableStateOf(false) }
+    var editingHabit by remember { mutableStateOf<Habit?>(null) }
     val snackbarHostState = remember { SnackbarHostState() }
 
     val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
@@ -68,7 +69,7 @@ fun HabitScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { showAddDialog = true }) {
+                    IconButton(onClick = { editingHabit = null }) {
                         Icon(
                             imageVector = Icons.Default.Add,
                             contentDescription = stringResource(Res.string.add_habit),
@@ -113,14 +114,7 @@ fun HabitScreen(
                                     )
                                 )
                             },
-                            onClick = {
-                                viewModel.onEvent(
-                                    HabitEvent.ToggleCompletion(
-                                        habitItem.habit.id,
-                                        habitItem.targetDate
-                                    )
-                                )
-                            }
+                            onLongClick = { editingHabit = habitItem.habit }
                         )
                     }
                 }
@@ -143,14 +137,7 @@ fun HabitScreen(
                                     )
                                 )
                             },
-                            onClick = {
-                                viewModel.onEvent(
-                                    HabitEvent.ToggleCompletion(
-                                        habitItem.habit.id,
-                                        habitItem.targetDate
-                                    )
-                                )
-                            }
+                            onLongClick = { editingHabit = habitItem.habit }
                         )
                     }
                 }
@@ -173,14 +160,7 @@ fun HabitScreen(
                                     )
                                 )
                             },
-                            onClick = {
-                                viewModel.onEvent(
-                                    HabitEvent.ToggleCompletion(
-                                        habitItem.habit.id,
-                                        habitItem.targetDate
-                                    )
-                                )
-                            }
+                            onLongClick = { editingHabit = habitItem.habit }
                         )
                     }
                 }
@@ -201,12 +181,17 @@ fun HabitScreen(
         }
     }
 
-    if (showAddDialog) {
-        AddHabitDialog(
-            onDismiss = { showAddDialog = false },
-            onSave = { name, recurrenceType, daysOfWeek, color ->
-                viewModel.onEvent(HabitEvent.AddHabit(name, recurrenceType, daysOfWeek, color))
-                showAddDialog = false
+    if (editingHabit != null) {
+        HabitDialog(
+            habit = editingHabit,
+            onDismiss = { editingHabit = null },
+            onSave = { habit ->
+                viewModel.onEvent(HabitEvent.UpdateHabit(habit))
+                editingHabit = null
+            },
+            onDelete = {
+                editingHabit?.let { viewModel.onEvent(HabitEvent.DeleteHabit(it.id)) }
+                editingHabit = null
             }
         )
     }

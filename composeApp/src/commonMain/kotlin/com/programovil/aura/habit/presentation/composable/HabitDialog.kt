@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -30,19 +31,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.programovil.aura.designsystem.components.button.PrimaryButton
+import com.programovil.aura.designsystem.components.input.BasicInput
+import com.programovil.aura.designsystem.theme.AppTheme
+import com.programovil.aura.habit.domain.model.Habit
+import com.programovil.aura.habit.domain.model.RecurrenceType
+import com.programovil.aura.shared.parseHexColor
 import aura_app.composeapp.generated.resources.Res
 import aura_app.composeapp.generated.resources.cancel
 import aura_app.composeapp.generated.resources.color_label
 import aura_app.composeapp.generated.resources.daily
+import aura_app.composeapp.generated.resources.edit_habit
 import aura_app.composeapp.generated.resources.habit_name
 import aura_app.composeapp.generated.resources.new_habit
 import aura_app.composeapp.generated.resources.repeat_on
 import aura_app.composeapp.generated.resources.save
 import aura_app.composeapp.generated.resources.weekly
-import com.programovil.aura.designsystem.components.button.PrimaryButton
-import com.programovil.aura.designsystem.components.input.BasicInput
-import com.programovil.aura.designsystem.theme.AppTheme
-import com.programovil.aura.habit.domain.model.RecurrenceType
 import aura_app.composeapp.generated.resources.day_fri
 import aura_app.composeapp.generated.resources.day_mon
 import aura_app.composeapp.generated.resources.day_sat
@@ -50,12 +54,16 @@ import aura_app.composeapp.generated.resources.day_sun
 import aura_app.composeapp.generated.resources.day_thu
 import aura_app.composeapp.generated.resources.day_tue
 import aura_app.composeapp.generated.resources.day_wed
-import com.programovil.aura.shared.parseHexColor
+import aura_app.composeapp.generated.resources.delete_habit
 import org.jetbrains.compose.resources.stringResource
 
 private val colorPalette = listOf(
     "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7", "#DDA0DD"
 )
+
+private fun bitmaskFromDays(daysOfWeek: List<Int>): Int {
+    return daysOfWeek.fold(0) { acc, day -> acc or (1 shl (day - 1)) }
+}
 
 @Composable
 private fun getDayLabels(): List<String> {
@@ -72,14 +80,18 @@ private fun getDayLabels(): List<String> {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun AddHabitDialog(
+fun HabitDialog(
+    habit: Habit?,
     onDismiss: () -> Unit,
-    onSave: (name: String, recurrenceType: RecurrenceType, daysOfWeek: List<Int>, color: String) -> Unit
+    onSave: (habit: Habit) -> Unit,
+    onDelete: (() -> Unit)? = null
 ) {
-    var name by remember { mutableStateOf("") }
-    var isDaily by remember { mutableStateOf(true) }
-    var selectedDays by remember { mutableIntStateOf(0) }
-    var selectedColor by remember { mutableStateOf(colorPalette[0]) }
+    var name by remember { mutableStateOf(habit?.name ?: "") }
+    var isDaily by remember { mutableStateOf(habit?.recurrenceType != RecurrenceType.WEEKLY) }
+    var selectedDays by remember { mutableIntStateOf(habit?.let { bitmaskFromDays(it.daysOfWeek) } ?: 0) }
+    var selectedColor by remember { mutableStateOf(habit?.color ?: colorPalette[0]) }
+
+    val isEditMode = habit != null
 
     Dialog(onDismissRequest = onDismiss) {
         Surface(
@@ -90,7 +102,7 @@ fun AddHabitDialog(
                 modifier = Modifier.padding(24.dp)
             ) {
                 Text(
-                    text = stringResource(Res.string.new_habit),
+                    text = stringResource(if (isEditMode) Res.string.edit_habit else Res.string.new_habit),
                     style = AppTheme.typography.headlineSmall
                 )
 
@@ -196,24 +208,47 @@ fun AddHabitDialog(
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
+                    if (isEditMode && onDelete != null) {
+                        TextButton(onClick = {
+                            onDelete()
+                            onDismiss()
+                        }) {
+                            Text(
+                                text = stringResource(Res.string.delete_habit),
+                                style = AppTheme.typography.labelLarge,
+                                color = AppTheme.colors.error
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.weight(1f))
+
                     PrimaryButton(
                         text = stringResource(Res.string.cancel),
-                        onClick = onDismiss,
-                        enabled = true
+                        onClick = onDismiss
                     )
-                    Spacer(modifier = Modifier.weight(1f).size(0.dp))
+
+                    Spacer(modifier = Modifier.size(8.dp))
+
                     PrimaryButton(
                         text = stringResource(Res.string.save),
                         onClick = {
                             if (name.isNotBlank()) {
-                                val daysOfWeek = if (isDaily) {
-                                    emptyList()
-                                } else {
-                                    (0..6).filter { (selectedDays and (1 shl it)) != 0 }.map { it + 1 }
-                                }
-                                onSave(name, if (isDaily) RecurrenceType.DAILY else RecurrenceType.WEEKLY, daysOfWeek, selectedColor)
+                                val daysOfWeek = if (isDaily) emptyList()
+                                else (0..6).filter { (selectedDays and (1 shl it)) != 0 }.map { it + 1 }
+
+                                val habitToSave = Habit(
+                                    id = habit?.id ?: java.util.UUID.randomUUID().toString(),
+                                    name = name.trim(),
+                                    recurrenceType = if (isDaily) RecurrenceType.DAILY else RecurrenceType.WEEKLY,
+                                    daysOfWeek = daysOfWeek,
+                                    color = selectedColor,
+                                    createdAt = habit?.createdAt ?: System.currentTimeMillis()
+                                )
+                                onSave(habitToSave)
+                                onDismiss()
                             }
                         },
                         enabled = name.isNotBlank()

@@ -37,6 +37,8 @@
 
     <!-- Add Habit Dialog -->
     <string name="new_habit">New Habit</string>
+    <string name="edit_habit">Edit Habit</string>
+    <string name="delete_habit">Delete</string>
     <string name="habit_name">Habit name</string>
     <string name="daily">Daily</string>
     <string name="daily_badge">Daily</string>

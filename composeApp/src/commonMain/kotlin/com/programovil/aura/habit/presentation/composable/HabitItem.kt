@@ -37,7 +37,7 @@ import org.jetbrains.compose.resources.stringResource
 fun HabitItem(
     habitWithStatus: HabitWithStatus,
     onToggle: () -> Unit,
-    onClick: () -> Unit,
+    onLongClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val habit = habitWithStatus.habit
@@ -47,7 +47,7 @@ fun HabitItem(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
+            .clickable(onClick = onLongClick),
         colors = CardDefaults.cardColors(
             containerColor = AppTheme.colors.surface,
             contentColor = AppTheme.colors.textPrimary

@@ -11,10 +11,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -59,10 +62,11 @@ fun HabitCard(
             modifier = Modifier.padding(12.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
+            // Single row: Color indicator, Habit name, Progress, Streak, Checkbox
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Box(
                     modifier = Modifier
@@ -78,20 +82,38 @@ fun HabitCard(
                     modifier = Modifier.weight(1f)
                 )
 
+                // Progress info (subtle)
                 if (habit.recurrenceType != RecurrenceType.DAILY) {
+                    val periodLabel = when (habit.recurrenceType) {
+                        RecurrenceType.WEEKLY -> "week"
+                        RecurrenceType.MONTHLY -> "month"
+                        RecurrenceType.DAILY -> "day"
+                    }
                     Text(
-                        text = "$completed/$target",
+                        text = "$completed/$target $periodLabel",
                         style = AppTheme.typography.labelMedium,
-                        color = AppTheme.colors.textSecondary
+                        color = AppTheme.colors.textSecondary.copy(alpha = 0.6f)
                     )
                 }
 
+                // Streak with fire icon
                 if (streak > 0) {
-                    Text(
-                        text = streak.toString(),
-                        style = AppTheme.typography.labelLarge,
-                        color = AppTheme.colors.primary
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(2.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.LocalFireDepartment,
+                            contentDescription = "streak",
+                            tint = AppTheme.colors.textSecondary,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Text(
+                            text = "$streak",
+                            style = AppTheme.typography.labelLarge,
+                            color = AppTheme.colors.textPrimary
+                        )
+                    }
                 }
 
                 val todayCompleted = last7Days.lastOrNull()?.isCompleted == true

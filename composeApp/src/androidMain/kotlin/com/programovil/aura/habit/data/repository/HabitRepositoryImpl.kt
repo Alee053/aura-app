@@ -34,12 +34,11 @@ private class HabitRepositoryImpl : HabitRepository {
                     return@addSnapshotListener
                 }
                 val habits = snapshot?.documents?.mapNotNull { doc ->
-                    val daysOfWeek = (doc.get("daysOfWeek") as? List<*>)?.mapNotNull { (it as? Number)?.toInt() } ?: emptyList()
                     val habitData = HabitData(
                         id = doc.id,
                         name = doc.getString("name") ?: "",
                         recurrenceType = doc.getString("recurrenceType") ?: "DAILY",
-                        daysOfWeek = daysOfWeek,
+                        targetCount = doc.getLong("targetCount")?.toInt() ?: 1,
                         color = doc.getString("color") ?: "",
                         createdAt = doc.getLong("createdAt")
                     )
@@ -97,7 +96,7 @@ private class HabitRepositoryImpl : HabitRepository {
         val data = mapOf(
             "name" to habit.name,
             "recurrenceType" to habit.recurrenceType.name,
-            "daysOfWeek" to habit.daysOfWeek,
+            "targetCount" to habit.targetCount,
             "color" to habit.color,
             "createdAt" to habit.createdAt
         )
@@ -108,7 +107,7 @@ private class HabitRepositoryImpl : HabitRepository {
         val data = mapOf(
             "name" to habit.name,
             "recurrenceType" to habit.recurrenceType.name,
-            "daysOfWeek" to habit.daysOfWeek,
+            "targetCount" to habit.targetCount,
             "color" to habit.color,
             "createdAt" to habit.createdAt
         )

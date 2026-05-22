@@ -86,14 +86,14 @@ class GetHabitsGroupedByDayUseCase(private val repository: HabitRepository) {
             .map { it.completedDate }
             .toSet()
 
-        return (0..6).map { daysAgo ->
+        return (6 downTo 0).map { daysAgo ->
             val date = targetDate.minus(daysAgo, DateTimeUnit.DAY)
             val dateStr = date.toString()
             val dayOfWeek = date.dayOfWeek.isoDayNumber
             val isScheduled = habit.isScheduledFor(dayOfWeek)
             val isCompleted = completedDates.contains(dateStr)
             DayCompletion(dateStr, isCompleted, isScheduled)
-        }.reversed()
+        }
     }
 
     private fun calculateStreak(habit: Habit, completions: List<HabitCompletion>, fromDate: LocalDate): Int {

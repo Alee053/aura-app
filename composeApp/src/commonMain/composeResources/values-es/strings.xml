@@ -39,6 +39,7 @@
     <string name="new_habit">Nuevo hábito</string>
     <string name="habit_name">Nombre del hábito</string>
     <string name="daily">Diario</string>
+    <string name="daily_badge">Diario</string>
     <string name="weekly">Semanal</string>
     <string name="repeat_on">Repetir en:</string>
     <string name="color_label">Color:</string>

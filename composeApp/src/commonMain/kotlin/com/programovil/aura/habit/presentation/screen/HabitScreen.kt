@@ -112,6 +112,14 @@ fun HabitScreen(
                                         habitItem.targetDate
                                     )
                                 )
+                            },
+                            onClick = {
+                                viewModel.onEvent(
+                                    HabitEvent.ToggleCompletion(
+                                        habitItem.habit.id,
+                                        habitItem.targetDate
+                                    )
+                                )
                             }
                         )
                     }
@@ -134,6 +142,14 @@ fun HabitScreen(
                                         habitItem.targetDate
                                     )
                                 )
+                            },
+                            onClick = {
+                                viewModel.onEvent(
+                                    HabitEvent.ToggleCompletion(
+                                        habitItem.habit.id,
+                                        habitItem.targetDate
+                                    )
+                                )
                             }
                         )
                     }
@@ -150,6 +166,14 @@ fun HabitScreen(
                         HabitItem(
                             habitWithStatus = habitItem,
                             onToggle = {
+                                viewModel.onEvent(
+                                    HabitEvent.ToggleCompletion(
+                                        habitItem.habit.id,
+                                        habitItem.targetDate
+                                    )
+                                )
+                            },
+                            onClick = {
                                 viewModel.onEvent(
                                     HabitEvent.ToggleCompletion(
                                         habitItem.habit.id,

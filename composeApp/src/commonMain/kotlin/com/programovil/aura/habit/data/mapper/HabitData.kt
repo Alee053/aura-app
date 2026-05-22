@@ -8,7 +8,7 @@ data class HabitData(
     val id: String,
     val name: String,
     val recurrenceType: String,
-    val daysOfWeek: List<Int> = emptyList(),
+    val targetCount: Int,
     val color: String,
     val createdAt: Long? = null
 )
@@ -24,7 +24,7 @@ fun HabitData.toDomain(): Habit = Habit(
     id = id,
     name = name,
     recurrenceType = RecurrenceType.valueOf(recurrenceType),
-    daysOfWeek = daysOfWeek,
+    targetCount = targetCount,
     color = color,
     createdAt = createdAt ?: 0L
 )
@@ -33,7 +33,7 @@ fun Habit.toData(): HabitData = HabitData(
     id = id,
     name = name,
     recurrenceType = recurrenceType.name,
-    daysOfWeek = daysOfWeek,
+    targetCount = targetCount,
     color = color,
     createdAt = createdAt
 )

@@ -1,7 +1,6 @@
-package com.programovil.aura.todo.domain.repository
+package com.programovil.aura.todo.data.repository
 
 import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
 import com.programovil.aura.shared.FirebaseConfig
 import com.programovil.aura.todo.data.mapper.TodoData
 import com.programovil.aura.todo.data.mapper.toDomain
@@ -34,6 +33,7 @@ private class TodoRepositoryImpl : TodoRepository {
                     val todoData = TodoData(
                         id = doc.id,
                         title = doc.getString("title") ?: "",
+                        description = doc.getString("description"),
                         isCompleted = doc.getBoolean("isCompleted") ?: false,
                         dueDate = doc.getLong("dueDate")
                     )
@@ -44,16 +44,37 @@ private class TodoRepositoryImpl : TodoRepository {
         awaitClose { listener.remove() }
     }
 
-    override suspend fun addTodo(title: String, dueDate: Long?): Result<Unit> = runCatching {
+    override suspend fun addTodo(title: String, description: String?, dueDate: Long?): Result<Unit> = runCatching {
         val data = mutableMapOf(
             "title" to title,
             "isCompleted" to false,
             "createdAt" to FieldValue.serverTimestamp()
         )
+        if (description != null) {
+            data["description"] = description
+        }
         if (dueDate != null) {
             data["dueDate"] = dueDate
         }
         userTodosCollection().add(data).await()
+    }
+
+    override suspend fun updateTodo(todo: Todo): Result<Unit> = runCatching {
+        val data = mutableMapOf<String, Any>(
+            "title" to todo.title,
+            "isCompleted" to todo.isCompleted
+        )
+        if (todo.description != null) {
+            data["description"] = todo.description
+        } else {
+            data["description"] = FieldValue.delete()
+        }
+        if (todo.dueDate != null) {
+            data["dueDate"] = todo.dueDate
+        } else {
+            data["dueDate"] = FieldValue.delete()
+        }
+        userTodosCollection().document(todo.id).update(data).await()
     }
 
     override suspend fun toggleTodo(todoId: String, isCompleted: Boolean): Result<Unit> = runCatching {

@@ -15,11 +15,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -32,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.programovil.aura.designsystem.components.button.PrimaryButton
@@ -106,7 +110,7 @@ private fun TargetCountStepper(
     val label = if (max == 7) stringResource(Res.string.per_week) else stringResource(Res.string.per_month)
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         IconButton(
             onClick = { if (count > 1) onCountChange(count - 1) },
@@ -121,11 +125,29 @@ private fun TargetCountStepper(
                 tint = AppTheme.colors.textPrimary
             )
         }
-        Text(
-            text = "$count $label",
-            style = AppTheme.typography.bodyMedium,
-            color = AppTheme.colors.textPrimary
+
+        OutlinedTextField(
+            value = count.toString(),
+            onValueChange = { newValue ->
+                val newCount = newValue.filter { it.isDigit() }.toIntOrNull()
+                if (newCount != null && newCount in 1..max) {
+                    onCountChange(newCount)
+                } else if (newValue.isEmpty()) {
+                    onCountChange(1)
+                }
+            },
+            modifier = Modifier.width(60.dp),
+            textStyle = AppTheme.typography.bodyMedium.copy(color = AppTheme.colors.textPrimary),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            singleLine = true,
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = AppTheme.colors.primary,
+                unfocusedBorderColor = AppTheme.colors.textSecondary.copy(alpha = 0.3f),
+                focusedTextColor = AppTheme.colors.textPrimary,
+                unfocusedTextColor = AppTheme.colors.textPrimary,
+            )
         )
+
         IconButton(
             onClick = { if (count < max) onCountChange(count + 1) },
             modifier = Modifier
@@ -139,6 +161,12 @@ private fun TargetCountStepper(
                 tint = AppTheme.colors.textPrimary
             )
         }
+
+        Text(
+            text = label,
+            style = AppTheme.typography.bodyMedium,
+            color = AppTheme.colors.textSecondary
+        )
     }
 }
 

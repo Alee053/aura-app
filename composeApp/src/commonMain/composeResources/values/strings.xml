@@ -7,7 +7,7 @@
 
     <!-- Todo Screen -->
     <string name="todos_title">My Todos</string>
-    <string name="add_todo">+</string>
+    <string name="add_todo">Add todo</string>
     <string name="new_todo_hint">New todo</string>
     <string name="empty_todos">No todos yet. Add your first one!</string>
     <string name="delete">X</string>
@@ -16,6 +16,15 @@
     <string name="due_date_label">Due date: %1$s</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+
+    <!-- Todo Dialog -->
+    <string name="new_todo">New Todo</string>
+    <string name="edit_todo">Edit Todo</string>
+    <string name="todo_name_hint">Todo name</string>
+    <string name="todo_description_hint">Description (optional)</string>
+    <string name="add_due_date">Add due date</string>
+    <string name="clear_due_date">Clear</string>
+    <string name="add_first_todo">Add first todo</string>
 
     <!-- Habit Screen -->
     <string name="habits_title">Habits</string>

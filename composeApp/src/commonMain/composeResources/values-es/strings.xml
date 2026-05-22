@@ -7,7 +7,7 @@
 
     <!-- Todo Screen -->
     <string name="todos_title">Mis Tareas</string>
-    <string name="add_todo">+</string>
+    <string name="add_todo">Agregar tarea</string>
     <string name="new_todo_hint">Nueva tarea</string>
     <string name="empty_todos">No hay tareas. ¡Agrega la primera!</string>
     <string name="delete">X</string>
@@ -16,6 +16,15 @@
     <string name="due_date_label">Fecha: %1$s</string>
     <string name="ok">Aceptar</string>
     <string name="cancel">Cancelar</string>
+
+    <!-- Todo Dialog -->
+    <string name="new_todo">Nueva tarea</string>
+    <string name="edit_todo">Editar tarea</string>
+    <string name="todo_name_hint">Nombre de la tarea</string>
+    <string name="todo_description_hint">Descripción (opcional)</string>
+    <string name="add_due_date">Agregar fecha</string>
+    <string name="clear_due_date">Borrar</string>
+    <string name="add_first_todo">Agregar primera tarea</string>
 
     <!-- Habit Screen -->
     <string name="habits_title">Hábitos</string>

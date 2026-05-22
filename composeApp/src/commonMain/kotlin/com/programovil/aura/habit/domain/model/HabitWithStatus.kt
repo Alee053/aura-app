@@ -7,5 +7,6 @@ data class HabitWithStatus(
     val isDone: Boolean,
     val isMissed: Boolean,
     val streak: Int = 0,
-    val targetDate: String = ""  // YYYY-MM-DD format
+    val targetDate: String = "",
+    val weeklyCompletions: List<DayCompletion> = emptyList()
 )

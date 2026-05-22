@@ -90,34 +90,32 @@ class GetHabitsWithStatusUseCase(private val repository: HabitRepository) {
 
     private fun calculateStreak(habit: Habit, completions: List<HabitCompletion>, today: LocalDate): Int {
         val completedDates = completions.map { it.completedDate }.toSet()
-        var streak = 0
-        var period = getPeriodContaining(today, habit.recurrenceType)
+        val currentPeriod = getPeriodContaining(today, habit.recurrenceType)
+        val currentCount = countCompletionsInPeriod(completedDates, currentPeriod)
+        val currentPeriodComplete = currentPeriod.endDate < today
 
-        var searchLimit = 100
-        var foundPeriod: Period? = null
-
-        while (searchLimit-- > 0) {
-            if (countCompletionsInPeriod(completedDates, period) >= habit.targetCount) {
-                foundPeriod = period
-                break
-            }
-            period = previousPeriod(period, habit.recurrenceType)
+        // If current period is complete and doesn't meet target, streak is 0
+        if (currentPeriodComplete && currentCount < habit.targetCount) {
+            return 0
         }
 
-        if (foundPeriod == null) return 0
+        // Count completions from consecutive previous periods that met the target
+        var streak = 0
+        var period = previousPeriod(currentPeriod, habit.recurrenceType)
+        var searchLimit = 100
 
-        streak = 1
-        var currentPeriod = previousPeriod(foundPeriod, habit.recurrenceType)
-
-        var streakLimit = 100
-        while (streakLimit-- > 0) {
-            if (countCompletionsInPeriod(completedDates, currentPeriod) >= habit.targetCount) {
-                streak++
-                currentPeriod = previousPeriod(currentPeriod, habit.recurrenceType)
+        while (searchLimit-- > 0) {
+            val count = countCompletionsInPeriod(completedDates, period)
+            if (count >= habit.targetCount) {
+                streak += count
+                period = previousPeriod(period, habit.recurrenceType)
             } else {
                 break
             }
         }
+
+        // Add current period completions
+        streak += currentCount
 
         return streak
     }

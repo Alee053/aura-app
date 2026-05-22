@@ -10,24 +10,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -38,22 +30,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.programovil.aura.designsystem.components.button.PrimaryButton
 import com.programovil.aura.designsystem.theme.AppTheme
+import com.programovil.aura.todo.domain.model.Todo
+import com.programovil.aura.todo.presentation.composable.TodoDialog
 import com.programovil.aura.todo.presentation.composable.TodoItem
 import com.programovil.aura.todo.presentation.viewmodel.TodoViewModel
 import aura_app.composeapp.generated.resources.Res
+import aura_app.composeapp.generated.resources.add_first_todo
 import aura_app.composeapp.generated.resources.add_todo
-import aura_app.composeapp.generated.resources.cancel
 import aura_app.composeapp.generated.resources.empty_todos
-import aura_app.composeapp.generated.resources.new_todo_hint
-import aura_app.composeapp.generated.resources.ok
-import aura_app.composeapp.generated.resources.select_due_date
 import aura_app.composeapp.generated.resources.todos_title
-import aura_app.composeapp.generated.resources.due_date_label
 import org.jetbrains.compose.resources.stringResource
-import kotlinx.datetime.Instant
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,9 +52,8 @@ fun TodoScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
 
-    var newTodoTitle by remember { mutableStateOf("") }
-    var selectedDueDate by remember { mutableStateOf<Long?>(null) }
-    var showDatePicker by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) }
+    var editingTodo by remember { mutableStateOf<Todo?>(null) }
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -77,26 +64,32 @@ fun TodoScreen(
         }
     }
 
-    if (showDatePicker) {
-        val datePickerState = rememberDatePickerState()
-        DatePickerDialog(
-            onDismissRequest = { showDatePicker = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    selectedDueDate = datePickerState.selectedDateMillis
-                    showDatePicker = false
-                }) {
-                    Text(stringResource(Res.string.ok))
+    if (showDialog) {
+        TodoDialog(
+            todo = editingTodo,
+            onDismiss = {
+                showDialog = false
+                editingTodo = null
+            },
+            onSave = { title, description, dueDate ->
+                if (editingTodo != null) {
+                    viewModel.updateTodo(
+                        editingTodo!!.copy(
+                            title = title,
+                            description = description,
+                            dueDate = dueDate
+                        )
+                    )
+                } else {
+                    viewModel.addTodo(title, description, dueDate)
                 }
             },
-            dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) {
-                    Text(stringResource(Res.string.cancel))
+            onDelete = editingTodo?.let { todo ->
+                {
+                    viewModel.deleteTodo(todo.id)
                 }
             }
-        ) {
-            DatePicker(state = datePickerState)
-        }
+        )
     }
 
     Scaffold(
@@ -118,11 +111,8 @@ fun TodoScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    if (newTodoTitle.isNotBlank()) {
-                        viewModel.addTodo(newTodoTitle, selectedDueDate)
-                        newTodoTitle = ""
-                        selectedDueDate = null
-                    }
+                    editingTodo = null
+                    showDialog = true
                 },
                 containerColor = AppTheme.colors.primary
             ) {
@@ -141,50 +131,6 @@ fun TodoScreen(
                 .padding(padding)
                 .padding(horizontal = 16.dp)
         ) {
-            OutlinedTextField(
-                value = newTodoTitle,
-                onValueChange = { newTodoTitle = it },
-                label = { Text(stringResource(Res.string.new_todo_hint)) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                singleLine = true,
-                textStyle = AppTheme.typography.bodyMedium.copy(
-                    color = AppTheme.colors.textPrimary
-                ),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = AppTheme.colors.textPrimary,
-                    unfocusedTextColor = AppTheme.colors.textPrimary,
-                    disabledTextColor = AppTheme.colors.textPrimary.copy(alpha = 0.38f),
-                    focusedBorderColor = AppTheme.colors.primary,
-                    unfocusedBorderColor = AppTheme.colors.textPrimary.copy(alpha = 0.5f),
-                    disabledBorderColor = AppTheme.colors.textPrimary.copy(alpha = 0.12f),
-                    focusedLabelColor = AppTheme.colors.primary,
-                    unfocusedLabelColor = AppTheme.colors.textSecondary,
-                    cursorColor = AppTheme.colors.primary
-                ),
-                trailingIcon = {
-                    IconButton(onClick = { showDatePicker = true }) {
-                        Icon(
-                            imageVector = Icons.Default.CalendarToday,
-                            contentDescription = stringResource(Res.string.select_due_date),
-                            tint = if (selectedDueDate != null) AppTheme.colors.primary else AppTheme.colors.textSecondary
-                        )
-                    }
-                }
-            )
-
-            selectedDueDate?.let { millis ->
-                val date = Instant.fromEpochMilliseconds(millis)
-                    .toLocalDateTime(TimeZone.currentSystemDefault()).date
-                Text(
-                    text = stringResource(Res.string.due_date_label, date.toString()),
-                    style = AppTheme.typography.labelLarge,
-                    color = AppTheme.colors.primary,
-                    modifier = Modifier.padding(bottom = 8.dp)
-                )
-            }
-
             when {
                 isLoading -> {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -193,11 +139,23 @@ fun TodoScreen(
                 }
                 todos.isEmpty() -> {
                     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Text(
-                            stringResource(Res.string.empty_todos),
-                            style = AppTheme.typography.bodyMedium,
-                            color = AppTheme.colors.textSecondary
-                        )
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            Text(
+                                stringResource(Res.string.empty_todos),
+                                style = AppTheme.typography.bodyMedium,
+                                color = AppTheme.colors.textSecondary
+                            )
+                            PrimaryButton(
+                                text = stringResource(Res.string.add_first_todo),
+                                onClick = {
+                                    editingTodo = null
+                                    showDialog = true
+                                }
+                            )
+                        }
                     }
                 }
                 else -> {
@@ -209,7 +167,10 @@ fun TodoScreen(
                             TodoItem(
                                 todo = todo,
                                 onToggle = { viewModel.toggleTodo(todo.id, !todo.isCompleted) },
-                                onDelete = { viewModel.deleteTodo(todo.id) }
+                                onClick = {
+                                    editingTodo = todo
+                                    showDialog = true
+                                }
                             )
                         }
                     }

@@ -51,7 +51,7 @@ class GetHabitsWithStatusUseCase(private val repository: HabitRepository) {
         return when (type) {
             RecurrenceType.DAILY -> Period(date, date)
             RecurrenceType.WEEKLY -> {
-                val daysSinceMonday = (date.dayOfWeek.isoDayNumber - 1) % 7
+                val daysSinceMonday = date.dayOfWeek.isoDayNumber - 1
                 val monday = date.minus(daysSinceMonday, DateTimeUnit.DAY)
                 Period(monday, monday.plus(6, DateTimeUnit.DAY))
             }
@@ -109,7 +109,8 @@ class GetHabitsWithStatusUseCase(private val repository: HabitRepository) {
         streak = 1
         var currentPeriod = previousPeriod(foundPeriod, habit.recurrenceType)
 
-        while (searchLimit-- > 0) {
+        var streakLimit = 100
+        while (streakLimit-- > 0) {
             if (countCompletionsInPeriod(completedDates, currentPeriod) >= habit.targetCount) {
                 streak++
                 currentPeriod = previousPeriod(currentPeriod, habit.recurrenceType)

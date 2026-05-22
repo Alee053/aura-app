@@ -1,7 +1,9 @@
 package com.programovil.aura.todo.presentation.composable
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -30,6 +32,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.programovil.aura.designsystem.components.button.PrimaryButton
@@ -139,37 +143,49 @@ fun TodoDialog(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                Row(
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .clip(RoundedCornerShape(8.dp))
                         .clickable { showDatePicker = true }
-                        .padding(vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                        .padding(12.dp)
                 ) {
-                    val dateText = dueDate?.let { millis ->
-                        val date = Instant.fromEpochMilliseconds(millis)
-                            .toLocalDateTime(TimeZone.currentSystemDefault()).date
-                        date.toString()
-                    } ?: stringResource(Res.string.add_due_date)
-
-                    Text(
-                        text = dateText,
-                        style = AppTheme.typography.bodyMedium,
-                        color = if (dueDate != null) AppTheme.colors.textPrimary else AppTheme.colors.textSecondary
-                    )
-
-                    if (dueDate != null) {
-                        IconButton(
-                            onClick = { dueDate = null },
-                            modifier = Modifier.size(24.dp)
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(8.dp),
+                        color = Color.Transparent,
+                        border = BorderStroke(1.dp, AppTheme.colors.textSecondary.copy(alpha = 0.3f))
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(0.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = stringResource(Res.string.clear_due_date),
-                                tint = AppTheme.colors.textSecondary,
-                                modifier = Modifier.size(16.dp)
+                            val dateText = dueDate?.let { millis ->
+                                val date = Instant.fromEpochMilliseconds(millis)
+                                    .toLocalDateTime(TimeZone.currentSystemDefault()).date
+                                date.toString()
+                            } ?: stringResource(Res.string.add_due_date)
+
+                            Text(
+                                text = dateText,
+                                style = AppTheme.typography.bodyMedium,
+                                color = if (dueDate != null) AppTheme.colors.textPrimary else AppTheme.colors.textSecondary
                             )
+
+                            if (dueDate != null) {
+                                IconButton(
+                                    onClick = { dueDate = null },
+                                    modifier = Modifier.size(24.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Close,
+                                        contentDescription = stringResource(Res.string.clear_due_date),
+                                        tint = AppTheme.colors.textSecondary,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                }
+                            }
                         }
                     }
                 }

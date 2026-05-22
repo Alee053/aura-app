@@ -19,7 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.programovil.aura.habit.presentation.composable.HabitDialog
-import com.programovil.aura.habit.presentation.composable.HabitItem
+import com.programovil.aura.habit.presentation.composable.HabitCard
 import com.programovil.aura.designsystem.theme.AppTheme
 import com.programovil.aura.designsystem.components.button.PrimaryButton
 import com.programovil.aura.habit.domain.model.Habit
@@ -29,9 +29,6 @@ import kotlinx.datetime.*
 import aura_app.composeapp.generated.resources.Res
 import aura_app.composeapp.generated.resources.habits_title
 import aura_app.composeapp.generated.resources.add_habit
-import aura_app.composeapp.generated.resources.today
-import aura_app.composeapp.generated.resources.tomorrow
-import aura_app.composeapp.generated.resources.this_week
 import aura_app.composeapp.generated.resources.empty_habits
 import aura_app.composeapp.generated.resources.add_first_habit
 import org.jetbrains.compose.resources.stringResource
@@ -48,7 +45,6 @@ fun HabitScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
     val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
-    val tomorrow = today.plus(1, DateTimeUnit.DAY)
 
     LaunchedEffect(uiState.error) {
         uiState.error?.let { error ->
@@ -105,21 +101,14 @@ fun HabitScreen(
                     .padding(padding),
                 contentPadding = PaddingValues(vertical = 8.dp)
             ) {
-                if (uiState.todayHabits.isNotEmpty()) {
-                    item {
-                        HabitSectionHeader(
-                            title = stringResource(Res.string.today),
-                            subtitle = today.toString()
-                        )
-                    }
-                    items(uiState.todayHabits, key = { it.habit.id + it.targetDate }) { habitItem ->
-                        HabitItem(
+                items(uiState.habits, key = { it.habit.id }) { habitItem ->
+                        HabitCard(
                             habitWithStatus = habitItem,
-                            onToggle = {
+                            onToggle = { date ->
                                 viewModel.onEvent(
                                     HabitEvent.ToggleCompletion(
                                         habitItem.habit.id,
-                                        habitItem.targetDate
+                                        date
                                     )
                                 )
                             },
@@ -129,63 +118,8 @@ fun HabitScreen(
                             }
                         )
                     }
-                }
 
-                if (uiState.tomorrowHabits.isNotEmpty()) {
-                    item {
-                        HabitSectionHeader(
-                            title = stringResource(Res.string.tomorrow),
-                            subtitle = tomorrow.toString()
-                        )
-                    }
-                    items(uiState.tomorrowHabits, key = { it.habit.id + it.targetDate }) { habitItem ->
-                        HabitItem(
-                            habitWithStatus = habitItem,
-                            onToggle = {
-                                viewModel.onEvent(
-                                    HabitEvent.ToggleCompletion(
-                                        habitItem.habit.id,
-                                        habitItem.targetDate
-                                    )
-                                )
-                            },
-                            onLongClick = {
-                                editingHabit = habitItem.habit
-                                showDialog = true
-                            }
-                        )
-                    }
-                }
-
-                if (uiState.thisWeekHabits.isNotEmpty()) {
-                    item {
-                        HabitSectionHeader(
-                            title = stringResource(Res.string.this_week),
-                            subtitle = null
-                        )
-                    }
-                    items(uiState.thisWeekHabits, key = { it.habit.id + it.targetDate }) { habitItem ->
-                        HabitItem(
-                            habitWithStatus = habitItem,
-                            onToggle = {
-                                viewModel.onEvent(
-                                    HabitEvent.ToggleCompletion(
-                                        habitItem.habit.id,
-                                        habitItem.targetDate
-                                    )
-                                )
-                            },
-                            onLongClick = {
-                                editingHabit = habitItem.habit
-                                showDialog = true
-                            }
-                        )
-                    }
-                }
-
-                if (uiState.todayHabits.isEmpty() &&
-                    uiState.tomorrowHabits.isEmpty() &&
-                    uiState.thisWeekHabits.isEmpty()) {
+                if (uiState.habits.isEmpty()) {
                     item {
                         Box(
                             modifier = Modifier.fillMaxSize().padding(32.dp),
@@ -235,27 +169,5 @@ fun HabitScreen(
                 }
             }
         )
-    }
-}
-
-@Composable
-private fun HabitSectionHeader(title: String, subtitle: String?) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp)
-    ) {
-        Text(
-            text = title,
-            style = AppTheme.typography.titleMedium,
-            color = AppTheme.colors.textPrimary
-        )
-        if (subtitle != null) {
-            Text(
-                text = subtitle,
-                style = AppTheme.typography.labelLarge,
-                color = AppTheme.colors.textSecondary
-            )
-        }
     }
 }

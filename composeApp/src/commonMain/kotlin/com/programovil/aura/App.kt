@@ -201,7 +201,8 @@ fun AuthenticatedApp(
                 todoViewModel = todoViewModel,
                 currentThemeMode = currentThemeMode,
                 onThemeChange = onThemeChange,
-                onSignOut = onSignOut
+                onSignOut = onSignOut,
+                featureFlags = featureFlags
             )
         }
     }

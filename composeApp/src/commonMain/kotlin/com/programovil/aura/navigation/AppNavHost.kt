@@ -10,6 +10,7 @@ import com.programovil.aura.home.presentation.screen.HomeScreen
 import com.programovil.aura.home.presentation.viewmodel.HomeViewModel
 import com.programovil.aura.settings.presentation.screen.SettingsScreen
 import com.programovil.aura.settings.presentation.viewmodel.SettingsViewModel
+import com.programovil.aura.shared.FeatureFlag
 import com.programovil.aura.todo.presentation.screen.TodoScreen
 import com.programovil.aura.todo.presentation.viewmodel.TodoViewModel
 import org.koin.compose.viewmodel.koinViewModel
@@ -20,26 +21,53 @@ fun AppNavHost(
     todoViewModel: TodoViewModel,
     currentThemeMode: ThemeMode,
     onThemeChange: (ThemeMode) -> Unit,
-    onSignOut: () -> Unit
+    onSignOut: () -> Unit,
+    featureFlags: Map<FeatureFlag, Boolean>
 ) {
     NavHost(navController = navController, startDestination = NavRoute.Home) {
         composable<NavRoute.Home> {
             val homeViewModel = koinViewModel<HomeViewModel>()
             HomeScreen(
                 viewModel = homeViewModel,
-                onTodoClick = { navController.navigate(NavRoute.Todo) },
-                onHabitClick = { navController.navigate(NavRoute.Habit) },
+                showTodos = featureFlags[FeatureFlag.TODOS_ENABLED] != false,
+                showHabits = featureFlags[FeatureFlag.HABITS_ENABLED] != false,
+                onTodoClick = {
+                    if (featureFlags[FeatureFlag.TODOS_ENABLED] != false) {
+                        navController.navigate(NavRoute.Todo)
+                    }
+                },
+                onHabitClick = {
+                    if (featureFlags[FeatureFlag.HABITS_ENABLED] != false) {
+                        navController.navigate(NavRoute.Habit)
+                    }
+                },
                 onSettingsClick = { navController.navigate(NavRoute.Settings) }
             )
         }
-        composable<NavRoute.Todo> {
-            TodoScreen(
-                viewModel = todoViewModel
-            )
+
+        if (featureFlags[FeatureFlag.TODOS_ENABLED] != false) {
+            composable<NavRoute.Todo> {
+                TodoScreen(
+                    viewModel = todoViewModel,
+                    featureFlags = featureFlags,
+                    onFeatureDisabled = {
+                        navController.popBackStack(NavRoute.Home, inclusive = false)
+                    }
+                )
+            }
         }
-        composable<NavRoute.Habit> {
-            HabitScreen()
+
+        if (featureFlags[FeatureFlag.HABITS_ENABLED] != false) {
+            composable<NavRoute.Habit> {
+                HabitScreen(
+                    featureFlags = featureFlags,
+                    onFeatureDisabled = {
+                        navController.popBackStack(NavRoute.Home, inclusive = false)
+                    }
+                )
+            }
         }
+
         composable<NavRoute.Settings> {
             val settingsViewModel = koinViewModel<SettingsViewModel>()
             SettingsScreen(

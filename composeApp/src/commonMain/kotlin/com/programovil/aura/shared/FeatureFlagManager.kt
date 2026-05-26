@@ -14,9 +14,16 @@ class FeatureFlagManager(
 
     suspend fun initialize() {
         remoteConfigService.fetchAndActivate()
-        val updatedFlags = FeatureFlag.entries.associateWith { flag ->
+        refreshFlags()
+
+        remoteConfigService.registerOnConfigUpdateListener {
+            refreshFlags()
+        }
+    }
+
+    private fun refreshFlags() {
+        _flags.value = FeatureFlag.entries.associateWith { flag ->
             remoteConfigService.getBoolean(flag)
         }
-        _flags.value = updatedFlags
     }
 }

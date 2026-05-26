@@ -32,4 +32,7 @@ class FirebaseRemoteConfigService(context: Context) : RemoteConfigService {
     override suspend fun fetchAndActivate(): Result<Unit> = runCatching {
         remoteConfig.fetchAndActivate().await()
     }
+
+    override fun registerOnConfigUpdateListener(onUpdate: () -> Unit) {
+    }
 }

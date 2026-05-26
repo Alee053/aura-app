@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.programovil.aura.designsystem.components.button.PrimaryButton
 import com.programovil.aura.designsystem.theme.AppTheme
+import com.programovil.aura.shared.FeatureFlag
 import com.programovil.aura.todo.domain.model.Todo
 import com.programovil.aura.todo.presentation.composable.TodoDialog
 import com.programovil.aura.todo.presentation.composable.TodoItem
@@ -46,8 +47,16 @@ import org.jetbrains.compose.resources.stringResource
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TodoScreen(
-    viewModel: TodoViewModel
+    viewModel: TodoViewModel,
+    featureFlags: Map<FeatureFlag, Boolean> = emptyMap(),
+    onFeatureDisabled: () -> Unit = {}
 ) {
+    LaunchedEffect(featureFlags) {
+        if (featureFlags[FeatureFlag.TODOS_ENABLED] == false) {
+            onFeatureDisabled()
+        }
+    }
+
     val todos by viewModel.todos.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()

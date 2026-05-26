@@ -25,6 +25,7 @@ import com.programovil.aura.designsystem.components.button.PrimaryButton
 import com.programovil.aura.habit.domain.model.Habit
 import com.programovil.aura.habit.presentation.viewmodel.HabitEvent
 import com.programovil.aura.habit.presentation.viewmodel.HabitViewModel
+import com.programovil.aura.shared.FeatureFlag
 import kotlinx.datetime.*
 import aura_app.composeapp.generated.resources.Res
 import aura_app.composeapp.generated.resources.habits_title
@@ -37,8 +38,12 @@ import org.koin.compose.koinInject
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HabitScreen(
+    featureFlags: Map<FeatureFlag, Boolean> = emptyMap(),
+    onFeatureDisabled: () -> Unit = {},
     viewModel: HabitViewModel = koinInject()
 ) {
+    LaunchedEffect(featureFlags) { if (featureFlags[FeatureFlag.HABITS_ENABLED] == false) { onFeatureDisabled() } }
+
     val uiState by viewModel.uiState.collectAsState()
     var editingHabit by remember { mutableStateOf<Habit?>(null) }
     var showDialog by remember { mutableStateOf(false) }

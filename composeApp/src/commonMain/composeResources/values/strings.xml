@@ -116,6 +116,12 @@
     <string name="content_description_back">Back</string>
     <string name="content_description_delete">Delete</string>
 
+    <!-- Onboarding -->
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_previous">Previous</string>
+    <string name="onboarding_start">Get Started</string>
+
     <!-- Journal -->
     <string name="journal_title">Journal</string>
     <string name="journal_empty">No journal entries yet</string>

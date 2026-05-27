@@ -1,0 +1,60 @@
+{
+  "onboarding_config": [
+    {
+      "id": 1,
+      "title": {
+        "es": "Organiza tus tareas",
+        "en": "Organize your tasks",
+        "fr": "Organisez vos tâches"
+      },
+      "description": {
+        "es": "Crea, prioriza y completa tus tareas diarias con el botón flotante (+). Desliza para gestionar tu día.",
+        "en": "Create, prioritize, and complete your daily tasks with the floating (+) button. Swipe to manage your day.",
+        "fr": "Créez, priorisez et complétez vos tâches quotidiennes avec le bouton flottant (+)."
+      },
+      "image_url": { "es": "", "en": "", "fr": "" }
+    },
+    {
+      "id": 2,
+      "title": {
+        "es": "Construye hábitos duraderos",
+        "en": "Build lasting habits",
+        "fr": "Construisez des habitudes durables"
+      },
+      "description": {
+        "es": "Define hábitos recurrentes, registra tu progreso y mantén rachas. Usa el (+) para agregar nuevos hábitos.",
+        "en": "Set recurring habits, track your progress, and maintain streaks. Use (+) to add new habits.",
+        "fr": "Définissez des habitudes récurrentes, suivez vos progrès et maintenez vos séries."
+      },
+      "image_url": { "es": "", "en": "", "fr": "" }
+    },
+    {
+      "id": 3,
+      "title": {
+        "es": "Reflexiona con tu diario",
+        "en": "Reflect with your journal",
+        "fr": "Réfléchissez avec votre journal"
+      },
+      "description": {
+        "es": "Escribe entradas de diario, captura tus pensamientos y revisa tu crecimiento personal día a día.",
+        "en": "Write journal entries, capture your thoughts, and review your personal growth day by day.",
+        "fr": "Écrivez des entrées de journal, capturez vos pensées et révisez votre croissance personnelle."
+      },
+      "image_url": { "es": "", "en": "", "fr": "" }
+    },
+    {
+      "id": 4,
+      "title": {
+        "es": "Todo en un vistazo",
+        "en": "Everything at a glance",
+        "fr": "Tout en un coup d'œil"
+      },
+      "description": {
+        "es": "Tu panel principal muestra un resumen de tareas, hábitos y diario. ¡Todo listo para empezar!",
+        "en": "Your dashboard shows a summary of tasks, habits, and journal. Everything is ready to start!",
+        "fr": "Votre tableau de bord affiche un résumé des tâches, habitudes et journal. Tout est prêt !"
+      },
+      "image_url": { "es": "", "en": "", "fr": "" }
+    }
+  ]
+}

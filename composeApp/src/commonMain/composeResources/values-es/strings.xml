@@ -110,6 +110,12 @@
     <string name="content_description_back">Volver</string>
     <string name="content_description_delete">Eliminar</string>
 
+    <!-- Onboarding -->
+    <string name="onboarding_skip">Omitir</string>
+    <string name="onboarding_next">Siguiente</string>
+    <string name="onboarding_previous">Anterior</string>
+    <string name="onboarding_start">Comenzar</string>
+
     <!-- Journal -->
     <string name="journal_title">Diario</string>
     <string name="journal_empty">Aún no hay entradas</string>

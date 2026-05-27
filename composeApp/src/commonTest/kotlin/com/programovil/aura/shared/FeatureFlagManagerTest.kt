@@ -61,6 +61,7 @@ private class FakeRemoteConfigService(
 ) : RemoteConfigService {
     override suspend fun getBoolean(flag: FeatureFlag): Boolean = booleanValues[flag] ?: flag.defaultValue
     override suspend fun getString(flag: FeatureFlag, default: String): String = default
+    override suspend fun getString(key: String): String? = null
     override suspend fun fetchAndActivate(): Result<Unit> = fetchResult
     override fun registerOnConfigUpdateListener(onUpdate: () -> Unit) {}
 }

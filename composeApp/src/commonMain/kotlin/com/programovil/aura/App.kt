@@ -25,6 +25,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -72,7 +73,7 @@ fun App(
         val onboardingPrefs: OnboardingPreferences = koinInject()
         val isOnboardingCompleted by onboardingPrefs.isOnboardingCompleted
             .collectAsState(initial = false)
-        var dismissedThisSession = false
+        var dismissedThisSession by remember { mutableStateOf(false) }
 
         val showOnboarding = authState is AuthViewModel.AuthState.SignedIn
             && isOnboardingCompleted.not()

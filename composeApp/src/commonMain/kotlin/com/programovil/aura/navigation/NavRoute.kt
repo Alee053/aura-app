@@ -15,4 +15,10 @@ sealed class NavRoute {
 
     @Serializable
     data object Settings : NavRoute()
+
+    @Serializable
+    data object Journal : NavRoute()
+
+    @Serializable
+    data class JournalDetail(val entryId: String? = null) : NavRoute()
 }

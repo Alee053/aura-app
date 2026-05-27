@@ -6,4 +6,5 @@ enum class FeatureFlag(
 ) {
     HABITS_ENABLED("habits_enabled", true),
     TODOS_ENABLED("todos_enabled", true),
+    JOURNAL_ENABLED("journal_enabled", true),
 }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
@@ -50,6 +51,7 @@ import aura_app.composeapp.generated.resources.nav_home
 import aura_app.composeapp.generated.resources.nav_todos
 import aura_app.composeapp.generated.resources.nav_habits
 import aura_app.composeapp.generated.resources.nav_settings
+import aura_app.composeapp.generated.resources.nav_journal
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -115,6 +117,9 @@ fun AuthenticatedApp(
     val showHabits by remember(featureFlags) {
         mutableStateOf(featureFlags[FeatureFlag.HABITS_ENABLED] ?: true)
     }
+    val showJournals by remember(featureFlags) {
+        mutableStateOf(featureFlags[FeatureFlag.JOURNAL_ENABLED] ?: true)
+    }
 
     val navItemColors = NavigationBarItemDefaults.colors(
         selectedIconColor = AppTheme.colors.primary,
@@ -178,6 +183,22 @@ fun AuthenticatedApp(
                         colors = navItemColors
                     )
                 }
+                if (showJournals) {
+                    NavigationBarItem(
+                        icon = { Icon(Icons.Default.Book, contentDescription = "Journal") },
+                        label = { Text(stringResource(Res.string.nav_journal)) },
+                        selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Journal>() } == true,
+                        onClick = {
+                            navController.navigate(NavRoute.Journal) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    inclusive = false
+                                }
+                                launchSingleTop = true
+                            }
+                        },
+                        colors = navItemColors
+                    )
+                }
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
                     label = { Text(stringResource(Res.string.nav_settings)) },
@@ -207,5 +228,3 @@ fun AuthenticatedApp(
         }
     }
 }
-
-

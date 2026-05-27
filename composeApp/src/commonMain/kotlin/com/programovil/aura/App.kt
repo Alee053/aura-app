@@ -41,6 +41,8 @@ import com.programovil.aura.designsystem.theme.DsTheme
 import com.programovil.aura.designsystem.theme.ThemeMode
 import com.programovil.aura.navigation.AppNavHost
 import com.programovil.aura.navigation.NavRoute
+import com.programovil.aura.onboarding.data.OnboardingPreferences
+import com.programovil.aura.onboarding.presentation.screen.OnboardingScreen
 import com.programovil.aura.shared.FeatureFlag
 import com.programovil.aura.shared.FeatureFlagManager
 import com.programovil.aura.todo.presentation.viewmodel.TodoViewModel
@@ -67,8 +69,17 @@ fun App(
         val authViewModel: AuthViewModel = koinViewModel()
         val authState by authViewModel.authState.collectAsState()
 
-        when (val state = authState) {
-            is AuthViewModel.AuthState.Loading -> {
+        val onboardingPrefs: OnboardingPreferences = koinInject()
+        val isOnboardingCompleted by onboardingPrefs.isOnboardingCompleted
+            .collectAsState(initial = false)
+        var dismissedThisSession = false
+
+        val showOnboarding = authState is AuthViewModel.AuthState.SignedIn
+            && isOnboardingCompleted.not()
+            && dismissedThisSession.not()
+
+        when {
+            authState is AuthViewModel.AuthState.Loading -> {
                 Box(
                     modifier = Modifier.fillMaxSize().background(AppTheme.colors.background),
                     contentAlignment = Alignment.Center
@@ -76,18 +87,25 @@ fun App(
                     CircularProgressIndicator(color = AppTheme.colors.primary)
                 }
             }
-            is AuthViewModel.AuthState.SignedIn -> {
+            authState is AuthViewModel.AuthState.SignedOut ||
+                authState is AuthViewModel.AuthState.Error -> {
+                SignInScreen(
+                    errorMessage = if (authState is AuthViewModel.AuthState.Error)
+                        (authState as AuthViewModel.AuthState.Error).message else null,
+                    onSignInClick = onSignInClick
+                )
+            }
+            showOnboarding -> {
+                OnboardingScreen(
+                    onSkip = { dismissedThisSession = true },
+                    onStart = { }
+                )
+            }
+            authState is AuthViewModel.AuthState.SignedIn -> {
                 AuthenticatedApp(
                     currentThemeMode = currentThemeMode,
                     onThemeChange = { settingsViewModel.setThemeMode(it) },
                     onSignOut = { authViewModel.signOut() }
-                )
-            }
-            is AuthViewModel.AuthState.SignedOut,
-            is AuthViewModel.AuthState.Error -> {
-                SignInScreen(
-                    errorMessage = if (state is AuthViewModel.AuthState.Error) state.message else null,
-                    onSignInClick = onSignInClick
                 )
             }
         }

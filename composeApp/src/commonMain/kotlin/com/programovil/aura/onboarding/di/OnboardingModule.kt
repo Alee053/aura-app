@@ -1,6 +1,7 @@
 package com.programovil.aura.onboarding.di
 
 import com.programovil.aura.onboarding.data.OnboardingPreferences
+import com.programovil.aura.onboarding.data.OnboardingPreferencesImpl
 import com.programovil.aura.onboarding.data.repository.OnboardingRepositoryImpl
 import com.programovil.aura.onboarding.domain.repository.OnboardingRepository
 import com.programovil.aura.onboarding.domain.usecase.GetOnboardingSlidesUseCase
@@ -11,6 +12,6 @@ import org.koin.dsl.module
 
 val onboardingModule = module {
     singleOf(::OnboardingRepositoryImpl) bind OnboardingRepository::class
-    single { OnboardingPreferences(get()) }
+    singleOf(::OnboardingPreferencesImpl) bind OnboardingPreferences::class
     factoryOf(::GetOnboardingSlidesUseCase)
 }

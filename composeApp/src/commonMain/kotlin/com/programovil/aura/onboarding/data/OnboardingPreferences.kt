@@ -7,16 +7,21 @@ import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class OnboardingPreferences(private val dataStore: DataStore<Preferences>) {
+interface OnboardingPreferences {
+    val isOnboardingCompleted: Flow<Boolean>
+    suspend fun setOnboardingCompleted()
+}
+
+class OnboardingPreferencesImpl(private val dataStore: DataStore<Preferences>) : OnboardingPreferences {
 
     private object Keys {
         val ONBOARDING_COMPLETED = booleanPreferencesKey("onboarding_completed")
     }
 
-    val isOnboardingCompleted: Flow<Boolean> = dataStore.data
+    override val isOnboardingCompleted: Flow<Boolean> = dataStore.data
         .map { prefs -> prefs[Keys.ONBOARDING_COMPLETED] ?: false }
 
-    suspend fun setOnboardingCompleted() {
+    override suspend fun setOnboardingCompleted() {
         dataStore.edit { prefs -> prefs[Keys.ONBOARDING_COMPLETED] = true }
     }
 }

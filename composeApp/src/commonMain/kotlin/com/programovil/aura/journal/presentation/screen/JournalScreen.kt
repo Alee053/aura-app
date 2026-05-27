@@ -36,8 +36,11 @@ import com.programovil.aura.journal.presentation.composable.JournalCard
 import com.programovil.aura.journal.presentation.viewmodel.JournalViewModel
 import com.programovil.aura.shared.FeatureFlag
 import aura_app.composeapp.generated.resources.Res
+import aura_app.composeapp.generated.resources.journal_add_entry
+import aura_app.composeapp.generated.resources.journal_delete
 import aura_app.composeapp.generated.resources.journal_empty
 import aura_app.composeapp.generated.resources.journal_empty_subtitle
+import aura_app.composeapp.generated.resources.journal_title
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)

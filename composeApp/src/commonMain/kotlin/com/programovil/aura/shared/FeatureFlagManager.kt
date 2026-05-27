@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 class FeatureFlagManager(
     private val remoteConfigService: RemoteConfigService
 ) {
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private var pollingJob: Job? = null
 
     private val _flags = MutableStateFlow(

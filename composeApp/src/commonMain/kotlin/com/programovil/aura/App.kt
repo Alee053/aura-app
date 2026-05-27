@@ -40,6 +40,8 @@ import com.programovil.aura.designsystem.theme.DsTheme
 import com.programovil.aura.designsystem.theme.ThemeMode
 import com.programovil.aura.navigation.AppNavHost
 import com.programovil.aura.navigation.NavRoute
+import com.programovil.aura.onboarding.domain.OnboardingRepository
+import com.programovil.aura.onboarding.presentation.OnboardingScreen
 import com.programovil.aura.shared.FeatureFlag
 import com.programovil.aura.shared.FeatureFlagManager
 import com.programovil.aura.todo.presentation.viewmodel.TodoViewModel
@@ -75,7 +77,7 @@ fun App(
                 }
             }
             is AuthViewModel.AuthState.SignedIn -> {
-                AuthenticatedApp(
+                OnboardingFlow(
                     currentThemeMode = currentThemeMode,
                     onThemeChange = { settingsViewModel.setThemeMode(it) },
                     onSignOut = { authViewModel.signOut() }
@@ -88,6 +90,43 @@ fun App(
                     onSignInClick = onSignInClick
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun OnboardingFlow(
+    currentThemeMode: ThemeMode,
+    onThemeChange: (ThemeMode) -> Unit,
+    onSignOut: () -> Unit
+) {
+    val onboardingRepository: OnboardingRepository = koinInject()
+    val showOnboarding = remember { mutableStateOf<Boolean?>(null) }
+
+    LaunchedEffect(Unit) {
+        showOnboarding.value = !onboardingRepository.hasSeenOnboarding()
+    }
+
+    when (showOnboarding.value) {
+        null -> {
+            Box(
+                modifier = Modifier.fillMaxSize().background(AppTheme.colors.background),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = AppTheme.colors.primary)
+            }
+        }
+        true -> {
+            OnboardingScreen(
+                onNavigateToHome = { showOnboarding.value = false }
+            )
+        }
+        false -> {
+            AuthenticatedApp(
+                currentThemeMode = currentThemeMode,
+                onThemeChange = onThemeChange,
+                onSignOut = onSignOut
+            )
         }
     }
 }

@@ -32,6 +32,10 @@ class FirebaseRemoteConfigService(context: Context) : RemoteConfigService {
         return remoteConfig.getString(flag.key).takeIf { it.isNotEmpty() } ?: default
     }
 
+    override suspend fun getString(key: String): String? {
+        return remoteConfig.getString(key).takeIf { it.isNotEmpty() }
+    }
+
     override suspend fun fetchAndActivate(): Result<Unit> = runCatching {
         remoteConfig.fetchAndActivate().await()
     }

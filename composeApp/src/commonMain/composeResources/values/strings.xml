@@ -111,6 +111,10 @@
     <!-- Habit Item -->
     <string name="streak_format">%1$d</string>
 
+    <!-- Onboarding -->
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_start">Get Started</string>
+
     <!-- Common -->
     <string name="content_description_back">Back</string>
     <string name="content_description_delete">Delete</string>

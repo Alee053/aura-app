@@ -19,11 +19,14 @@ class FeatureFlagManager(
     val flags: StateFlow<Map<FeatureFlag, Boolean>> = _flags.asStateFlow()
 
     suspend fun initialize() {
-        remoteConfigService.fetchAndActivate()
+        val result = remoteConfigService.fetchAndActivate()
         refreshFlags()
 
         remoteConfigService.registerOnConfigUpdateListener {
-            scope.launch { refreshFlags() }
+            scope.launch {
+                remoteConfigService.fetchAndActivate()
+                refreshFlags()
+            }
         }
     }
 

@@ -7,5 +7,5 @@ import kotlinx.coroutines.flow.Flow
 class GetJournalEntriesUseCase(
     private val repository: JournalRepository
 ) {
-    operator fun invoke(): Flow<List<JournalEntry>> = repository.getEntries()
+    operator fun invoke(): Flow<Result<List<JournalEntry>>> = repository.getEntries()
 }

@@ -1,7 +1,7 @@
 package com.programovil.aura.journal.di
 
+import com.programovil.aura.journal.data.repository.createJournalRepository
 import com.programovil.aura.journal.domain.repository.JournalRepository
-import com.programovil.aura.journal.domain.repository.createJournalRepository
 import com.programovil.aura.journal.domain.usecase.AddJournalEntryUseCase
 import com.programovil.aura.journal.domain.usecase.DeleteJournalEntryUseCase
 import com.programovil.aura.journal.domain.usecase.GetJournalEntriesUseCase

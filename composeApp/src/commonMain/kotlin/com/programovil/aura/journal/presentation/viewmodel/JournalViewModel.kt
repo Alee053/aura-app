@@ -30,11 +30,19 @@ class JournalViewModel(
 
     private fun loadEntries() {
         viewModelScope.launch {
-            getEntriesUseCase().collect { entries ->
-                _uiState.value = _uiState.value.copy(
-                    entries = entries,
-                    isLoading = false
-                )
+            getEntriesUseCase().collect { result ->
+                result.onSuccess { entries ->
+                    _uiState.value = _uiState.value.copy(
+                        entries = entries,
+                        isLoading = false,
+                        error = null
+                    )
+                }.onFailure { error ->
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        error = error.message ?: "Failed to load journal entries"
+                    )
+                }
             }
         }
     }

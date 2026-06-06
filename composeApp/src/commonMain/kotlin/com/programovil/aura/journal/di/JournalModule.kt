@@ -1,10 +1,7 @@
 package com.programovil.aura.journal.di
 
-import com.programovil.aura.journal.data.database.JournalDatabase
-import com.programovil.aura.journal.data.database.getJournalDatabase
-import com.programovil.aura.journal.data.database.getJournalDatabaseBuilder
-import com.programovil.aura.journal.data.repository.JournalRepositoryImpl
 import com.programovil.aura.journal.domain.repository.JournalRepository
+import com.programovil.aura.journal.domain.repository.createJournalRepository
 import com.programovil.aura.journal.domain.usecase.AddJournalEntryUseCase
 import com.programovil.aura.journal.domain.usecase.DeleteJournalEntryUseCase
 import com.programovil.aura.journal.domain.usecase.GetJournalEntriesUseCase
@@ -18,9 +15,7 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 
 val journalModule = module {
-    single { getJournalDatabase(getJournalDatabaseBuilder()) }
-    single { get<JournalDatabase>().journalDao() }
-    single<JournalRepository> { JournalRepositoryImpl(get()) }
+    single<JournalRepository> { createJournalRepository() }
 
     factoryOf(::GetJournalEntriesUseCase)
     factoryOf(::GetJournalEntryUseCase)

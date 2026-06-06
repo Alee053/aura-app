@@ -10,3 +10,5 @@ interface JournalRepository {
     suspend fun updateEntry(entry: JournalEntry): Result<Unit>
     suspend fun deleteEntry(entry: JournalEntry): Result<Unit>
 }
+
+expect fun createJournalRepository(): JournalRepository

@@ -48,6 +48,8 @@ kotlin {
             implementation(libs.credentials)
             implementation(libs.credentials.play.services.auth)
             implementation(libs.googleid)
+            implementation(libs.objenesis)
+            implementation(libs.javassist)
             
             implementation(libs.kotlinx.coroutines.play.services)
             implementation(libs.workmanager.ktx)

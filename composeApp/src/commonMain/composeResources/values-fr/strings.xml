@@ -1,0 +1,137 @@
+<resources>
+    <!-- Navigation -->
+    <string name="nav_home">Accueil</string>
+    <string name="nav_todos">Tâches</string>
+    <string name="nav_habits">Habitudes</string>
+    <string name="nav_settings">Paramètres</string>
+    <string name="nav_journal">Journal</string>
+
+    <!-- Todo Screen -->
+    <string name="todos_title">Mes Tâches</string>
+    <string name="add_todo">Ajouter une tâche</string>
+    <string name="new_todo_hint">Nouvelle tâche</string>
+    <string name="empty_todos">Pas encore de tâches. Ajoutez la première !</string>
+    <string name="delete">X</string>
+    <string name="sign_out">Se déconnecter</string>
+    <string name="select_due_date">Sélectionner une date</string>
+    <string name="due_date_label">Date : %1$s</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Annuler</string>
+
+    <!-- Todo Dialog -->
+    <string name="new_todo">Nouvelle tâche</string>
+    <string name="edit_todo">Modifier la tâche</string>
+    <string name="todo_name_hint">Nom de la tâche</string>
+    <string name="todo_description_hint">Description (facultatif)</string>
+    <string name="add_due_date">Ajouter une date</string>
+    <string name="clear_due_date">Effacer</string>
+    <string name="add_first_todo">Ajouter la première tâche</string>
+    <string name="completed_section">Terminées</string>
+
+    <!-- Habit Screen -->
+    <string name="habits_title">Habitudes</string>
+    <string name="add_habit">Ajouter une habitude</string>
+    <string name="add_first_habit">Ajouter la première habitude</string>
+    <string name="today">Aujourd\'hui</string>
+    <string name="tomorrow">Demain</string>
+    <string name="this_week">Cette semaine</string>
+    <string name="empty_habits">Pas encore d\'habitudes. Ajoutez la première !</string>
+
+    <!-- Add Habit Dialog -->
+    <string name="new_habit">Nouvelle habitude</string>
+    <string name="edit_habit">Modifier l\'habitude</string>
+    <string name="delete_habit">Supprimer</string>
+    <string name="habit_name">Nom de l\'habitude</string>
+    <string name="daily">Quotidien</string>
+    <string name="daily_badge">Quotidien</string>
+    <string name="weekly">Hebdomadaire</string>
+    <string name="monthly">Mensuel</string>
+    <string name="per_week">/ semaine</string>
+    <string name="per_month">/ mois</string>
+    <string name="repeat_on">Répéter le :</string>
+    <string name="color_label">Couleur :</string>
+    <string name="save">Enregistrer</string>
+    <string name="day_mon">L</string>
+    <string name="day_tue">M</string>
+    <string name="day_wed">M</string>
+    <string name="day_thu">J</string>
+    <string name="day_fri">V</string>
+    <string name="day_sat">S</string>
+    <string name="day_sun">D</string>
+
+    <!-- Notification Settings -->
+    <string name="notification_settings">Paramètres de notification</string>
+    <string name="back">Retour</string>
+    <string name="daily_summary">Résumé quotidien</string>
+    <string name="enabled">Activé</string>
+    <string name="test_notification">Tester la notification</string>
+    <string name="notification_time">Heure de notification</string>
+    <string name="notification_helper">Les notifications seront envoyées quotidiennement à l\'heure définie.</string>
+    <string name="notification_permission">Autorisation de notification</string>
+    <string name="notification_permission_text">Autorisez les notifications pour recevoir les résumés quotidiens et les rappels.</string>
+    <string name="allow">Autoriser</string>
+    <string name="deny">Refuser</string>
+    <string name="due_label">Échéance : %1$s</string>
+
+    <!-- Settings Screen -->
+    <string name="settings">Paramètres</string>
+    <string name="settings_title">Paramètres</string>
+    <string name="logout_button">Se déconnecter</string>
+    <string name="themes">Thèmes</string>
+    <string name="themes_section">Thèmes</string>
+    <string name="purple_theme">Nuit Arctique</string>
+    <string name="green_theme">Aube Forestière</string>
+    <string name="red_theme">Désert Silencieux</string>
+    <string name="dark_theme">Minuit</string>
+    <string name="high_contrast_theme">Contraste Élevé</string>
+    <string name="preferences">Préférences</string>
+    <string name="preferences_section">Préférences</string>
+    <string name="notifications">Notifications</string>
+    <string name="notifications_subtitle">Recevoir des rappels quotidiens</string>
+    <string name="reminder_time_label">Heure du rappel</string>
+    <string name="sounds">Sons</string>
+    <string name="sounds_subtitle">Effets sonores subtils</string>
+    <string name="vibration">Vibration</string>
+    <string name="vibration_subtitle">Retour haptique</string>
+    <string name="app_name_label">AURA</string>
+    <string name="version">Version 1.0.0</string>
+    <string name="made_with_love">Fait avec amour pour une productivité consciente</string>
+
+    <!-- Sign In Screen -->
+    <string name="sign_in_title">Aura</string>
+    <string name="sign_in_subtitle">Connectez-vous pour synchroniser vos tâches</string>
+    <string name="sign_in_button">Se connecter avec Google</string>
+
+    <!-- Home Screen -->
+    <string name="home_dashboard_todos_title">TÂCHES AUJOURD\'HUI</string>
+    <string name="home_dashboard_habits_title">SÉRIE D\'HABITUDES</string>
+    <string name="home_dashboard_todos_subtitle">%1$d restantes</string>
+    <string name="home_dashboard_habits_subtitle">%1$d/%2$d faites aujourd\'hui</string>
+    <string name="settings_content_description">Paramètres</string>
+
+    <!-- Habit Item -->
+    <string name="streak_format">%1$d</string>
+
+    <!-- Common -->
+    <string name="content_description_back">Retour</string>
+    <string name="content_description_delete">Supprimer</string>
+
+    <!-- Journal -->
+    <string name="journal_title">Journal</string>
+    <string name="journal_empty">Pas encore d\'entrées</string>
+    <string name="journal_empty_subtitle">Appuyez sur + pour écrire votre première entrée</string>
+    <string name="journal_title_hint">Titre</string>
+    <string name="journal_content_hint">Écrivez vos pensées...</string>
+    <string name="journal_save">Enregistrer</string>
+    <string name="journal_delete">Supprimer</string>
+    <string name="journal_back">Retour</string>
+    <string name="journal_new_entry">Nouvelle entrée</string>
+    <string name="journal_edit_entry">Modifier l\'entrée</string>
+    <string name="journal_add_entry">Ajouter une entrée</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_skip">Passer</string>
+    <string name="onboarding_next">Suivant</string>
+    <string name="onboarding_previous">Précédent</string>
+    <string name="onboarding_start">Commencer</string>
+</resources>

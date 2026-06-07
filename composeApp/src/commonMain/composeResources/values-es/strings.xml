@@ -4,6 +4,7 @@
     <string name="nav_todos">Tareas</string>
     <string name="nav_habits">Hábitos</string>
     <string name="nav_settings">Ajustes</string>
+    <string name="nav_journal">Diario</string>
 
     <!-- Todo Screen -->
     <string name="todos_title">Mis Tareas</string>
@@ -108,4 +109,23 @@
     <!-- Common -->
     <string name="content_description_back">Volver</string>
     <string name="content_description_delete">Eliminar</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_skip">Omitir</string>
+    <string name="onboarding_next">Siguiente</string>
+    <string name="onboarding_previous">Anterior</string>
+    <string name="onboarding_start">Comenzar</string>
+
+    <!-- Journal -->
+    <string name="journal_title">Diario</string>
+    <string name="journal_empty">Aún no hay entradas</string>
+    <string name="journal_empty_subtitle">Toca + para escribir tu primera entrada</string>
+    <string name="journal_title_hint">Título</string>
+    <string name="journal_content_hint">Escribe tus pensamientos...</string>
+    <string name="journal_save">Guardar</string>
+    <string name="journal_delete">Eliminar</string>
+    <string name="journal_back">Volver</string>
+    <string name="journal_new_entry">Nueva entrada</string>
+    <string name="journal_edit_entry">Editar entrada</string>
+    <string name="journal_add_entry">Agregar entrada</string>
 </resources>

@@ -8,6 +8,8 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.googleServices)
     alias(libs.plugins.mockative)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 kotlin {
@@ -46,6 +48,8 @@ kotlin {
             implementation(libs.credentials)
             implementation(libs.credentials.play.services.auth)
             implementation(libs.googleid)
+            implementation(libs.objenesis)
+            implementation(libs.javassist)
             
             implementation(libs.kotlinx.coroutines.play.services)
             implementation(libs.workmanager.ktx)
@@ -70,6 +74,8 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.compose.material.icons.extended)
             implementation(libs.mockative)
+            implementation(libs.androidx.room.runtime)
+            implementation(libs.androidx.sqlite.bundled)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -113,4 +119,11 @@ android {
 
 dependencies {
     debugImplementation(libs.compose.uiTooling)
+    add("kspAndroid", libs.androidx.room.compiler)
+    add("kspIosSimulatorArm64", libs.androidx.room.compiler)
+    add("kspIosArm64", libs.androidx.room.compiler)
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }

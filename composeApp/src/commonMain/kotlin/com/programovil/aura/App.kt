@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
@@ -24,6 +25,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,6 +42,8 @@ import com.programovil.aura.designsystem.theme.DsTheme
 import com.programovil.aura.designsystem.theme.ThemeMode
 import com.programovil.aura.navigation.AppNavHost
 import com.programovil.aura.navigation.NavRoute
+import com.programovil.aura.onboarding.data.OnboardingPreferences
+import com.programovil.aura.onboarding.presentation.screen.OnboardingScreen
 import com.programovil.aura.shared.FeatureFlag
 import com.programovil.aura.shared.FeatureFlagManager
 import com.programovil.aura.todo.presentation.viewmodel.TodoViewModel
@@ -50,6 +54,7 @@ import aura_app.composeapp.generated.resources.nav_home
 import aura_app.composeapp.generated.resources.nav_todos
 import aura_app.composeapp.generated.resources.nav_habits
 import aura_app.composeapp.generated.resources.nav_settings
+import aura_app.composeapp.generated.resources.nav_journal
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -65,8 +70,17 @@ fun App(
         val authViewModel: AuthViewModel = koinViewModel()
         val authState by authViewModel.authState.collectAsState()
 
-        when (val state = authState) {
-            is AuthViewModel.AuthState.Loading -> {
+        val onboardingPrefs: OnboardingPreferences = koinInject()
+        val isOnboardingCompleted by onboardingPrefs.isOnboardingCompleted
+            .collectAsState(initial = false)
+        var dismissedThisSession by remember { mutableStateOf(false) }
+
+        val showOnboarding = authState is AuthViewModel.AuthState.SignedIn
+            && isOnboardingCompleted.not()
+            && dismissedThisSession.not()
+
+        when {
+            authState is AuthViewModel.AuthState.Loading -> {
                 Box(
                     modifier = Modifier.fillMaxSize().background(AppTheme.colors.background),
                     contentAlignment = Alignment.Center
@@ -74,18 +88,25 @@ fun App(
                     CircularProgressIndicator(color = AppTheme.colors.primary)
                 }
             }
-            is AuthViewModel.AuthState.SignedIn -> {
+            authState is AuthViewModel.AuthState.SignedOut ||
+                authState is AuthViewModel.AuthState.Error -> {
+                SignInScreen(
+                    errorMessage = if (authState is AuthViewModel.AuthState.Error)
+                        (authState as AuthViewModel.AuthState.Error).message else null,
+                    onSignInClick = onSignInClick
+                )
+            }
+            showOnboarding -> {
+                OnboardingScreen(
+                    onSkip = { dismissedThisSession = true },
+                    onStart = { }
+                )
+            }
+            authState is AuthViewModel.AuthState.SignedIn -> {
                 AuthenticatedApp(
                     currentThemeMode = currentThemeMode,
                     onThemeChange = { settingsViewModel.setThemeMode(it) },
                     onSignOut = { authViewModel.signOut() }
-                )
-            }
-            is AuthViewModel.AuthState.SignedOut,
-            is AuthViewModel.AuthState.Error -> {
-                SignInScreen(
-                    errorMessage = if (state is AuthViewModel.AuthState.Error) state.message else null,
-                    onSignInClick = onSignInClick
                 )
             }
         }
@@ -114,6 +135,9 @@ fun AuthenticatedApp(
     }
     val showHabits by remember(featureFlags) {
         mutableStateOf(featureFlags[FeatureFlag.HABITS_ENABLED] ?: true)
+    }
+    val showJournals by remember(featureFlags) {
+        mutableStateOf(featureFlags[FeatureFlag.JOURNAL_ENABLED] ?: true)
     }
 
     val navItemColors = NavigationBarItemDefaults.colors(
@@ -178,6 +202,22 @@ fun AuthenticatedApp(
                         colors = navItemColors
                     )
                 }
+                if (showJournals) {
+                    NavigationBarItem(
+                        icon = { Icon(Icons.Default.Book, contentDescription = "Journal") },
+                        label = { Text(stringResource(Res.string.nav_journal)) },
+                        selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Journal>() } == true,
+                        onClick = {
+                            navController.navigate(NavRoute.Journal) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    inclusive = false
+                                }
+                                launchSingleTop = true
+                            }
+                        },
+                        colors = navItemColors
+                    )
+                }
                 NavigationBarItem(
                     icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
                     label = { Text(stringResource(Res.string.nav_settings)) },
@@ -207,5 +247,3 @@ fun AuthenticatedApp(
         }
     }
 }
-
-

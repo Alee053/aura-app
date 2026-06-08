@@ -137,4 +137,13 @@
     <string name="journal_new_entry">New Entry</string>
     <string name="journal_edit_entry">Edit Entry</string>
     <string name="journal_add_entry">Add entry</string>
+
+    <!-- Experiments / A/B testing -->
+    <string name="home_dashboard_motivation_title">DAILY MOTIVATION</string>
+    <string name="home_dashboard_motivation_subtitle">%1$s</string>
+    <string name="home_dashboard_motivation_value_greeting">Keep going</string>
+    <string name="home_dashboard_motivation_value_premium">Stay focused</string>
+    <string name="settings_simulate_plan">Simulate Plan</string>
+    <string name="settings_simulate_plan_free">Free</string>
+    <string name="settings_simulate_plan_premium">Premium</string>
 </resources>

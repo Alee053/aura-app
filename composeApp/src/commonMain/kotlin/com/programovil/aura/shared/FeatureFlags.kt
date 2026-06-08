@@ -8,3 +8,10 @@ enum class FeatureFlag(
     TODOS_ENABLED("todos_enabled", true),
     JOURNAL_ENABLED("journal_enabled", true),
 }
+
+enum class UserPlanFlag(
+    val key: String,
+    val defaultValue: String
+) {
+    USER_PLAN("user_plan", "Free");
+}

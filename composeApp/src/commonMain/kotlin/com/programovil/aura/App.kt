@@ -37,6 +37,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.programovil.aura.auth.presentation.AuthViewModel
 import com.programovil.aura.auth.presentation.screen.SignInScreen
+import com.programovil.aura.auth.presentation.screen.authErrorMessage
 import com.programovil.aura.designsystem.theme.AppTheme
 import com.programovil.aura.designsystem.theme.DsTheme
 import com.programovil.aura.designsystem.theme.ThemeMode
@@ -90,9 +91,10 @@ fun App(
             }
             authState is AuthViewModel.AuthState.SignedOut ||
                 authState is AuthViewModel.AuthState.Error -> {
+                val errorMessage = (authState as? AuthViewModel.AuthState.Error)
+                    ?.let { authErrorMessage(it.error) }
                 SignInScreen(
-                    errorMessage = if (authState is AuthViewModel.AuthState.Error)
-                        (authState as AuthViewModel.AuthState.Error).message else null,
+                    errorMessage = errorMessage,
                     onSignInClick = onSignInClick
                 )
             }

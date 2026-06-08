@@ -25,5 +25,7 @@ class AndroidApp : Application() {
             androidContext(this@AndroidApp)
             modules(getModules(remoteConfigService))
         }
+
+        com.programovil.aura.experiments.presentation.worker.ExperimentsHeartbeatWorker.schedule(this)
     }
 }

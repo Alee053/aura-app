@@ -125,6 +125,8 @@ fun AuthenticatedApp(
     val todoViewModel: TodoViewModel = koinViewModel()
     val featureFlagManager: FeatureFlagManager = koinInject()
     val featureFlags by featureFlagManager.flags.collectAsState()
+    val getUserPlanUseCase: com.programovil.aura.experiments.domain.usecase.GetUserPlanUseCase = koinInject()
+    val userPlan by getUserPlanUseCase().collectAsState(initial = com.programovil.aura.experiments.domain.model.UserPlan.Free)
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
@@ -141,6 +143,7 @@ fun AuthenticatedApp(
     val showJournals by remember(featureFlags) {
         mutableStateOf(featureFlags[FeatureFlag.JOURNAL_ENABLED] ?: true)
     }
+    val showPremiumFeatures = userPlan is com.programovil.aura.experiments.domain.model.UserPlan.Premium
 
     val navItemColors = NavigationBarItemDefaults.colors(
         selectedIconColor = AppTheme.colors.primary,
@@ -188,7 +191,7 @@ fun AuthenticatedApp(
                         colors = navItemColors
                     )
                 }
-                if (showHabits) {
+                if (showHabits && showPremiumFeatures) {
                     NavigationBarItem(
                         icon = { Icon(Icons.Default.DateRange, contentDescription = "Habits") },
                         label = { Text(stringResource(Res.string.nav_habits)) },
@@ -204,7 +207,7 @@ fun AuthenticatedApp(
                         colors = navItemColors
                     )
                 }
-                if (showJournals) {
+                if (showJournals && showPremiumFeatures) {
                     NavigationBarItem(
                         icon = { Icon(Icons.Default.Book, contentDescription = "Journal") },
                         label = { Text(stringResource(Res.string.nav_journal)) },

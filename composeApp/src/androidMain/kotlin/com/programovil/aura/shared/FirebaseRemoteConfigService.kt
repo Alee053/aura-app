@@ -37,6 +37,11 @@ class FirebaseRemoteConfigService(context: Context) : RemoteConfigService {
         return remoteConfig.getString(flag.key).takeIf { it.isNotEmpty() } ?: default
     }
 
+    override suspend fun getUserPlan(): String {
+        val raw = remoteConfig.getString(UserPlanFlag.USER_PLAN.key)
+        return raw.takeIf { it.isNotEmpty() } ?: UserPlanFlag.USER_PLAN.defaultValue
+    }
+
     override suspend fun fetchAndActivate(): Result<Unit> = runCatching {
         remoteConfig.fetchAndActivate().await()
     }

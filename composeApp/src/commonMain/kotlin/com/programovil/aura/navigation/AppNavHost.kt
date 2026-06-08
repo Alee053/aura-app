@@ -13,6 +13,8 @@ import com.programovil.aura.journal.presentation.screen.JournalDetailScreen
 import com.programovil.aura.journal.presentation.screen.JournalScreen
 import com.programovil.aura.journal.presentation.viewmodel.JournalDetailViewModel
 import com.programovil.aura.journal.presentation.viewmodel.JournalViewModel
+import com.programovil.aura.pomodoro.presentation.PomodoroScreen
+import com.programovil.aura.pomodoro.presentation.PomodoroViewModel
 import com.programovil.aura.settings.presentation.screen.SettingsScreen
 import com.programovil.aura.settings.presentation.viewmodel.SettingsViewModel
 import com.programovil.aura.shared.FeatureFlag
@@ -104,6 +106,16 @@ fun AppNavHost(
                         }
                         navController.popBackStack()
                     }
+                )
+            }
+        }
+
+        if (featureFlags[FeatureFlag.POMODORO_ENABLED] != false) {
+            composable<NavRoute.Pomodoro> {
+                val pomodoroViewModel = koinViewModel<PomodoroViewModel>()
+                PomodoroScreen(
+                    viewModel = pomodoroViewModel,
+                    onSettingsClick = { navController.navigate(NavRoute.Settings) }
                 )
             }
         }

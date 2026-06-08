@@ -6,6 +6,7 @@ import com.programovil.aura.home.di.homeModule
 import com.programovil.aura.journal.di.journalModule
 import com.programovil.aura.notification.di.notificationModule
 import com.programovil.aura.onboarding.di.onboardingModule
+import com.programovil.aura.pomodoro.di.pomodoroModule
 import com.programovil.aura.settings.di.settingsModule
 import com.programovil.aura.shared.FeatureFlagManager
 import com.programovil.aura.shared.RemoteConfigService
@@ -22,6 +23,7 @@ fun getModules(remoteConfigService: RemoteConfigService) = listOf(
     settingsModule,
     journalModule,
     onboardingModule,
+    pomodoroModule,
     module {
         single { createDataStore() }
         single<RemoteConfigService> { remoteConfigService }

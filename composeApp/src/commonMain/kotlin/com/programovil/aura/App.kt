@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -55,6 +56,7 @@ import aura_app.composeapp.generated.resources.nav_todos
 import aura_app.composeapp.generated.resources.nav_habits
 import aura_app.composeapp.generated.resources.nav_settings
 import aura_app.composeapp.generated.resources.nav_journal
+import aura_app.composeapp.generated.resources.pomodoro_title
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -139,6 +141,9 @@ fun AuthenticatedApp(
     val showJournals by remember(featureFlags) {
         mutableStateOf(featureFlags[FeatureFlag.JOURNAL_ENABLED] ?: true)
     }
+    val showPomodoro by remember(featureFlags) {
+        mutableStateOf(featureFlags[FeatureFlag.POMODORO_ENABLED] ?: true)
+    }
 
     val navItemColors = NavigationBarItemDefaults.colors(
         selectedIconColor = AppTheme.colors.primary,
@@ -193,6 +198,22 @@ fun AuthenticatedApp(
                         selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Habit>() } == true,
                         onClick = {
                             navController.navigate(NavRoute.Habit) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    inclusive = false
+                                }
+                                launchSingleTop = true
+                            }
+                        },
+                        colors = navItemColors
+                    )
+                }
+                if (showPomodoro) {
+                    NavigationBarItem(
+                        icon = { Icon(Icons.Default.Timer, contentDescription = "Pomodoro") },
+                        label = { Text(stringResource(Res.string.pomodoro_title)) },
+                        selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Pomodoro>() } == true,
+                        onClick = {
+                            navController.navigate(NavRoute.Pomodoro) {
                                 popUpTo(navController.graph.findStartDestination().id) {
                                     inclusive = false
                                 }

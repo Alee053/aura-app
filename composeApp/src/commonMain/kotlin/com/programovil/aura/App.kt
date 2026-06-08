@@ -215,7 +215,7 @@ fun AuthenticatedApp(
                 }
                 if (showPomodoro) {
                     NavigationBarItem(
-                        icon = { Icon(Icons.Default.Timer, contentDescription = "Pomodoro") },
+                        icon = { Icon(Icons.Default.Timer, contentDescription = stringResource(Res.string.pomodoro_title)) },
                         label = { Text(stringResource(Res.string.pomodoro_title)) },
                         selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Pomodoro>() } == true,
                         onClick = {

@@ -8,7 +8,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.SkipNext
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,15 +26,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import aura_app.composeapp.generated.resources.*
 import com.programovil.aura.designsystem.theme.AppTheme
+import com.programovil.aura.pomodoro.domain.PomodoroDefaults
+import com.programovil.aura.shared.FeatureFlag
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PomodoroScreen(
     viewModel: PomodoroViewModel,
-    onSearchClick: () -> Unit = {},
+    featureFlags: Map<FeatureFlag, Boolean> = emptyMap(),
+    onFeatureDisabled: () -> Unit = {},
     onSettingsClick: () -> Unit = {}
 ) {
+    LaunchedEffect(featureFlags) {
+        if (featureFlags[FeatureFlag.POMODORO_ENABLED] == false) {
+            onFeatureDisabled()
+        }
+    }
+
     val uiState by viewModel.uiState.collectAsState()
 
     Scaffold(
@@ -38,13 +51,6 @@ fun PomodoroScreen(
             CenterAlignedTopAppBar(
                 title = { },
                 actions = {
-                    IconButton(onClick = onSearchClick) {
-                        Icon(
-                            Icons.Default.Search,
-                            contentDescription = stringResource(Res.string.pomodoro_content_description_search),
-                            tint = AppTheme.colors.textPrimary
-                        )
-                    }
                     IconButton(onClick = onSettingsClick) {
                         Icon(
                             Icons.Default.Settings,
@@ -58,7 +64,7 @@ fun PomodoroScreen(
                 )
             )
         },
-        containerColor = Color.Transparent // Usamos el gradiente del Box
+        containerColor = Color.Transparent
     ) { padding ->
         Box(
             modifier = Modifier
@@ -82,10 +88,9 @@ fun PomodoroScreen(
             ) {
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Central Timer
                 val circleBackgroundColor = AppTheme.colors.textPrimary.copy(alpha = 0.1f)
                 val progressColor = AppTheme.colors.textPrimary
-                
+
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier.size(280.dp)
@@ -130,32 +135,27 @@ fun PomodoroScreen(
                     }
                 }
 
-                // Time Selectors
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    TimeOption(
-                        label = stringResource(Res.string.pomodoro_5m),
-                        isSelected = uiState.selectedOption == 5,
-                        onClick = { viewModel.onTimeOptionSelected(5) }
-                    )
-                    Spacer(modifier = Modifier.width(12.dp))
-                    TimeOption(
-                        label = stringResource(Res.string.pomodoro_25m),
-                        isSelected = uiState.selectedOption == 25,
-                        onClick = { viewModel.onTimeOptionSelected(25) }
-                    )
-                    Spacer(modifier = Modifier.width(12.dp))
-                    TimeOption(
-                        label = stringResource(Res.string.pomodoro_10m),
-                        isSelected = uiState.selectedOption == 10,
-                        onClick = { viewModel.onTimeOptionSelected(10) }
-                    )
+                    PomodoroDefaults.MANUAL_DURATIONS_MINUTES.forEachIndexed { index, minutes ->
+                        if (index > 0) Spacer(modifier = Modifier.width(12.dp))
+                        val labelRes = when (minutes) {
+                            5 -> Res.string.pomodoro_5m
+                            10 -> Res.string.pomodoro_10m
+                            25 -> Res.string.pomodoro_25m
+                            else -> Res.string.pomodoro_25m
+                        }
+                        TimeOption(
+                            label = stringResource(labelRes),
+                            isSelected = uiState.selectedOption == minutes,
+                            onClick = { viewModel.onTimeOptionSelected(minutes) }
+                        )
+                    }
                 }
 
-                // Playback Controls
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center,
@@ -211,21 +211,27 @@ fun PomodoroScreen(
                     }
                 }
 
-                // Footer info
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.padding(bottom = 32.dp)
                 ) {
                     val sessionsCompletedText = stringResource(Res.string.pomodoro_sessions_completed, uiState.sessionsCompleted)
-                    val nextBreakLabel = if ((uiState.sessionsCompleted + 1) % 4 == 0) 
-                        stringResource(Res.string.pomodoro_status_long_break) 
-                    else 
-                        stringResource(Res.string.pomodoro_5_min_break)
-                    
-                    val nextBreakText = stringResource(Res.string.pomodoro_next_break, nextBreakLabel)
-                    
+                    val nextSessionLabel = when (uiState.mode) {
+                        PomodoroMode.POMODORO -> {
+                            val sessionsAfterNext = uiState.sessionsCompleted + 1
+                            if (sessionsAfterNext % PomodoroDefaults.SESSIONS_BEFORE_LONG_BREAK == 0)
+                                stringResource(Res.string.pomodoro_status_long_break)
+                            else
+                                stringResource(Res.string.pomodoro_status_short_break)
+                        }
+                        PomodoroMode.SHORT_BREAK,
+                        PomodoroMode.LONG_BREAK ->
+                            stringResource(Res.string.pomodoro_status_pomodoro)
+                    }
+                    val nextSessionText = stringResource(Res.string.pomodoro_next_session, nextSessionLabel)
+
                     Text(
-                        text = "$sessionsCompletedText | $nextBreakText",
+                        text = "$sessionsCompletedText | $nextSessionText",
                         style = AppTheme.typography.labelSmall,
                         color = AppTheme.colors.textSecondary,
                         letterSpacing = 1.sp

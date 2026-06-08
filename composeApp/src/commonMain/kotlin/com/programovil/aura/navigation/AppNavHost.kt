@@ -115,6 +115,10 @@ fun AppNavHost(
                 val pomodoroViewModel = koinViewModel<PomodoroViewModel>()
                 PomodoroScreen(
                     viewModel = pomodoroViewModel,
+                    featureFlags = featureFlags,
+                    onFeatureDisabled = {
+                        navController.popBackStack(NavRoute.Home, inclusive = false)
+                    },
                     onSettingsClick = { navController.navigate(NavRoute.Settings) }
                 )
             }

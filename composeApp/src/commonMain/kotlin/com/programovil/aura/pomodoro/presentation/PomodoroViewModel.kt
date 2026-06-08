@@ -2,6 +2,7 @@ package com.programovil.aura.pomodoro.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.programovil.aura.pomodoro.domain.PomodoroDefaults
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,12 +16,12 @@ enum class PomodoroMode {
 }
 
 data class PomodoroUiState(
-    val timeLeftSeconds: Int = 25 * 60,
-    val initialTimeSeconds: Int = 25 * 60,
+    val timeLeftSeconds: Int = PomodoroDefaults.POMODORO_MINUTES * 60,
+    val initialTimeSeconds: Int = PomodoroDefaults.POMODORO_MINUTES * 60,
     val isRunning: Boolean = false,
     val mode: PomodoroMode = PomodoroMode.POMODORO,
     val sessionsCompleted: Int = 0,
-    val selectedOption: Int = 25
+    val selectedOption: Int = PomodoroDefaults.POMODORO_MINUTES
 ) {
     val progress: Float
         get() = if (initialTimeSeconds > 0) timeLeftSeconds.toFloat() / initialTimeSeconds else 0f
@@ -56,7 +57,7 @@ class PomodoroViewModel : ViewModel() {
         _uiState.update { it.copy(isRunning = true) }
         timerJob = viewModelScope.launch {
             while (_uiState.value.timeLeftSeconds > 0) {
-                delay(1000)
+                delay(PomodoroDefaults.TICK_INTERVAL_MS)
                 _uiState.update { it.copy(timeLeftSeconds = it.timeLeftSeconds - 1) }
             }
             onTimerFinished()
@@ -65,6 +66,7 @@ class PomodoroViewModel : ViewModel() {
 
     private fun stopTimer() {
         timerJob?.cancel()
+        timerJob = null
         _uiState.update { it.copy(isRunning = false) }
     }
 
@@ -91,17 +93,16 @@ class PomodoroViewModel : ViewModel() {
 
             if (state.mode == PomodoroMode.POMODORO) {
                 newSessionsCompleted++
-                // Every 4 pomodoros, long break
-                if (newSessionsCompleted % 4 == 0) {
+                if (newSessionsCompleted % PomodoroDefaults.SESSIONS_BEFORE_LONG_BREAK == 0) {
                     nextMode = PomodoroMode.LONG_BREAK
-                    nextMinutes = 15
+                    nextMinutes = PomodoroDefaults.LONG_BREAK_MINUTES
                 } else {
                     nextMode = PomodoroMode.SHORT_BREAK
-                    nextMinutes = 5
+                    nextMinutes = PomodoroDefaults.SHORT_BREAK_MINUTES
                 }
             } else {
                 nextMode = PomodoroMode.POMODORO
-                nextMinutes = 25
+                nextMinutes = PomodoroDefaults.POMODORO_MINUTES
             }
 
             state.copy(

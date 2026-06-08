@@ -20,7 +20,7 @@ private class AndroidAuthService : AuthService {
 
     override fun handleSignIn(idToken: String?, onResult: (AuthViewModel.AuthState) -> Unit) {
         if (idToken == null) {
-            onResult(AuthViewModel.AuthState.Error("No token"))
+            onResult(AuthViewModel.AuthState.Error(AuthError.NoToken))
             return
         }
         val credential = GoogleAuthProvider.getCredential(idToken, null)
@@ -29,7 +29,7 @@ private class AndroidAuthService : AuthService {
                 if (task.isSuccessful) {
                     onResult(AuthViewModel.AuthState.SignedIn)
                 } else {
-                    onResult(AuthViewModel.AuthState.Error(task.exception?.message ?: "Unknown error"))
+                    onResult(AuthViewModel.AuthState.Error(AuthError.Exception(task.exception?.message)))
                 }
             }
     }

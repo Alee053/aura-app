@@ -143,4 +143,23 @@
     <string name="home_dashboard_motivation_subtitle">%1$s</string>
     <string name="home_dashboard_motivation_value_greeting">Keep going</string>
     <string name="home_dashboard_motivation_value_premium">Stay focused</string>
+
+    <!-- Pomodoro Screen -->
+    <string name="pomodoro_title">Pomodoro</string>
+    <string name="pomodoro_status_pomodoro">POMODORO</string>
+    <string name="pomodoro_status_short_break">SHORT BREAK</string>
+    <string name="pomodoro_status_long_break">LONG BREAK</string>
+    <string name="pomodoro_5m">5m</string>
+    <string name="pomodoro_10m">10m</string>
+    <string name="pomodoro_15m">15m</string>
+    <string name="pomodoro_25m">25m</string>
+    <string name="pomodoro_sessions_completed">SESSIONS COMPLETED: %1$d</string>
+    <string name="pomodoro_next_break">NEXT: %1$s</string>
+    <string name="pomodoro_5_min_break">5-MIN BREAK</string>
+    <string name="pomodoro_content_description_search">Search</string>
+    <string name="pomodoro_content_description_settings">Settings</string>
+    <string name="pomodoro_content_description_reset">Reset</string>
+    <string name="pomodoro_content_description_play">Play</string>
+    <string name="pomodoro_content_description_pause">Pause</string>
+    <string name="pomodoro_content_description_skip">Skip</string>
 </resources>

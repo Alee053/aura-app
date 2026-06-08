@@ -1,6 +1,7 @@
 package com.programovil.aura.di
 
 import com.programovil.aura.auth.di.authModule
+import com.programovil.aura.experiments.di.experimentsModule
 import com.programovil.aura.habit.di.habitModule
 import com.programovil.aura.home.di.homeModule
 import com.programovil.aura.journal.di.journalModule
@@ -22,6 +23,7 @@ fun getModules(remoteConfigService: RemoteConfigService) = listOf(
     settingsModule,
     journalModule,
     onboardingModule,
+    experimentsModule,
     module {
         single { createDataStore() }
         single<RemoteConfigService> { remoteConfigService }

@@ -2,6 +2,7 @@ package com.programovil.aura.auth.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.programovil.aura.auth.domain.AuthError
 import com.programovil.aura.auth.domain.AuthService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +16,7 @@ class AuthViewModel(
         data object Loading : AuthState()
         data object SignedIn : AuthState()
         data object SignedOut : AuthState()
-        data class Error(val message: String) : AuthState()
+        data class Error(val error: AuthError) : AuthState()
     }
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Loading)
@@ -33,6 +34,10 @@ class AuthViewModel(
         authService.handleSignIn(idToken) { state ->
             _authState.value = state
         }
+    }
+
+    fun reportAuthError(error: AuthError) {
+        _authState.value = AuthState.Error(error)
     }
 
     fun signOut() {

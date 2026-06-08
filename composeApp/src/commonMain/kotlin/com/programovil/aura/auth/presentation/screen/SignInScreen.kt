@@ -22,11 +22,25 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.programovil.aura.designsystem.components.button.PrimaryButton
 import com.programovil.aura.designsystem.theme.AppTheme
+import com.programovil.aura.auth.domain.AuthError
 import aura_app.composeapp.generated.resources.Res
 import aura_app.composeapp.generated.resources.sign_in_title
 import aura_app.composeapp.generated.resources.sign_in_subtitle
 import aura_app.composeapp.generated.resources.sign_in_button
+import aura_app.composeapp.generated.resources.auth_error_no_credential
+import aura_app.composeapp.generated.resources.auth_error_no_token
+import aura_app.composeapp.generated.resources.auth_error_unknown
 import org.jetbrains.compose.resources.stringResource
+
+@Composable
+fun authErrorMessage(error: AuthError): String = when (error) {
+    is AuthError.NoCredential -> stringResource(Res.string.auth_error_no_credential)
+    is AuthError.NoToken -> stringResource(Res.string.auth_error_no_token)
+    is AuthError.Exception -> stringResource(
+        Res.string.auth_error_unknown,
+        error.message ?: stringResource(Res.string.auth_error_no_token)
+    )
+}
 
 @Composable
 fun SignInScreen(

@@ -105,7 +105,9 @@ class AndroidNotificationScheduler(
     }
 
     override fun showPomodoroCompletionNow() {
-        val request = OneTimeWorkRequestBuilder<PomodoroCompletionWorker>().build()
+        val request = OneTimeWorkRequestBuilder<PomodoroCompletionWorker>()
+            .setInputData(PomodoroCompletionWorker.forceNotifyInputData())
+            .build()
         workManager.enqueue(request)
     }
 

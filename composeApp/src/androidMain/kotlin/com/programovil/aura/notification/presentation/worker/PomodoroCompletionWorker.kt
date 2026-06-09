@@ -1,6 +1,7 @@
 package com.programovil.aura.notification.presentation.worker
 
 import android.content.Context
+import androidx.work.Data
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.programovil.aura.notification.NotificationHelper
@@ -17,6 +18,12 @@ class PomodoroCompletionWorker(
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
+        val forceNotify = inputData.getBoolean(KEY_FORCE_NOTIFY, false)
+        if (forceNotify) {
+            NotificationHelper.showPomodoroCompletionNotification(applicationContext)
+            return Result.success()
+        }
+
         val repository = PomodoroPreferencesRepository(createDataStore())
         val state = repository.state.first()
         val now = SystemTimeProvider.currentTimeMillis()
@@ -34,5 +41,12 @@ class PomodoroCompletionWorker(
 
     companion object {
         const val WORK_NAME = "pomodoro_completion_work"
+        private const val KEY_FORCE_NOTIFY = "key_force_notify"
+
+        fun forceNotifyInputData(): Data {
+            return Data.Builder()
+                .putBoolean(KEY_FORCE_NOTIFY, true)
+                .build()
+        }
     }
 }

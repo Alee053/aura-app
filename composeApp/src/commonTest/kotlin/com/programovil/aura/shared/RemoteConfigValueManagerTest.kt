@@ -39,7 +39,10 @@ class RemoteConfigValueManagerTest {
 
         manager.initialize()
 
-        assertEquals("Premium", manager.value.value)
+        manager.value.test {
+            assertEquals("Premium", awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -47,9 +50,9 @@ class RemoteConfigValueManagerTest {
         var callCount = 0
         val fake = object : RemoteConfigService {
             override suspend fun getBoolean(key: String, default: Boolean) = default
-            override suspend fun getString(key: String, default: String) = {
+            override suspend fun getString(key: String, default: String): String {
                 callCount++
-                default
+                return default
             }
             override suspend fun fetchAndActivate(): Result<Unit> = Result.success(Unit)
             override fun registerOnConfigUpdateListener(onUpdate: () -> Unit) {}
@@ -84,7 +87,11 @@ class RemoteConfigValueManagerTest {
             parser = { it }
         )
         manager.initialize()
-        assertEquals("v1", manager.value.value)
+
+        manager.value.test {
+            assertEquals("v1", awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
 
         backing["k"] = "v2"
         listener?.invoke()

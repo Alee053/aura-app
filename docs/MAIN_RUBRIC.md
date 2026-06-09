@@ -2,14 +2,15 @@
 
 ## Aura App
 
-- [ ] Firebase setup
+- [x] Firebase setup
 - [ ] Figma mockups
-- [ ] Clean architecture
-- [ ] MVVM-MVI
-- [ ] KOIN
-- [ ] Unit Tests, UI tests
+- [x] Clean architecture
+- [x] MVVM-MVI
+- [x] KOIN
+- [x] Unit Tests
+- [ ] UI tests
 - [ ] Remote config
-- [ ] Retrofit rest y/o room?
-- [ ] N0tif push interna externa
+- [x] Retrofit rest y/o room? (Firestore-only; no Room, no Retrofit needed)
+- [x] N0tif push interna externa (FCM service + WorkManager + NotificationHelper)
 - [ ] Localise (loco)
 - [ ] Demo

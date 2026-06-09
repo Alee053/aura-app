@@ -8,6 +8,7 @@ import com.programovil.aura.pomodoro.domain.PomodoroMode
 import com.programovil.aura.pomodoro.domain.PomodoroStateRepository
 import com.programovil.aura.pomodoro.domain.PomodoroTimerState
 import com.programovil.aura.pomodoro.domain.TimeProvider
+import com.programovil.aura.shared.AppVisibilityTracker
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -138,11 +139,13 @@ class PomodoroViewModel(
 
         timerJob = viewModelScope.launch {
             while (persistedState.isRunning) {
-                publishState(persistedState)
-                if (shouldAdvanceCompletedTimer(persistedState)) {
+                val remainingSeconds = computeRemainingSeconds(persistedState)
+                if (remainingSeconds <= 0) {
+                    publishState(persistedState.copy(timeLeftSeconds = 0))
                     advanceToNextSession(persistedState)
                     break
                 }
+                publishState(persistedState.copy(timeLeftSeconds = remainingSeconds))
                 delay(PomodoroDefaults.TICK_INTERVAL_MS)
             }
         }
@@ -193,6 +196,7 @@ class PomodoroViewModel(
         stopTicker()
         try {
             val completedMode = state.mode
+            val isForeground = AppVisibilityTracker.isForeground.value
             val newSessionsCompleted: Int
             val nextMode: PomodoroMode
             val nextMinutes: Int
@@ -225,6 +229,9 @@ class PomodoroViewModel(
                     completedMode = completedMode
                 )
             )
+            if (!isForeground) {
+                notificationScheduler.showPomodoroCompletionNow()
+            }
         } finally {
             isAdvancingSession = false
         }

@@ -104,6 +104,11 @@ class AndroidNotificationScheduler(
         workManager.cancelUniqueWork(PomodoroCompletionWorker.WORK_NAME)
     }
 
+    override fun showPomodoroCompletionNow() {
+        val request = OneTimeWorkRequestBuilder<PomodoroCompletionWorker>().build()
+        workManager.enqueue(request)
+    }
+
     override fun testNotification() {
         val testRequest = OneTimeWorkRequestBuilder<DailySummaryWorker>().build()
         workManager.enqueue(testRequest)

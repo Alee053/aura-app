@@ -5,5 +5,6 @@ interface NotificationScheduler {
     fun cancelDailySummary()
     fun schedulePomodoroCompletion(delayMillis: Long)
     fun cancelPomodoroCompletion()
+    fun showPomodoroCompletionNow()
     fun testNotification()
 }

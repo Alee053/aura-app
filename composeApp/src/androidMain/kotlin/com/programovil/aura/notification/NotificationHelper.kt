@@ -97,8 +97,8 @@ object NotificationHelper {
 
         val notification = NotificationCompat.Builder(context, CHANNEL_POMODORO)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle("EL TIEMPO ACABO")
-            .setContentText("REGRESA A LA APP PARA CONTINUAR")
+            .setContentTitle("TIME IS UP")
+            .setContentText("To continue your Pomodoro open Aura")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .setContentIntent(createPendingIntent(context))

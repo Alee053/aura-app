@@ -6,6 +6,7 @@ import com.programovil.aura.pomodoro.domain.PomodoroStateRepository
 import com.programovil.aura.pomodoro.domain.PomodoroTimerState
 import com.programovil.aura.pomodoro.domain.TimeProvider
 import com.programovil.aura.notification.domain.NotificationScheduler
+import com.programovil.aura.shared.AppVisibilityTracker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -39,6 +40,7 @@ class PomodoroViewModelTest {
         repository = FakePomodoroStateRepository()
         timeProvider = FakeTimeProvider()
         notificationScheduler = FakeNotificationScheduler()
+        AppVisibilityTracker.markForeground()
     }
 
     @AfterTest
@@ -222,6 +224,7 @@ class PomodoroViewModelTest {
 
     @Test
     fun `restores finished timer after app reopen and shows completion message`() = runTest(testDispatcher) {
+        AppVisibilityTracker.markBackground()
         repository.saveImmediate(
             PomodoroTimerState(
                 timeLeftSeconds = 1,
@@ -259,6 +262,22 @@ class PomodoroViewModelTest {
 
         assertFalse(viewModel.uiState.value.showCompletionMessage)
         assertNull(viewModel.uiState.value.completedMode)
+    }
+
+    @Test
+    fun `background completion sends immediate notification and keeps completion page pending`() = runTest(testDispatcher) {
+        AppVisibilityTracker.markBackground()
+        val viewModel = createViewModel()
+        viewModel.onTimeOptionSelected(1)
+        runCurrent()
+        viewModel.toggleTimer()
+        runCurrent()
+
+        advanceClockBy(60 * PomodoroDefaults.TICK_INTERVAL_MS)
+
+        assertTrue(notificationScheduler.immediatePomodoroNotificationShown)
+        assertTrue(viewModel.uiState.value.showCompletionMessage)
+        assertEquals(PomodoroMode.SHORT_BREAK, viewModel.uiState.value.mode)
     }
 
     private fun createViewModel(): PomodoroViewModel {
@@ -303,6 +322,8 @@ private class FakeTimeProvider(
 private class FakeNotificationScheduler : NotificationScheduler {
     var scheduledDelayMillis: Long? = null
         private set
+    var immediatePomodoroNotificationShown: Boolean = false
+        private set
 
     override fun scheduleDailySummary(hour: Int, minute: Int) = Unit
 
@@ -314,6 +335,10 @@ private class FakeNotificationScheduler : NotificationScheduler {
 
     override fun cancelPomodoroCompletion() {
         scheduledDelayMillis = null
+    }
+
+    override fun showPomodoroCompletionNow() {
+        immediatePomodoroNotificationShown = true
     }
 
     override fun testNotification() = Unit

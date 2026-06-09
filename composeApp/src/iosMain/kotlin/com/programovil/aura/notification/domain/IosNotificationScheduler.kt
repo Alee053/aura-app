@@ -52,8 +52,8 @@ class IosNotificationScheduler : NotificationScheduler {
 
     override fun schedulePomodoroCompletion(delayMillis: Long) {
         val content = UNMutableNotificationContent().apply {
-            setTitle("El tiempo acabo")
-            setBody("Regresa a la app para continuar.")
+            setTitle("TIME IS UP")
+            setBody("To continue your Pomodoro open Aura")
             setSound(UNNotificationSound.defaultSound)
         }
 
@@ -78,6 +78,10 @@ class IosNotificationScheduler : NotificationScheduler {
 
     override fun cancelPomodoroCompletion() {
         notificationCenter.removePendingNotificationRequestsWithIdentifiers(listOf(POMODORO_NOTIFICATION_ID))
+    }
+
+    override fun showPomodoroCompletionNow() {
+        schedulePomodoroCompletion(delayMillis = 1000L)
     }
 
     override fun testNotification() {

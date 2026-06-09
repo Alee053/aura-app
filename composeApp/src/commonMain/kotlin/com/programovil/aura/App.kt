@@ -132,6 +132,7 @@ fun AuthenticatedApp(
 
     LaunchedEffect(Unit) {
         featureFlagManager.initialize()
+        getUserPlanUseCase.refresh()
     }
 
     val showTodos by remember(featureFlags) {

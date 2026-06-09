@@ -39,7 +39,10 @@ class FirebaseRemoteConfigService(context: Context) : RemoteConfigService {
 
     override suspend fun getUserPlan(): String {
         val raw = remoteConfig.getString(UserPlanFlag.USER_PLAN.key)
-        return raw.takeIf { it.isNotEmpty() } ?: UserPlanFlag.USER_PLAN.defaultValue
+        Log.d(TAG, "getUserPlan: raw=\"$raw\" (key=${UserPlanFlag.USER_PLAN.key})")
+        val effective = raw.takeIf { it.isNotEmpty() } ?: UserPlanFlag.USER_PLAN.defaultValue
+        Log.d(TAG, "getUserPlan: effective=\"$effective\"")
+        return effective
     }
 
     override suspend fun fetchAndActivate(): Result<Unit> = runCatching {

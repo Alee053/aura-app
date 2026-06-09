@@ -10,6 +10,7 @@ import com.programovil.aura.onboarding.di.onboardingModule
 import com.programovil.aura.settings.di.settingsModule
 import com.programovil.aura.shared.FeatureFlagManager
 import com.programovil.aura.shared.RemoteConfigService
+import com.programovil.aura.shared.UserPlanManager
 import com.programovil.aura.shared.data.createDataStore
 import com.programovil.aura.todo.di.todoModule
 import org.koin.dsl.module
@@ -28,5 +29,6 @@ fun getModules(remoteConfigService: RemoteConfigService) = listOf(
         single { createDataStore() }
         single<RemoteConfigService> { remoteConfigService }
         single { FeatureFlagManager(get()) }
+        single { UserPlanManager(get()) }
     }
 )

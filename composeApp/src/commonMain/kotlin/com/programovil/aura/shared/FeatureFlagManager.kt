@@ -1,6 +1,9 @@
 package com.programovil.aura.shared
 
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,6 +18,7 @@ import kotlinx.coroutines.launch
 class FeatureFlagManager(
     remoteConfigService: RemoteConfigService
 ) {
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val managers: Map<FeatureFlag, RemoteConfigValueManager<Boolean>> =
         FeatureFlag.entries.associateWith { flag ->
             RemoteConfigValueManager(
@@ -30,10 +34,10 @@ class FeatureFlagManager(
     )
     val flags: StateFlow<Map<FeatureFlag, Boolean>> = _flags.asStateFlow()
 
-    suspend fun initialize() = coroutineScope {
+    suspend fun initialize() {
         managers.values.forEach { it.initialize() }
         managers.forEach { (flag, mgr) ->
-            launch {
+            scope.launch {
                 mgr.value.collect { newValue ->
                     _flags.update { it + (flag to newValue) }
                 }
@@ -42,6 +46,7 @@ class FeatureFlagManager(
     }
 
     fun stop() {
+        scope.cancel()
         managers.values.forEach { it.stop() }
     }
 }

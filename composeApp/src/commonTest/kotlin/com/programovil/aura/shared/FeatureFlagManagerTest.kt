@@ -9,18 +9,6 @@ import java.util.concurrent.locks.LockSupport
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-/**
- * Tests for [FeatureFlagManager].
- *
- * The composed [RemoteConfigValueManager] instances launch their internal
- * `refresh()` work on `Dispatchers.Default` (a real thread pool that
- * `runTest` does not control). Because [FeatureFlagManager.initialize]
- * blocks indefinitely on a `collect` scope, the test launches `initialize`
- * in the background and polls the resulting flags until the remote values
- * are reflected. A `LockSupport.parkNanos` between polls forces a JVM-level
- * thread yield so the `Dispatchers.Default` coroutines get a deterministic
- * chance to run.
- */
 @OptIn(ExperimentalCoroutinesApi::class)
 class FeatureFlagManagerTest {
 

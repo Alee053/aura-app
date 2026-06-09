@@ -1,5 +1,6 @@
 package com.programovil.aura
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -10,7 +11,9 @@ import androidx.credentials.GetCredentialRequest
 import androidx.credentials.GetCredentialResponse
 import androidx.credentials.exceptions.GetCredentialException
 import androidx.lifecycle.lifecycleScope
+import com.programovil.aura.notification.NotificationHelper
 import com.programovil.aura.auth.presentation.AuthViewModel
+import com.programovil.aura.shared.PomodoroLaunchEvents
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.getViewModel
 
@@ -60,6 +63,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         authViewModel = getViewModel()
+        handleIntent(intent)
 
         setContent {
             App(
@@ -67,6 +71,22 @@ class MainActivity : ComponentActivity() {
                     launchGoogleSignIn()
                 }
             )
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent?) {
+        if (intent?.action == NotificationHelper.ACTION_OPEN_POMODORO_COMPLETION ||
+            intent?.getBooleanExtra(NotificationHelper.EXTRA_OPEN_POMODORO_COMPLETION, false) == true
+        ) {
+            PomodoroLaunchEvents.requestSync()
+            intent.removeExtra(NotificationHelper.EXTRA_OPEN_POMODORO_COMPLETION)
+            intent.action = null
         }
     }
 }

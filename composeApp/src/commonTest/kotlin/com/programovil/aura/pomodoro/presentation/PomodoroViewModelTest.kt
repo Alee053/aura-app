@@ -248,6 +248,32 @@ class PomodoroViewModelTest {
     }
 
     @Test
+    fun `syncTimerState advances an expired running timer and resets it to the next session`() = runTest(testDispatcher) {
+        repository.saveImmediate(
+            PomodoroTimerState(
+                timeLeftSeconds = 1,
+                initialTimeSeconds = 1,
+                isRunning = true,
+                mode = PomodoroMode.POMODORO,
+                sessionsCompleted = 0,
+                selectedOption = 1,
+                endsAtEpochMillis = timeProvider.currentTimeMillis() - 1000L
+            )
+        )
+        val viewModel = createViewModel()
+
+        viewModel.syncTimerState()
+        runCurrent()
+
+        val state = viewModel.uiState.value
+        assertEquals(PomodoroMode.SHORT_BREAK, state.mode)
+        assertEquals(PomodoroDefaults.SHORT_BREAK_MINUTES * 60, state.timeLeftSeconds)
+        assertFalse(state.isRunning)
+        assertTrue(state.showCompletionMessage)
+        assertEquals(PomodoroMode.POMODORO, state.completedMode)
+    }
+
+    @Test
     fun `dismissCompletionMessage clears persisted completion state`() = runTest(testDispatcher) {
         repository.saveImmediate(
             PomodoroTimerState(

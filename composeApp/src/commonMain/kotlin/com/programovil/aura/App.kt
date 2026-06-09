@@ -51,8 +51,10 @@ import com.programovil.aura.onboarding.presentation.screen.OnboardingScreen
 import com.programovil.aura.pomodoro.presentation.PomodoroCompletionOverlay
 import com.programovil.aura.pomodoro.presentation.PomodoroViewModel
 import com.programovil.aura.pomodoro.presentation.pomodoroNextSessionLabel
+import com.programovil.aura.shared.AppLifecycleEvents
 import com.programovil.aura.shared.FeatureFlag
 import com.programovil.aura.shared.FeatureFlagManager
+import com.programovil.aura.shared.PomodoroLaunchEvents
 import com.programovil.aura.todo.presentation.viewmodel.TodoViewModel
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
@@ -64,6 +66,7 @@ import aura_app.composeapp.generated.resources.nav_settings
 import aura_app.composeapp.generated.resources.nav_journal
 import aura_app.composeapp.generated.resources.pomodoro_title
 import org.jetbrains.compose.resources.stringResource
+import kotlinx.coroutines.flow.collect
 
 @Composable
 @Preview
@@ -144,6 +147,22 @@ fun AuthenticatedApp(
     LaunchedEffect(Unit) {
         featureFlagManager.initialize()
         userPlanManager.initialize()
+    }
+
+    LaunchedEffect(Unit) {
+        pomodoroViewModel.syncTimerState()
+    }
+
+    LaunchedEffect(pomodoroViewModel) {
+        AppLifecycleEvents.foregroundEvents.collect {
+            pomodoroViewModel.syncTimerState()
+        }
+    }
+
+    LaunchedEffect(pomodoroViewModel) {
+        PomodoroLaunchEvents.events.collect {
+            pomodoroViewModel.syncTimerState()
+        }
     }
 
     val showTodos by remember(featureFlags) {

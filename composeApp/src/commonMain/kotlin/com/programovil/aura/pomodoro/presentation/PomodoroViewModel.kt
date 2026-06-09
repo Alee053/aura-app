@@ -3,6 +3,7 @@ package com.programovil.aura.pomodoro.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.programovil.aura.notification.domain.NotificationScheduler
+import com.programovil.aura.pomodoro.domain.PomodoroCompletionHandler
 import com.programovil.aura.pomodoro.domain.PomodoroDefaults
 import com.programovil.aura.pomodoro.domain.PomodoroMode
 import com.programovil.aura.pomodoro.domain.PomodoroStateRepository
@@ -48,17 +49,14 @@ class PomodoroViewModel(
         viewModelScope.launch {
             repository.state.collect { state ->
                 persistedState = state
-                if (shouldAdvanceCompletedTimer(state)) {
-                    advanceToNextSession(state)
-                } else {
-                    publishState(state)
-                    if (state.isRunning) {
-                        ensureTicker()
-                    } else {
-                        stopTicker()
-                    }
-                }
+                handleStateUpdate(state)
             }
+        }
+    }
+
+    fun syncTimerState() {
+        viewModelScope.launch {
+            handleStateUpdate(persistedState)
         }
     }
 
@@ -172,18 +170,31 @@ class PomodoroViewModel(
         }
     }
 
-    private fun computeRemainingSeconds(state: PomodoroTimerState): Int {
-        if (!state.isRunning) {
-            return state.timeLeftSeconds.coerceAtLeast(0)
+    private suspend fun handleStateUpdate(state: PomodoroTimerState) {
+        if (shouldAdvanceCompletedTimer(state)) {
+            advanceToNextSession(state)
+        } else {
+            publishState(state)
+            if (state.isRunning) {
+                ensureTicker()
+            } else {
+                stopTicker()
+            }
         }
+    }
 
-        val endsAt = state.endsAtEpochMillis ?: return state.timeLeftSeconds.coerceAtLeast(0)
-        val millisLeft = endsAt - timeProvider.currentTimeMillis()
-        return ((millisLeft + 999L) / 1000L).coerceAtLeast(0L).toInt()
+    private fun computeRemainingSeconds(state: PomodoroTimerState): Int {
+        return PomodoroCompletionHandler.computeRemainingSeconds(
+            state = state,
+            currentTimeMillis = timeProvider.currentTimeMillis()
+        )
     }
 
     private fun shouldAdvanceCompletedTimer(state: PomodoroTimerState): Boolean {
-        return state.isRunning && computeRemainingSeconds(state) <= 0 && !isAdvancingSession
+        return PomodoroCompletionHandler.isExpired(
+            state = state,
+            currentTimeMillis = timeProvider.currentTimeMillis()
+        ) && !isAdvancingSession
     }
 
     private suspend fun advanceToNextSession(state: PomodoroTimerState) {
@@ -195,40 +206,8 @@ class PomodoroViewModel(
         notificationScheduler.cancelPomodoroCompletion()
         stopTicker()
         try {
-            val completedMode = state.mode
             val isForeground = AppVisibilityTracker.isForeground.value
-            val newSessionsCompleted: Int
-            val nextMode: PomodoroMode
-            val nextMinutes: Int
-
-            if (completedMode == PomodoroMode.POMODORO) {
-                newSessionsCompleted = state.sessionsCompleted + 1
-                if (newSessionsCompleted % PomodoroDefaults.SESSIONS_BEFORE_LONG_BREAK == 0) {
-                    nextMode = PomodoroMode.LONG_BREAK
-                    nextMinutes = PomodoroDefaults.LONG_BREAK_MINUTES
-                } else {
-                    nextMode = PomodoroMode.SHORT_BREAK
-                    nextMinutes = PomodoroDefaults.SHORT_BREAK_MINUTES
-                }
-            } else {
-                newSessionsCompleted = state.sessionsCompleted
-                nextMode = PomodoroMode.POMODORO
-                nextMinutes = PomodoroDefaults.POMODORO_MINUTES
-            }
-
-            repository.saveState(
-                state.copy(
-                    mode = nextMode,
-                    sessionsCompleted = newSessionsCompleted,
-                    timeLeftSeconds = nextMinutes * 60,
-                    initialTimeSeconds = nextMinutes * 60,
-                    selectedOption = nextMinutes,
-                    isRunning = false,
-                    endsAtEpochMillis = null,
-                    showCompletionMessage = true,
-                    completedMode = completedMode
-                )
-            )
+            repository.saveState(PomodoroCompletionHandler.advanceToNextSession(state))
             if (!isForeground) {
                 notificationScheduler.showPomodoroCompletionNow()
             }

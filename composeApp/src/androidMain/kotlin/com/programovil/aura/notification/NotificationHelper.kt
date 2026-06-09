@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import com.programovil.aura.MainActivity
 import androidx.core.app.NotificationCompat
 import com.programovil.aura.R
 
@@ -47,7 +48,11 @@ object NotificationHelper {
     }
 
     private fun createPendingIntent(context: Context): PendingIntent {
-        val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)
+        val intent = Intent(context, MainActivity::class.java).apply {
+            action = ACTION_OPEN_POMODORO_COMPLETION
+            putExtra(EXTRA_OPEN_POMODORO_COMPLETION, true)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        }
         return PendingIntent.getActivity(
             context,
             0,
@@ -110,4 +115,6 @@ object NotificationHelper {
     private const val NOTIFICATION_ID_DAILY_SUMMARY = 1001
     private const val NOTIFICATION_ID_DUE_DATE = 1002
     private const val NOTIFICATION_ID_POMODORO = 1003
+    const val ACTION_OPEN_POMODORO_COMPLETION = "com.programovil.aura.action.OPEN_POMODORO_COMPLETION"
+    const val EXTRA_OPEN_POMODORO_COMPLETION = "extra_open_pomodoro_completion"
 }

@@ -22,10 +22,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -65,10 +61,6 @@ import aura_app.composeapp.generated.resources.reminder_time_label
 import aura_app.composeapp.generated.resources.app_name_label
 import aura_app.composeapp.generated.resources.version
 import aura_app.composeapp.generated.resources.made_with_love
-import aura_app.composeapp.generated.resources.settings_simulate_plan
-import aura_app.composeapp.generated.resources.settings_simulate_plan_free
-import aura_app.composeapp.generated.resources.settings_simulate_plan_premium
-import com.programovil.aura.experiments.domain.model.UserPlan
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -290,41 +282,6 @@ fun SettingsScreen(
                             cursorColor = AppTheme.colors.primary
                         ),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-            ) {
-                Text(
-                    text = stringResource(Res.string.settings_simulate_plan),
-                    style = AppTheme.typography.titleMedium,
-                    color = AppTheme.colors.textPrimary
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    FilterChip(
-                        selected = uiState.userPlan is UserPlan.Free,
-                        onClick = { viewModel.setSimulatedPlan(UserPlan.Free) },
-                        label = { Text(stringResource(Res.string.settings_simulate_plan_free)) },
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = AppTheme.colors.primary,
-                            selectedLabelColor = AppTheme.colors.textPrimary
-                        )
-                    )
-                    FilterChip(
-                        selected = uiState.userPlan is UserPlan.Premium,
-                        onClick = { viewModel.setSimulatedPlan(UserPlan.Premium) },
-                        label = { Text(stringResource(Res.string.settings_simulate_plan_premium)) },
-                        colors = FilterChipDefaults.filterChipColors(
-                            selectedContainerColor = AppTheme.colors.primary,
-                            selectedLabelColor = AppTheme.colors.textPrimary
-                        )
                     )
                 }
             }

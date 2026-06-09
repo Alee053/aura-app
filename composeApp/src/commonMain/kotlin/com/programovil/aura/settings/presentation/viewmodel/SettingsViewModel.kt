@@ -3,8 +3,6 @@ package com.programovil.aura.settings.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.programovil.aura.designsystem.theme.ThemeMode
-import com.programovil.aura.experiments.domain.model.UserPlan
-import com.programovil.aura.experiments.domain.usecase.GetUserPlanUseCase
 import com.programovil.aura.notification.data.NotificationPreferences
 import com.programovil.aura.notification.domain.NotificationScheduler
 import com.programovil.aura.settings.domain.repository.ThemeRepository
@@ -18,15 +16,13 @@ data class SettingsUiState(
     val themeMode: ThemeMode = ThemeMode.PURPLE,
     val notificationsEnabled: Boolean = false,
     val notificationHour: Int = 8,
-    val notificationMinute: Int = 0,
-    val userPlan: UserPlan = UserPlan.Free
+    val notificationMinute: Int = 0
 )
 
 class SettingsViewModel(
     private val themeRepository: ThemeRepository,
     private val notificationPreferences: NotificationPreferences,
-    private val notificationScheduler: NotificationScheduler,
-    private val getUserPlanUseCase: GetUserPlanUseCase
+    private val notificationScheduler: NotificationScheduler
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
@@ -65,11 +61,6 @@ class SettingsViewModel(
                 }
             }
         }
-        viewModelScope.launch {
-            getUserPlanUseCase().collect { plan ->
-                _uiState.update { it.copy(userPlan = plan) }
-            }
-        }
     }
 
     fun setThemeMode(mode: ThemeMode) {
@@ -87,12 +78,6 @@ class SettingsViewModel(
     fun setNotificationTime(hour: Int, minute: Int) {
         viewModelScope.launch {
             notificationPreferences.setNotificationTime(hour, minute)
-        }
-    }
-
-    fun setSimulatedPlan(plan: UserPlan) {
-        viewModelScope.launch {
-            getUserPlanUseCase.set(plan)
         }
     }
 }

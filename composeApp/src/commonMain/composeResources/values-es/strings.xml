@@ -134,7 +134,4 @@
     <string name="home_dashboard_motivation_subtitle">%1$s</string>
     <string name="home_dashboard_motivation_value_greeting">Sigue así</string>
     <string name="home_dashboard_motivation_value_premium">Mantén el enfoque</string>
-    <string name="settings_simulate_plan">Simular Plan</string>
-    <string name="settings_simulate_plan_free">Gratis</string>
-    <string name="settings_simulate_plan_premium">Premium</string>
 </resources>

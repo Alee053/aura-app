@@ -140,7 +140,4 @@
     <string name="home_dashboard_motivation_subtitle">%1$s</string>
     <string name="home_dashboard_motivation_value_greeting">Continuez</string>
     <string name="home_dashboard_motivation_value_premium">Restez concentré</string>
-    <string name="settings_simulate_plan">Simuler le plan</string>
-    <string name="settings_simulate_plan_free">Gratuit</string>
-    <string name="settings_simulate_plan_premium">Premium</string>
 </resources>

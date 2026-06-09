@@ -154,6 +154,12 @@
     <string name="pomodoro_25m">25m</string>
     <string name="pomodoro_sessions_completed">SESSIONS COMPLETED: %1$d</string>
     <string name="pomodoro_next_session">NEXT: %1$s</string>
+    <string name="pomodoro_status_summary">%1$s | %2$s</string>
+    <string name="pomodoro_completion_title">Session finished</string>
+    <string name="pomodoro_completion_pomodoro_message">Your focus session is over.</string>
+    <string name="pomodoro_completion_break_message">Your break is over.</string>
+    <string name="pomodoro_completion_next">Up next: %1$s</string>
+    <string name="pomodoro_completion_close">Close</string>
     <string name="pomodoro_content_description_settings">Settings</string>
     <string name="pomodoro_content_description_reset">Reset</string>
     <string name="pomodoro_content_description_play">Play</string>

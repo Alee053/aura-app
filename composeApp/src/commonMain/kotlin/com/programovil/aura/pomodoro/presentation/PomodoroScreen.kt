@@ -24,9 +24,13 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import aura_app.composeapp.generated.resources.*
+import com.programovil.aura.designsystem.components.button.PrimaryButton
 import com.programovil.aura.designsystem.theme.AppTheme
 import com.programovil.aura.pomodoro.domain.PomodoroDefaults
+import com.programovil.aura.pomodoro.domain.PomodoroMode
 import com.programovil.aura.shared.FeatureFlag
 import org.jetbrains.compose.resources.stringResource
 
@@ -45,6 +49,26 @@ fun PomodoroScreen(
     }
 
     val uiState by viewModel.uiState.collectAsState()
+    val nextSessionLabel = when (uiState.mode) {
+        PomodoroMode.POMODORO -> {
+            val sessionsAfterNext = uiState.sessionsCompleted + 1
+            if (sessionsAfterNext % PomodoroDefaults.SESSIONS_BEFORE_LONG_BREAK == 0) {
+                stringResource(Res.string.pomodoro_status_long_break)
+            } else {
+                stringResource(Res.string.pomodoro_status_short_break)
+            }
+        }
+        PomodoroMode.SHORT_BREAK,
+        PomodoroMode.LONG_BREAK -> stringResource(Res.string.pomodoro_status_pomodoro)
+    }
+
+    if (uiState.showCompletionMessage) {
+        PomodoroCompletionDialog(
+            completedMode = uiState.completedMode,
+            nextSessionLabel = nextSessionLabel,
+            onClose = viewModel::dismissCompletionMessage
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -216,25 +240,82 @@ fun PomodoroScreen(
                     modifier = Modifier.padding(bottom = 32.dp)
                 ) {
                     val sessionsCompletedText = stringResource(Res.string.pomodoro_sessions_completed, uiState.sessionsCompleted)
-                    val nextSessionLabel = when (uiState.mode) {
-                        PomodoroMode.POMODORO -> {
-                            val sessionsAfterNext = uiState.sessionsCompleted + 1
-                            if (sessionsAfterNext % PomodoroDefaults.SESSIONS_BEFORE_LONG_BREAK == 0)
-                                stringResource(Res.string.pomodoro_status_long_break)
-                            else
-                                stringResource(Res.string.pomodoro_status_short_break)
-                        }
-                        PomodoroMode.SHORT_BREAK,
-                        PomodoroMode.LONG_BREAK ->
-                            stringResource(Res.string.pomodoro_status_pomodoro)
-                    }
                     val nextSessionText = stringResource(Res.string.pomodoro_next_session, nextSessionLabel)
 
                     Text(
-                        text = "$sessionsCompletedText | $nextSessionText",
+                        text = stringResource(Res.string.pomodoro_status_summary, sessionsCompletedText, nextSessionText),
                         style = AppTheme.typography.labelSmall,
                         color = AppTheme.colors.textSecondary,
                         letterSpacing = 1.sp
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun PomodoroCompletionDialog(
+    completedMode: PomodoroMode?,
+    nextSessionLabel: String,
+    onClose: () -> Unit
+) {
+    val completionMessage = when (completedMode) {
+        PomodoroMode.POMODORO -> stringResource(Res.string.pomodoro_completion_pomodoro_message)
+        PomodoroMode.SHORT_BREAK,
+        PomodoroMode.LONG_BREAK -> stringResource(Res.string.pomodoro_completion_break_message)
+        null -> stringResource(Res.string.pomodoro_completion_pomodoro_message)
+    }
+
+    Dialog(
+        onDismissRequest = { },
+        properties = DialogProperties(
+            dismissOnBackPress = false,
+            dismissOnClickOutside = false,
+            usePlatformDefaultWidth = false
+        )
+    ) {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = AppTheme.colors.background
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                AppTheme.colors.background,
+                                AppTheme.colors.surface
+                            )
+                        )
+                    )
+                    .padding(24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(
+                        text = stringResource(Res.string.pomodoro_completion_title),
+                        style = AppTheme.typography.headlineLarge,
+                        color = AppTheme.colors.textPrimary
+                    )
+                    Text(
+                        text = completionMessage,
+                        style = AppTheme.typography.bodyLarge,
+                        color = AppTheme.colors.textSecondary
+                    )
+                    Text(
+                        text = stringResource(Res.string.pomodoro_completion_next, nextSessionLabel),
+                        style = AppTheme.typography.titleMedium,
+                        color = AppTheme.colors.primary
+                    )
+                    PrimaryButton(
+                        text = stringResource(Res.string.pomodoro_completion_close),
+                        onClick = onClose,
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }

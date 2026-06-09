@@ -3,17 +3,18 @@ package com.programovil.aura.pomodoro.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.programovil.aura.pomodoro.domain.PomodoroDefaults
+import com.programovil.aura.pomodoro.domain.PomodoroMode
+import com.programovil.aura.pomodoro.domain.PomodoroStateRepository
+import com.programovil.aura.pomodoro.domain.PomodoroTimerState
+import com.programovil.aura.pomodoro.domain.TimeProvider
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-
-enum class PomodoroMode {
-    POMODORO, SHORT_BREAK, LONG_BREAK
-}
 
 data class PomodoroUiState(
     val timeLeftSeconds: Int = PomodoroDefaults.POMODORO_MINUTES * 60,
@@ -21,78 +22,175 @@ data class PomodoroUiState(
     val isRunning: Boolean = false,
     val mode: PomodoroMode = PomodoroMode.POMODORO,
     val sessionsCompleted: Int = 0,
-    val selectedOption: Int = PomodoroDefaults.POMODORO_MINUTES
+    val selectedOption: Int = PomodoroDefaults.POMODORO_MINUTES,
+    val showCompletionMessage: Boolean = false,
+    val completedMode: PomodoroMode? = null
 ) {
     val progress: Float
         get() = if (initialTimeSeconds > 0) timeLeftSeconds.toFloat() / initialTimeSeconds else 0f
 }
 
-class PomodoroViewModel : ViewModel() {
+class PomodoroViewModel(
+    private val repository: PomodoroStateRepository,
+    private val timeProvider: TimeProvider
+) : ViewModel() {
     private val _uiState = MutableStateFlow(PomodoroUiState())
     val uiState: StateFlow<PomodoroUiState> = _uiState.asStateFlow()
 
     private var timerJob: Job? = null
+    private var persistedState = PomodoroTimerState()
+    private var isAdvancingSession = false
 
-    fun onTimeOptionSelected(minutes: Int) {
-        stopTimer()
-        _uiState.update {
-            it.copy(
-                timeLeftSeconds = minutes * 60,
-                initialTimeSeconds = minutes * 60,
-                selectedOption = minutes,
-                isRunning = false
-            )
+    init {
+        viewModelScope.launch {
+            repository.state.collect { state ->
+                persistedState = state
+                if (shouldAdvanceCompletedTimer(state)) {
+                    advanceToNextSession(state)
+                } else {
+                    publishState(state)
+                    if (state.isRunning) {
+                        ensureTicker()
+                    } else {
+                        stopTicker()
+                    }
+                }
+            }
         }
     }
 
+    fun onTimeOptionSelected(minutes: Int) {
+        val updatedState = persistedState.copy(
+            timeLeftSeconds = minutes * 60,
+            initialTimeSeconds = minutes * 60,
+            selectedOption = minutes,
+            isRunning = false,
+            endsAtEpochMillis = null
+        )
+        saveState(updatedState)
+    }
+
     fun toggleTimer() {
-        if (_uiState.value.isRunning) {
-            stopTimer()
+        if (persistedState.isRunning) {
+            pauseTimer()
         } else {
             startTimer()
         }
     }
 
-    private fun startTimer() {
-        _uiState.update { it.copy(isRunning = true) }
-        timerJob = viewModelScope.launch {
-            while (_uiState.value.timeLeftSeconds > 0) {
-                delay(PomodoroDefaults.TICK_INTERVAL_MS)
-                _uiState.update { it.copy(timeLeftSeconds = it.timeLeftSeconds - 1) }
-            }
-            onTimerFinished()
+    fun resetTimer() {
+        saveState(
+            persistedState.copy(
+                timeLeftSeconds = persistedState.initialTimeSeconds,
+                isRunning = false,
+                endsAtEpochMillis = null
+            )
+        )
+    }
+
+    fun skipSession() {
+        viewModelScope.launch {
+            advanceToNextSession(persistedState.copy(isRunning = false, endsAtEpochMillis = null))
         }
     }
 
-    private fun stopTimer() {
-        timerJob?.cancel()
-        timerJob = null
-        _uiState.update { it.copy(isRunning = false) }
+    fun dismissCompletionMessage() {
+        saveState(
+            persistedState.copy(
+                showCompletionMessage = false,
+                completedMode = null
+            )
+        )
     }
 
-    fun resetTimer() {
-        stopTimer()
+    private fun startTimer() {
+        val remainingSeconds = computeRemainingSeconds(persistedState)
+        val updatedState = persistedState.copy(
+            timeLeftSeconds = remainingSeconds,
+            isRunning = true,
+            endsAtEpochMillis = timeProvider.currentTimeMillis() + remainingSeconds * 1000L
+        )
+        saveState(updatedState)
+    }
+
+    private fun pauseTimer() {
+        val remainingSeconds = computeRemainingSeconds(persistedState)
+        saveState(
+            persistedState.copy(
+                timeLeftSeconds = remainingSeconds,
+                isRunning = false,
+                endsAtEpochMillis = null
+            )
+        )
+    }
+
+    private fun ensureTicker() {
+        if (timerJob?.isActive == true) {
+            return
+        }
+
+        timerJob = viewModelScope.launch {
+            while (persistedState.isRunning) {
+                publishState(persistedState)
+                if (shouldAdvanceCompletedTimer(persistedState)) {
+                    advanceToNextSession(persistedState)
+                    break
+                }
+                delay(PomodoroDefaults.TICK_INTERVAL_MS)
+            }
+        }
+    }
+
+    private fun stopTicker() {
+        timerJob?.cancel()
+        timerJob = null
+    }
+
+    private fun publishState(state: PomodoroTimerState) {
+        val remainingSeconds = computeRemainingSeconds(state)
         _uiState.update {
             it.copy(
-                timeLeftSeconds = it.initialTimeSeconds,
-                isRunning = false
+                timeLeftSeconds = remainingSeconds,
+                initialTimeSeconds = state.initialTimeSeconds,
+                isRunning = state.isRunning,
+                mode = state.mode,
+                sessionsCompleted = state.sessionsCompleted,
+                selectedOption = state.selectedOption,
+                showCompletionMessage = state.showCompletionMessage,
+                completedMode = state.completedMode
             )
         }
     }
 
-    fun skipSession() {
-        stopTimer()
-        onTimerFinished()
+    private fun computeRemainingSeconds(state: PomodoroTimerState): Int {
+        if (!state.isRunning) {
+            return state.timeLeftSeconds.coerceAtLeast(0)
+        }
+
+        val endsAt = state.endsAtEpochMillis ?: return state.timeLeftSeconds.coerceAtLeast(0)
+        val millisLeft = endsAt - timeProvider.currentTimeMillis()
+        return ((millisLeft + 999L) / 1000L).coerceAtLeast(0L).toInt()
     }
 
-    private fun onTimerFinished() {
-        _uiState.update { state ->
+    private fun shouldAdvanceCompletedTimer(state: PomodoroTimerState): Boolean {
+        return state.isRunning && computeRemainingSeconds(state) <= 0 && !isAdvancingSession
+    }
+
+    private suspend fun advanceToNextSession(state: PomodoroTimerState) {
+        if (isAdvancingSession) {
+            return
+        }
+
+        isAdvancingSession = true
+        stopTicker()
+        try {
+            val completedMode = state.mode
+            val newSessionsCompleted: Int
             val nextMode: PomodoroMode
             val nextMinutes: Int
-            var newSessionsCompleted = state.sessionsCompleted
 
-            if (state.mode == PomodoroMode.POMODORO) {
-                newSessionsCompleted++
+            if (completedMode == PomodoroMode.POMODORO) {
+                newSessionsCompleted = state.sessionsCompleted + 1
                 if (newSessionsCompleted % PomodoroDefaults.SESSIONS_BEFORE_LONG_BREAK == 0) {
                     nextMode = PomodoroMode.LONG_BREAK
                     nextMinutes = PomodoroDefaults.LONG_BREAK_MINUTES
@@ -101,18 +199,33 @@ class PomodoroViewModel : ViewModel() {
                     nextMinutes = PomodoroDefaults.SHORT_BREAK_MINUTES
                 }
             } else {
+                newSessionsCompleted = state.sessionsCompleted
                 nextMode = PomodoroMode.POMODORO
                 nextMinutes = PomodoroDefaults.POMODORO_MINUTES
             }
 
-            state.copy(
-                mode = nextMode,
-                sessionsCompleted = newSessionsCompleted,
-                timeLeftSeconds = nextMinutes * 60,
-                initialTimeSeconds = nextMinutes * 60,
-                selectedOption = nextMinutes,
-                isRunning = false
+            repository.saveState(
+                state.copy(
+                    mode = nextMode,
+                    sessionsCompleted = newSessionsCompleted,
+                    timeLeftSeconds = nextMinutes * 60,
+                    initialTimeSeconds = nextMinutes * 60,
+                    selectedOption = nextMinutes,
+                    isRunning = false,
+                    endsAtEpochMillis = null,
+                    showCompletionMessage = true,
+                    completedMode = completedMode
+                )
             )
+        } finally {
+            isAdvancingSession = false
+        }
+    }
+
+    private fun saveState(state: PomodoroTimerState) {
+        stopTicker()
+        viewModelScope.launch {
+            repository.saveState(state)
         }
     }
 }

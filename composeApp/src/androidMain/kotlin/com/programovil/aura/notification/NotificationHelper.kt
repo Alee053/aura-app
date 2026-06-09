@@ -12,6 +12,7 @@ object NotificationHelper {
 
     const val CHANNEL_DAILY_SUMMARY = "daily_summary"
     const val CHANNEL_DUE_DATE_REMINDER = "due_date_reminder"
+    const val CHANNEL_POMODORO = "pomodoro_completion"
 
     fun createNotificationChannels(context: Context) {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -32,7 +33,17 @@ object NotificationHelper {
             description = "Reminders for tasks due today"
         }
 
-        notificationManager.createNotificationChannels(listOf(dailySummaryChannel, dueDateChannel))
+        val pomodoroChannel = NotificationChannel(
+            CHANNEL_POMODORO,
+            "Pomodoro",
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = "Pomodoro completion alerts"
+        }
+
+        notificationManager.createNotificationChannels(
+            listOf(dailySummaryChannel, dueDateChannel, pomodoroChannel)
+        )
     }
 
     private fun createPendingIntent(context: Context): PendingIntent {
@@ -81,6 +92,22 @@ object NotificationHelper {
         notificationManager.notify(NOTIFICATION_ID_DUE_DATE, notification)
     }
 
+    fun showPomodoroCompletionNotification(context: Context) {
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val notification = NotificationCompat.Builder(context, CHANNEL_POMODORO)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle("EL TIEMPO ACABO")
+            .setContentText("REGRESA A LA APP PARA CONTINUAR")
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .setContentIntent(createPendingIntent(context))
+            .build()
+
+        notificationManager.notify(NOTIFICATION_ID_POMODORO, notification)
+    }
+
     private const val NOTIFICATION_ID_DAILY_SUMMARY = 1001
     private const val NOTIFICATION_ID_DUE_DATE = 1002
+    private const val NOTIFICATION_ID_POMODORO = 1003
 }

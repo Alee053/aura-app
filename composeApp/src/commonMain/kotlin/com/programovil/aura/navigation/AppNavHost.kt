@@ -27,6 +27,7 @@ import org.koin.core.parameter.parametersOf
 fun AppNavHost(
     navController: NavHostController,
     todoViewModel: TodoViewModel,
+    pomodoroViewModel: PomodoroViewModel,
     currentThemeMode: ThemeMode,
     onThemeChange: (ThemeMode) -> Unit,
     onSignOut: () -> Unit,
@@ -112,7 +113,6 @@ fun AppNavHost(
 
         if (featureFlags[FeatureFlag.POMODORO_ENABLED] != false) {
             composable<NavRoute.Pomodoro> {
-                val pomodoroViewModel = koinViewModel<PomodoroViewModel>()
                 PomodoroScreen(
                     viewModel = pomodoroViewModel,
                     featureFlags = featureFlags,

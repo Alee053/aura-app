@@ -5,6 +5,7 @@ import com.programovil.aura.pomodoro.domain.PomodoroMode
 import com.programovil.aura.pomodoro.domain.PomodoroStateRepository
 import com.programovil.aura.pomodoro.domain.PomodoroTimerState
 import com.programovil.aura.pomodoro.domain.TimeProvider
+import com.programovil.aura.notification.domain.NotificationScheduler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -30,12 +31,14 @@ class PomodoroViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var repository: FakePomodoroStateRepository
     private lateinit var timeProvider: FakeTimeProvider
+    private lateinit var notificationScheduler: FakeNotificationScheduler
 
     @BeforeTest
     fun setup() {
         Dispatchers.setMain(testDispatcher)
         repository = FakePomodoroStateRepository()
         timeProvider = FakeTimeProvider()
+        notificationScheduler = FakeNotificationScheduler()
     }
 
     @AfterTest
@@ -78,6 +81,7 @@ class PomodoroViewModelTest {
         viewModel.toggleTimer()
         runCurrent()
         assertTrue(viewModel.uiState.value.isRunning)
+        assertEquals(PomodoroDefaults.POMODORO_MINUTES * 60 * 1000L, notificationScheduler.scheduledDelayMillis)
 
         advanceClockBy(PomodoroDefaults.TICK_INTERVAL_MS)
         assertEquals(
@@ -88,6 +92,7 @@ class PomodoroViewModelTest {
         viewModel.toggleTimer()
         runCurrent()
         assertFalse(viewModel.uiState.value.isRunning)
+        assertNull(notificationScheduler.scheduledDelayMillis)
     }
 
     @Test
@@ -257,7 +262,7 @@ class PomodoroViewModelTest {
     }
 
     private fun createViewModel(): PomodoroViewModel {
-        val viewModel = PomodoroViewModel(repository, timeProvider)
+        val viewModel = PomodoroViewModel(repository, timeProvider, notificationScheduler)
         testDispatcher.scheduler.runCurrent()
         return viewModel
     }
@@ -293,4 +298,23 @@ private class FakeTimeProvider(
     fun advanceBy(milliseconds: Long) {
         nowMillis += milliseconds
     }
+}
+
+private class FakeNotificationScheduler : NotificationScheduler {
+    var scheduledDelayMillis: Long? = null
+        private set
+
+    override fun scheduleDailySummary(hour: Int, minute: Int) = Unit
+
+    override fun cancelDailySummary() = Unit
+
+    override fun schedulePomodoroCompletion(delayMillis: Long) {
+        scheduledDelayMillis = delayMillis
+    }
+
+    override fun cancelPomodoroCompletion() {
+        scheduledDelayMillis = null
+    }
+
+    override fun testNotification() = Unit
 }

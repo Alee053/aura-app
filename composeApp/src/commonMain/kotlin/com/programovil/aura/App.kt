@@ -48,6 +48,9 @@ import com.programovil.aura.navigation.AppNavHost
 import com.programovil.aura.navigation.NavRoute
 import com.programovil.aura.onboarding.data.OnboardingPreferences
 import com.programovil.aura.onboarding.presentation.screen.OnboardingScreen
+import com.programovil.aura.pomodoro.presentation.PomodoroCompletionOverlay
+import com.programovil.aura.pomodoro.presentation.PomodoroViewModel
+import com.programovil.aura.pomodoro.presentation.pomodoroNextSessionLabel
 import com.programovil.aura.shared.FeatureFlag
 import com.programovil.aura.shared.FeatureFlagManager
 import com.programovil.aura.todo.presentation.viewmodel.TodoViewModel
@@ -127,6 +130,8 @@ fun AuthenticatedApp(
 ) {
     val navController = rememberNavController()
     val todoViewModel: TodoViewModel = koinViewModel()
+    val pomodoroViewModel: PomodoroViewModel = koinViewModel()
+    val pomodoroUiState by pomodoroViewModel.uiState.collectAsState()
     val featureFlagManager: FeatureFlagManager = koinInject()
     val featureFlags by featureFlagManager.flags.collectAsState()
     val userPlanManager: UserPlanManager = koinInject()
@@ -150,6 +155,10 @@ fun AuthenticatedApp(
     val showPomodoro by remember(featureFlags) {
         mutableStateOf(featureFlags[FeatureFlag.POMODORO_ENABLED] ?: true)
     }
+    val pomodoroNextSessionLabel = pomodoroNextSessionLabel(
+        mode = pomodoroUiState.mode,
+        sessionsCompleted = pomodoroUiState.sessionsCompleted
+    )
 
     val navItemColors = NavigationBarItemDefaults.colors(
         selectedIconColor = AppTheme.colors.primary,
@@ -262,15 +271,28 @@ fun AuthenticatedApp(
             }
         }
     ) { padding ->
-        Box(Modifier.padding(padding)) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
             AppNavHost(
                 navController = navController,
                 todoViewModel = todoViewModel,
+                pomodoroViewModel = pomodoroViewModel,
                 currentThemeMode = currentThemeMode,
                 onThemeChange = onThemeChange,
                 onSignOut = onSignOut,
                 featureFlags = featureFlags
             )
+
+            if (showPomodoro && pomodoroUiState.showCompletionMessage) {
+                PomodoroCompletionOverlay(
+                    completedMode = pomodoroUiState.completedMode,
+                    nextSessionLabel = pomodoroNextSessionLabel,
+                    onClose = pomodoroViewModel::dismissCompletionMessage
+                )
+            }
         }
     }
 }

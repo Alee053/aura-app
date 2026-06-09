@@ -2,6 +2,7 @@ package com.programovil.aura.pomodoro.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.programovil.aura.notification.domain.NotificationScheduler
 import com.programovil.aura.pomodoro.domain.PomodoroDefaults
 import com.programovil.aura.pomodoro.domain.PomodoroMode
 import com.programovil.aura.pomodoro.domain.PomodoroStateRepository
@@ -32,7 +33,8 @@ data class PomodoroUiState(
 
 class PomodoroViewModel(
     private val repository: PomodoroStateRepository,
-    private val timeProvider: TimeProvider
+    private val timeProvider: TimeProvider,
+    private val notificationScheduler: NotificationScheduler
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(PomodoroUiState())
     val uiState: StateFlow<PomodoroUiState> = _uiState.asStateFlow()
@@ -60,6 +62,7 @@ class PomodoroViewModel(
     }
 
     fun onTimeOptionSelected(minutes: Int) {
+        notificationScheduler.cancelPomodoroCompletion()
         val updatedState = persistedState.copy(
             timeLeftSeconds = minutes * 60,
             initialTimeSeconds = minutes * 60,
@@ -79,6 +82,7 @@ class PomodoroViewModel(
     }
 
     fun resetTimer() {
+        notificationScheduler.cancelPomodoroCompletion()
         saveState(
             persistedState.copy(
                 timeLeftSeconds = persistedState.initialTimeSeconds,
@@ -90,6 +94,7 @@ class PomodoroViewModel(
 
     fun skipSession() {
         viewModelScope.launch {
+            notificationScheduler.cancelPomodoroCompletion()
             advanceToNextSession(persistedState.copy(isRunning = false, endsAtEpochMillis = null))
         }
     }
@@ -105,6 +110,7 @@ class PomodoroViewModel(
 
     private fun startTimer() {
         val remainingSeconds = computeRemainingSeconds(persistedState)
+        notificationScheduler.schedulePomodoroCompletion(remainingSeconds * 1000L)
         val updatedState = persistedState.copy(
             timeLeftSeconds = remainingSeconds,
             isRunning = true,
@@ -115,6 +121,7 @@ class PomodoroViewModel(
 
     private fun pauseTimer() {
         val remainingSeconds = computeRemainingSeconds(persistedState)
+        notificationScheduler.cancelPomodoroCompletion()
         saveState(
             persistedState.copy(
                 timeLeftSeconds = remainingSeconds,
@@ -182,6 +189,7 @@ class PomodoroViewModel(
         }
 
         isAdvancingSession = true
+        notificationScheduler.cancelPomodoroCompletion()
         stopTicker()
         try {
             val completedMode = state.mode

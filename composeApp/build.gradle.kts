@@ -129,3 +129,83 @@ dependencies {
 room {
     schemaDirectory("$projectDir/schemas")
 }
+
+val pullTranslations by tasks.registering {
+    group = "localization"
+    description = "Downloads es/fr translations from Loco and writes them to values-es/ and values-fr/."
+
+    val resourcesDir = layout.projectDirectory.dir("src/commonMain/composeResources")
+
+    val targets = listOf(
+        "es" to "values-es/strings.xml",
+        "fr" to "values-fr/strings.xml"
+    )
+
+    doLast {
+        // Resolution order for LOCO_API_KEY:
+        //   1. Real environment variable (so CI / shell overrides work).
+        //   2. Project root .env file (developer convenience, gitignored).
+        //   3. gradle.properties (escape hatch for systems without .env support).
+        val key = providers.environmentVariable("LOCO_API_KEY").orNull
+            ?: run {
+                val envFile = rootProject.file(".env")
+                if (envFile.exists()) {
+                    envFile.readLines()
+                        .map { it.trim() }
+                        .firstOrNull { it.startsWith("LOCO_API_KEY=") }
+                        ?.substringAfter("=")
+                        ?.trim()
+                        ?.takeIf { it.isNotEmpty() }
+                } else null
+            }
+            ?: providers.gradleProperty("LOCO_API_KEY").orNull
+
+        if (key.isNullOrBlank()) {
+            throw GradleException(
+                "LOCO_API_KEY is not set. Add it to a .env file at the repo root, " +
+                "export it in your shell, or add `LOCO_API_KEY=...` to gradle.properties. " +
+                "Get a key from https://localise.biz (Developer Tools → API Keys)."
+            )
+        }
+
+        for ((locale, relativePath) in targets) {
+            val outFile = resourcesDir.file(relativePath).asFile
+            val tmpFile = File(outFile.parentFile, "${outFile.name}.tmp")
+            val url = "https://localise.biz/api/export/locale/$locale.xml?key=$key"
+
+            println("[pullTranslations] GET $url → ${outFile.relativeTo(rootDir)}")
+            val process = ProcessBuilder(
+                "curl", "--silent", "--show-error", "--fail",
+                "--output", tmpFile.absolutePath,
+                url
+            ).redirectErrorStream(true).start()
+            val output = process.inputStream.bufferedReader().readText()
+            val exit = process.waitFor()
+            if (exit != 0) {
+                if (tmpFile.exists()) tmpFile.delete()
+                throw GradleException(
+                    "[pullTranslations] curl failed for locale '$locale' (exit $exit):\n$output"
+                )
+            }
+
+            if (!tmpFile.exists() || tmpFile.length() == 0L) {
+                throw GradleException(
+                    "[pullTranslations] Loco returned an empty file for locale '$locale'. " +
+                    "Check that the locale exists in your Loco project."
+                )
+            }
+            if (outFile.exists() && outFile.readText() == tmpFile.readText()) {
+                tmpFile.delete()
+                println("[pullTranslations] $locale unchanged.")
+            } else {
+                if (outFile.exists()) outFile.delete()
+                tmpFile.renameTo(outFile)
+                println("[pullTranslations] $locale updated (${outFile.length()} bytes).")
+            }
+        }
+    }
+}
+
+tasks.named("preBuild") {
+    dependsOn(pullTranslations)
+}

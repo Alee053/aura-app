@@ -18,3 +18,6 @@ captures
 **/xcshareddata/WorkspaceSettings.xcsettings
 node_modules/
 .worktrees/
+
+# Local secrets (Loco API key, etc.) — see .env.example
+.env

@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import com.programovil.aura.designsystem.theme.AppTheme
+import com.programovil.aura.experiments.domain.model.Tone
 import com.programovil.aura.home.presentation.composable.DashboardCard
 import com.programovil.aura.home.presentation.viewmodel.HomeViewModel
 import aura_app.composeapp.generated.resources.Res
@@ -30,6 +31,10 @@ import aura_app.composeapp.generated.resources.home_dashboard_todos_title
 import aura_app.composeapp.generated.resources.home_dashboard_habits_title
 import aura_app.composeapp.generated.resources.home_dashboard_todos_subtitle
 import aura_app.composeapp.generated.resources.home_dashboard_habits_subtitle
+import aura_app.composeapp.generated.resources.home_dashboard_motivation_subtitle
+import aura_app.composeapp.generated.resources.home_dashboard_motivation_title
+import aura_app.composeapp.generated.resources.home_dashboard_motivation_value_greeting
+import aura_app.composeapp.generated.resources.home_dashboard_motivation_value_premium
 import aura_app.composeapp.generated.resources.settings_content_description
 import org.jetbrains.compose.resources.stringResource
 
@@ -99,6 +104,21 @@ fun HomeScreen(
                 value = if (uiState.isLoading) "..." else uiState.dashboardData.currentStreak.toString(),
                 subtitle = if (uiState.isLoading) "" else stringResource(Res.string.home_dashboard_habits_subtitle, uiState.dashboardData.completedHabitsToday, uiState.dashboardData.totalHabitsToday),
                 onClick = onHabitClick
+            )
+        }
+
+        if (uiState.homeVariant.showsDailyMotivation) {
+            Spacer(modifier = Modifier.height(16.dp))
+            val motivation = if (uiState.homeVariant.tone == Tone.Direct) {
+                stringResource(Res.string.home_dashboard_motivation_value_premium)
+            } else {
+                stringResource(Res.string.home_dashboard_motivation_value_greeting)
+            }
+            DashboardCard(
+                title = stringResource(Res.string.home_dashboard_motivation_title),
+                value = "✦",
+                subtitle = stringResource(Res.string.home_dashboard_motivation_subtitle, motivation),
+                onClick = {}
             )
         }
     }

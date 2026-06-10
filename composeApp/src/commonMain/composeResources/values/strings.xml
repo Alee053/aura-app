@@ -101,6 +101,9 @@
     <string name="sign_in_title">Aura</string>
     <string name="sign_in_subtitle">Sign in to sync your todos across devices</string>
     <string name="sign_in_button">Sign in with Google</string>
+    <string name="auth_error_no_credential">No Google account available. Please add one and try again.</string>
+    <string name="auth_error_no_token">Could not retrieve sign-in token from Google. Please try again.</string>
+    <string name="auth_error_unknown">Sign-in failed: %1$s</string>
 
     <!-- Home Screen -->
     <string name="home_dashboard_todos_title">TODOS TODAY</string>
@@ -134,4 +137,10 @@
     <string name="journal_new_entry">New Entry</string>
     <string name="journal_edit_entry">Edit Entry</string>
     <string name="journal_add_entry">Add entry</string>
+
+    <!-- Experiments / A/B testing -->
+    <string name="home_dashboard_motivation_title">DAILY MOTIVATION</string>
+    <string name="home_dashboard_motivation_subtitle">%1$s</string>
+    <string name="home_dashboard_motivation_value_greeting">Keep going</string>
+    <string name="home_dashboard_motivation_value_premium">Stay focused</string>
 </resources>

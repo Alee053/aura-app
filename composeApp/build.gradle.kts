@@ -44,6 +44,7 @@ kotlin {
             implementation(libs.firebase.auth.ktx)
             implementation(libs.firebase.firestore.ktx)
             implementation(libs.firebase.messaging.ktx)
+            implementation(libs.firebase.database.ktx)
             
             implementation(libs.credentials)
             implementation(libs.credentials.play.services.auth)

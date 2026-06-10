@@ -4,8 +4,8 @@ import io.mockative.Mockable
 
 @Mockable
 interface RemoteConfigService {
-    suspend fun getBoolean(flag: FeatureFlag): Boolean
-    suspend fun getString(flag: FeatureFlag, default: String): String
+    suspend fun getBoolean(key: String, default: Boolean): Boolean
+    suspend fun getString(key: String, default: String): String
     suspend fun fetchAndActivate(): Result<Unit>
 
     /** Register a callback that is invoked when remote config values change. */

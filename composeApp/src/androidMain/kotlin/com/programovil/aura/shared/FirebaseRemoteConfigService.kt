@@ -23,18 +23,21 @@ class FirebaseRemoteConfigService(context: Context) : RemoteConfigService {
             minimumFetchIntervalInSeconds = 0
         }
         remoteConfig.setConfigSettingsAsync(configSettings)
-        val defaults = FeatureFlag.entries.associate { flag ->
+        val flagDefaults: Map<String, Any> = FeatureFlag.entries.associate { flag ->
             flag.key to flag.defaultValue
         }
-        remoteConfig.setDefaultsAsync(defaults)
+        val userPlanDefaults: Map<String, Any> = UserPlanFlag.entries.associate { flag ->
+            flag.key to flag.defaultValue
+        }
+        remoteConfig.setDefaultsAsync(flagDefaults + userPlanDefaults)
     }
 
-    override suspend fun getBoolean(flag: FeatureFlag): Boolean {
-        return remoteConfig.getBoolean(flag.key)
+    override suspend fun getBoolean(key: String, default: Boolean): Boolean {
+        return remoteConfig.getBoolean(key)
     }
 
-    override suspend fun getString(flag: FeatureFlag, default: String): String {
-        return remoteConfig.getString(flag.key).takeIf { it.isNotEmpty() } ?: default
+    override suspend fun getString(key: String, default: String): String {
+        return remoteConfig.getString(key).takeIf { it.isNotEmpty() } ?: default
     }
 
     override suspend fun fetchAndActivate(): Result<Unit> = runCatching {

@@ -2,6 +2,10 @@ package com.programovil.aura.home.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.programovil.aura.experiments.domain.model.HomeVariant
+import com.programovil.aura.experiments.domain.model.Tone
+import com.programovil.aura.experiments.domain.usecase.GetHomeVariantUseCase
+import com.programovil.aura.experiments.domain.usecase.GetUserPlanUseCase
 import com.programovil.aura.home.domain.model.DashboardData
 import com.programovil.aura.home.domain.usecase.GetDashboardDataUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,11 +16,14 @@ import kotlinx.coroutines.launch
 
 data class HomeUiState(
     val dashboardData: DashboardData = DashboardData(),
-    val isLoading: Boolean = true
+    val isLoading: Boolean = true,
+    val homeVariant: HomeVariant = HomeVariant(showsDailyMotivation = false, tone = Tone.Gentle)
 )
 
 class HomeViewModel(
-    private val getDashboardDataUseCase: GetDashboardDataUseCase
+    private val getDashboardDataUseCase: GetDashboardDataUseCase,
+    private val getHomeVariantUseCase: GetHomeVariantUseCase,
+    private val getUserPlanUseCase: GetUserPlanUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -30,6 +37,12 @@ class HomeViewModel(
                 }.onFailure {
                     _uiState.update { it.copy(isLoading = false) }
                 }
+            }
+        }
+        viewModelScope.launch {
+            getUserPlanUseCase().collect {
+                val variant = getHomeVariantUseCase()
+                _uiState.update { state -> state.copy(homeVariant = variant) }
             }
         }
     }

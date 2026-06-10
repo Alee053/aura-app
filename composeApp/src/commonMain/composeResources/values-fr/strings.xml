@@ -134,4 +134,10 @@
     <string name="onboarding_next">Suivant</string>
     <string name="onboarding_previous">Précédent</string>
     <string name="onboarding_start">Commencer</string>
+
+    <!-- Experiments / A/B testing -->
+    <string name="home_dashboard_motivation_title">MOTIVATION QUOTIDIENNE</string>
+    <string name="home_dashboard_motivation_subtitle">%1$s</string>
+    <string name="home_dashboard_motivation_value_greeting">Continuez</string>
+    <string name="home_dashboard_motivation_value_premium">Restez concentré</string>
 </resources>

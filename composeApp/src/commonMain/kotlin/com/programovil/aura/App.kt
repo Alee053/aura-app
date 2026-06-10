@@ -37,9 +37,12 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.programovil.aura.auth.presentation.AuthViewModel
 import com.programovil.aura.auth.presentation.screen.SignInScreen
+import com.programovil.aura.auth.presentation.screen.authErrorMessage
 import com.programovil.aura.designsystem.theme.AppTheme
 import com.programovil.aura.designsystem.theme.DsTheme
 import com.programovil.aura.designsystem.theme.ThemeMode
+import com.programovil.aura.habit.domain.usecase.GetHabitsAccessibilityUseCase
+import com.programovil.aura.shared.UserPlanManager
 import com.programovil.aura.navigation.AppNavHost
 import com.programovil.aura.navigation.NavRoute
 import com.programovil.aura.onboarding.data.OnboardingPreferences
@@ -90,9 +93,10 @@ fun App(
             }
             authState is AuthViewModel.AuthState.SignedOut ||
                 authState is AuthViewModel.AuthState.Error -> {
+                val errorMessage = (authState as? AuthViewModel.AuthState.Error)
+                    ?.let { authErrorMessage(it.error) }
                 SignInScreen(
-                    errorMessage = if (authState is AuthViewModel.AuthState.Error)
-                        (authState as AuthViewModel.AuthState.Error).message else null,
+                    errorMessage = errorMessage,
                     onSignInClick = onSignInClick
                 )
             }
@@ -123,18 +127,20 @@ fun AuthenticatedApp(
     val todoViewModel: TodoViewModel = koinViewModel()
     val featureFlagManager: FeatureFlagManager = koinInject()
     val featureFlags by featureFlagManager.flags.collectAsState()
+    val userPlanManager: UserPlanManager = koinInject()
+    val getHabitsAccessibilityUseCase: GetHabitsAccessibilityUseCase = koinInject()
+    val showHabitsAccessible: Boolean by getHabitsAccessibilityUseCase()
+        .collectAsState(initial = true)
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
     LaunchedEffect(Unit) {
         featureFlagManager.initialize()
+        userPlanManager.initialize()
     }
 
     val showTodos by remember(featureFlags) {
         mutableStateOf(featureFlags[FeatureFlag.TODOS_ENABLED] ?: true)
-    }
-    val showHabits by remember(featureFlags) {
-        mutableStateOf(featureFlags[FeatureFlag.HABITS_ENABLED] ?: true)
     }
     val showJournals by remember(featureFlags) {
         mutableStateOf(featureFlags[FeatureFlag.JOURNAL_ENABLED] ?: true)
@@ -186,7 +192,7 @@ fun AuthenticatedApp(
                         colors = navItemColors
                     )
                 }
-                if (showHabits) {
+                if (showHabitsAccessible) {
                     NavigationBarItem(
                         icon = { Icon(Icons.Default.DateRange, contentDescription = "Habits") },
                         label = { Text(stringResource(Res.string.nav_habits)) },

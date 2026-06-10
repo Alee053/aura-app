@@ -4,6 +4,7 @@ import com.programovil.aura.habit.domain.repository.HabitRepository
 import com.programovil.aura.habit.domain.repository.createHabitRepository
 import com.programovil.aura.habit.domain.usecase.AddHabitUseCase
 import com.programovil.aura.habit.domain.usecase.DeleteHabitUseCase
+import com.programovil.aura.habit.domain.usecase.GetHabitsAccessibilityUseCase
 import com.programovil.aura.habit.domain.usecase.GetHabitsWithStatusUseCase
 import com.programovil.aura.habit.domain.usecase.ToggleHabitCompletionUseCase
 import com.programovil.aura.habit.domain.usecase.UpdateHabitUseCase
@@ -22,6 +23,7 @@ val habitModule = module {
     factoryOf(::ToggleHabitCompletionUseCase)
     factoryOf(::DeleteHabitUseCase)
     factoryOf(::UpdateHabitUseCase)
+    factoryOf(::GetHabitsAccessibilityUseCase)
 
     // Presentation layer
     viewModelOf(::HabitViewModel)

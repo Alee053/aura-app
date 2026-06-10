@@ -209,3 +209,79 @@ val pullTranslations by tasks.registering {
 tasks.named("preBuild") {
     dependsOn(pullTranslations)
 }
+
+// ---------------------------------------------------------------------------
+// Localization: push source English to Loco
+// ---------------------------------------------------------------------------
+// Usage: ./gradlew :composeApp:pushTranslations
+//
+// Uploads values/strings.xml to Loco as the `en` source. New keys get tagged
+// "new", updated keys get tagged "source-changed" so you can filter the
+// dashboard and re-translate as needed. Existing es/fr translations are
+// NEVER deleted by this task.
+val pushTranslations by tasks.registering {
+    group = "localization"
+    description = "Uploads values/strings.xml to Loco as the en source locale. Manual only."
+
+    val resourcesDir = layout.projectDirectory.dir("src/commonMain/composeResources")
+    val sourceFile = resourcesDir.file("values/strings.xml").asFile
+
+    doLast {
+        if (!sourceFile.exists()) {
+            throw GradleException("[pushTranslations] ${sourceFile.relativeTo(rootDir)} does not exist.")
+        }
+
+        // Same key resolution as pullTranslations.
+        val key = providers.environmentVariable("LOCO_API_KEY").orNull
+            ?: run {
+                val envFile = rootProject.file(".env")
+                if (envFile.exists()) {
+                    envFile.readLines()
+                        .map { it.trim() }
+                        .firstOrNull { it.startsWith("LOCO_API_KEY=") }
+                        ?.substringAfter("=")
+                        ?.trim()
+                        ?.takeIf { it.isNotEmpty() }
+                } else null
+            }
+            ?: providers.gradleProperty("LOCO_API_KEY").orNull
+
+        if (key.isNullOrBlank()) {
+            throw GradleException(
+                "LOCO_API_KEY is not set. Add it to .env, export it, or set it in gradle.properties."
+            )
+        }
+
+        // Loco's import endpoint. We:
+        //   - index by id (so the <string name="..."> attr is the asset id)
+        //   - target the en locale (this is the source)
+        //   - NOT delete-absent: keys removed locally stay in Loco (safer)
+        //   - tag new keys as "new" so they're easy to find
+        //   - tag updated keys as "source-changed" so you know to re-check translations
+        //   - ignore-blank: don't import empty <string> entries
+        val url = "https://localise.biz/api/import/xml" +
+            "?index=id" +
+            "&locale=en" +
+            "&ignore-blank=true" +
+            "&tag-new=new" +
+            "&tag-updated=source-changed"
+
+        println("[pushTranslations] POST $url  ←  ${sourceFile.relativeTo(rootDir)}")
+
+        val process = ProcessBuilder(
+            "curl", "--silent", "--show-error", "--fail",
+            "--header", "Content-Type: application/xml",
+            "--data-binary", "@${sourceFile.absolutePath}",
+            url + "&key=$key"
+        ).redirectErrorStream(true).start()
+        val output = process.inputStream.bufferedReader().readText()
+        val exit = process.waitFor()
+        if (exit != 0) {
+            throw GradleException(
+                "[pushTranslations] curl failed (exit $exit):\n$output"
+            )
+        }
+        println("[pushTranslations] OK")
+        println(output)
+    }
+}

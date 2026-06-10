@@ -73,3 +73,41 @@ cd functions && npm run build && firebase deploy --only functions
 - Strictly use `kotlinx-datetime` for all date operations.
 - Platform-specific builders for Room, DataStore, and Firebase via `expect`/`actual`.
 - All UI consumes `AppTheme.colors` and `AppTheme.typography` tokens — no hardcoded colors or font sizes.
+
+### Localization (Loco)
+
+Translations are managed in [Loco](https://localise.biz) and synced to the repo via two Gradle tasks. The project has three locales: **`en`** (source, in git), **`es`**, and **`fr`**.
+
+#### API key
+
+Set `LOCO_API_KEY` once, picked up in this order:
+1. Shell environment variable
+2. `.env` file at the repo root (gitignored — copy `.env.example` to get started)
+3. `gradle.properties`
+
+A read-only **Export** key is sufficient for pulls; pushes need a **Full Access** key. Get one under [Developer Tools → API Keys](https://localise.biz).
+
+#### Tasks
+
+| Task | What it does | When to run |
+|---|---|---|
+| `:composeApp:pullTranslations` | Downloads `es` and `fr` from Loco into `values-es/strings.xml` and `values-fr/strings.xml`. Runs automatically on every `preBuild` (i.e. every `./gradlew assemble*`, test, IDE sync). | Automatic. |
+| `:composeApp:pushTranslations` | Uploads `values/strings.xml` to Loco as the `en` source. New keys get tagged `new`; updated keys get tagged `source-changed` so you can spot drift in the Loco dashboard. Existing `es`/`fr` translations are never deleted. | Run manually after editing English. |
+
+```shell
+./gradlew :composeApp:pushTranslations   # upload English to Loco
+./gradlew assembleDebug                  # pulls es/fr automatically, then builds
+```
+
+#### Workflow for adding or changing a string
+
+1. Edit the English text in `composeApp/src/commonMain/composeResources/values/strings.xml`.
+2. Run `./gradlew :composeApp:pushTranslations` to upload it to Loco.
+3. In the Loco dashboard, either translate manually or trigger auto-translation. New and changed keys are pre-tagged for easy filtering.
+4. Run `./gradlew assembleDebug` (or any other build) to pull the latest `es`/`fr` translations back into the repo.
+
+#### Important constraints
+
+- **Android printf placeholders** (`%1$s`, `%1$d`, `%2$s`, etc.) must survive every round trip. If you use Loco's machine translation, configure the Gemini system prompt to never alter or reorder these tokens.
+- The **English source is the source of truth** in git. `es` and `fr` files in git are overwritten on every build, so any hand-edits to those files will be lost.
+- Missing English keys in the source file are **not** deleted from Loco by `pushTranslations` — it only adds and updates. This protects your hand-tuned `es`/`fr` translations from accidental wipes.

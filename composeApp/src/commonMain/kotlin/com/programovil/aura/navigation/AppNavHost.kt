@@ -31,7 +31,8 @@ fun AppNavHost(
     currentThemeMode: ThemeMode,
     onThemeChange: (ThemeMode) -> Unit,
     onSignOut: () -> Unit,
-    featureFlags: Map<FeatureFlag, Boolean>
+    featureFlags: Map<FeatureFlag, Boolean>,
+    showHabitsAccessible: Boolean = true
 ) {
     NavHost(navController = navController, startDestination = NavRoute.Home) {
         composable<NavRoute.Home> {
@@ -39,14 +40,14 @@ fun AppNavHost(
             HomeScreen(
                 viewModel = homeViewModel,
                 showTodos = featureFlags[FeatureFlag.TODOS_ENABLED] != false,
-                showHabits = featureFlags[FeatureFlag.HABITS_ENABLED] != false,
+                showHabits = showHabitsAccessible,
                 onTodoClick = {
                     if (featureFlags[FeatureFlag.TODOS_ENABLED] != false) {
                         navController.navigate(NavRoute.Todo)
                     }
                 },
                 onHabitClick = {
-                    if (featureFlags[FeatureFlag.HABITS_ENABLED] != false) {
+                    if (showHabitsAccessible) {
                         navController.navigate(NavRoute.Habit)
                     }
                 },
@@ -66,7 +67,7 @@ fun AppNavHost(
             }
         }
 
-        if (featureFlags[FeatureFlag.HABITS_ENABLED] != false) {
+        if (showHabitsAccessible) {
             composable<NavRoute.Habit> {
                 HabitScreen(
                     featureFlags = featureFlags,

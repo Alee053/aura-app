@@ -299,7 +299,8 @@ fun AuthenticatedApp(
                 currentThemeMode = currentThemeMode,
                 onThemeChange = onThemeChange,
                 onSignOut = onSignOut,
-                featureFlags = featureFlags
+                featureFlags = featureFlags,
+                showHabitsAccessible = showHabitsAccessible
             )
 
             if (showPomodoro && pomodoroUiState.showCompletionMessage) {

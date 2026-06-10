@@ -25,6 +25,7 @@ import com.programovil.aura.designsystem.components.button.PrimaryButton
 import com.programovil.aura.habit.domain.model.Habit
 import com.programovil.aura.habit.presentation.viewmodel.HabitEvent
 import com.programovil.aura.habit.presentation.viewmodel.HabitViewModel
+import com.programovil.aura.habit.domain.usecase.GetHabitsAccessibilityUseCase
 import com.programovil.aura.shared.FeatureFlag
 import kotlinx.datetime.*
 import aura_app.composeapp.generated.resources.Res
@@ -40,9 +41,12 @@ import org.koin.compose.koinInject
 fun HabitScreen(
     featureFlags: Map<FeatureFlag, Boolean> = emptyMap(),
     onFeatureDisabled: () -> Unit = {},
-    viewModel: HabitViewModel = koinInject()
+    viewModel: HabitViewModel = koinInject(),
+    getHabitsAccessibilityUseCase: GetHabitsAccessibilityUseCase = koinInject()
 ) {
-    LaunchedEffect(featureFlags) { if (featureFlags[FeatureFlag.HABITS_ENABLED] == false) { onFeatureDisabled() } }
+    val showHabitsAccessible by getHabitsAccessibilityUseCase()
+        .collectAsState(initial = true)
+    LaunchedEffect(showHabitsAccessible) { if (!showHabitsAccessible) { onFeatureDisabled() } }
 
     val uiState by viewModel.uiState.collectAsState()
     var editingHabit by remember { mutableStateOf<Habit?>(null) }

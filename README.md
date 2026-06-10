@@ -1,113 +1,197 @@
 # Aura
 
-Productivity app (Todo + Habits + Dashboard + Settings) built with Kotlin Multiplatform targeting Android and iOS.
+Aplicación de productividad (Todo + Hábitos + Dashboard + Ajustes) construida con **Kotlin Multiplatform**, con soporte para Android e iOS.
 
-## Features & Modules
+> Documentación adicional: [`AGENTS.md`](AGENTS.md) (especificación de arquitectura para agentes de IA) y la carpeta [`docs/`](docs/) (guías técnicas detalladas).
 
-### Implemented
+## Características y módulos
 
-- **Auth** — Google Sign-In with persistent session. Abstracted for platform-native SDKs (Android/iOS).
-- **Home/Dashboard** — Overview screen with KPI cards and quick access to all features.
-- **Todo** — Full CRUD with due-date support. Backed by **Cloud Firestore** for cross-device sync.
-- **Habits** — Strict habit tracking with streaks (Today, Tomorrow, This Week). Backed by **Room KMP (SQLite)**.
-- **Settings** — Theme switcher with 5 palettes (Purple, Green, Red, Dark, High Contrast) persisted via DataStore KMP.
-- **Notifications** — Local notification scheduling for daily summaries and due-date reminders. Abstracted for multi-platform.
-- **Feature Flags** — Firebase Remote Config toggles for conditional feature visibility (Todos, Habits, Notifications).
-- **Navigation** — Type-safe Bottom Navigation (Home, Todo, Habit, Settings) with `kotlinx-serialization`.
-- **Design System** — Custom `designsystem` module with theme tokens (`AppTheme.colors`, `AppTheme.typography`), reusable components (PrimaryButton, BasicInput, AuraHorizontalDivider), and 5 color palettes.
+### Implementadas
 
-### Planned
+- **Autenticación** — Inicio de sesión con Google y sesión persistente. Abstraído para SDKs nativos de cada plataforma (Android/iOS).
+- **Home / Dashboard** — Pantalla de inicio con tarjetas KPI y acceso rápido a todas las funciones.
+- **Todo** — CRUD completo con soporte de fecha de vencimiento. Respaldado por **Cloud Firestore** para sincronización entre dispositivos.
+- **Hábitos** — Seguimiento estricto de hábitos con rachas (Hoy, Mañana, Esta semana). Respaldado por **Room KMP (SQLite)**.
+- **Ajustes** — Selector de tema con 5 paletas (Morado, Verde, Rojo, Oscuro, Alto contraste) persistido con DataStore KMP.
+- **Notificaciones** — Programación de notificaciones locales para resúmenes diarios y recordatorios de fecha de vencimiento. Abstraído para multiplataforma.
+- **Feature Flags** — Toggles mediante Firebase Remote Config para visibilidad condicional de funciones (Todos, Hábitos, Notificaciones, Journal, Pomodoro, Premium).
+- **Navegación** — Bottom Navigation con tipos seguros (Home, Todo, Hábitos, Ajustes, Journal, Pomodoro) usando `kotlinx-serialization`.
+- **Sistema de diseño** — Módulo propio `designsystem` con tokens de tema (`AppTheme.colors`, `AppTheme.typography`), componentes reutilizables (`PrimaryButton`, `BasicInput`, `AuraHorizontalDivider`) y 5 paletas de color.
+- **Onboarding** — Flujo inicial basado en JSON por idioma, localizado dinámicamente.
+- **Journal** — Entradas de diario con sincronización en Firestore.
+- **Pomodoro** — Temporizador de enfoque con tres modos (Pomodoro / Pausa corta / Pausa larga) y persistencia del estado.
+- **Experimentos A/B** — Infraestructura de experimentación (`Free` vs `Premium`), variantes de Home, variantes de notificaciones y frases de motivación.
 
-- **Pomodoro** — Focus timer
-- **Agenda** — Calendar overview combining Todos and Habits
+### Planificadas
 
-## Tech Stack
+- **Agenda** — Vista de calendario combinando Todos y Hábitos.
 
-| Layer | Technology |
+## Stack tecnológico
+
+| Capa | Tecnología |
 |---|---|
 | **Framework** | Kotlin Multiplatform (Android + iOS) |
 | **UI** | Compose Multiplatform |
-| **Architecture** | Clean Architecture + MVVM |
-| **DI** | Koin (per-feature modules) |
-| **Local DB** | Room KMP (SQLite) |
-| **Remote DB** | Cloud Firestore |
-| **Auth** | Firebase Auth (Google Sign-In) |
-| **Navigation** | Navigation Compose + kotlinx-serialization |
-| **Date/Time** | kotlinx-datetime |
-| **Preferences** | DataStore KMP |
+| **Arquitectura** | Clean Architecture + MVVM/MVI |
+| **DI** | Koin 4.1.1 (módulos por feature) |
+| **Base de datos local** | Room KMP (SQLite) |
+| **Base de datos remota** | Cloud Firestore + Firebase Realtime Database |
+| **Autenticación** | Firebase Auth (Google Sign-In) |
+| **Navegación** | Navigation Compose + kotlinx-serialization |
+| **Fecha / hora** | kotlinx-datetime |
+| **Preferencias** | DataStore KMP |
 | **Feature Flags** | Firebase Remote Config |
-| **Push Notifications** | Firebase Cloud Messaging + WorkManager |
-| **Error Tracking** | Sentry |
+| **Notificaciones push** | Firebase Cloud Messaging + WorkManager |
+| **Internacionalización** | Compose `composeResources` + [Loco](https://localise.biz) |
+| **Tareas en segundo plano** | WorkManager (Android) / `UNUserNotificationCenter` (iOS) |
+| **Tracking de errores** | Sentry |
 | **Testing** | kotlin-test + Turbine + Mockative |
 
-## Architecture
+## Estructura del proyecto
 
-The project follows **Clean Architecture** with per-feature modularity. Each feature contains its own Domain, Data, and Presentation layers. Shared logic lives in `commonMain`, with platform-specific code limited to `expect`/`actual` declarations.
-
-See [`AGENTS.md`](AGENTS.md) for the full architecture specification and [`docs/`](docs/) for detailed guides:
-- [`docs/KMP_ARCHITECTURE.md`](docs/KMP_ARCHITECTURE.md) — KMP compilation model, source sets, `expect`/`actual`
-- [`docs/guides/KOIN_IN_KMP.md`](docs/guides/KOIN_IN_KMP.md) — Dependency injection
-- [`docs/guides/NAVIGATION_IN_KMP.md`](docs/guides/NAVIGATION_IN_KMP.md) — Type-safe routing
-- [`docs/guides/FIREBASE_IN_KMP.md`](docs/guides/FIREBASE_IN_KMP.md) — Firebase services
-- [`docs/guides/WORKMANAGER_IN_KMP.md`](docs/guides/WORKMANAGER_IN_KMP.md) — Background tasks
-
-## Development
-
-### Android
-```shell
-./gradlew :composeApp:assembleDebug           # Build
-./gradlew :composeApp:testDebugUnitTest       # Unit tests
-./gradlew :composeApp:connectedAndroidTest    # Instrumented tests
+```
+aura-app/
+├── composeApp/           # Módulo KMP: código compartido y específico por plataforma
+│   ├── src/
+│   │   ├── commonMain/   # Kotlin neutro de plataforma
+│   │   ├── commonTest/   # Tests unitarios
+│   │   ├── androidMain/  # Implementaciones Android
+│   │   └── iosMain/      # Implementaciones iOS
+│   └── build.gradle.kts
+├── designsystem/         # Módulo de sistema de diseño (colores, tipografía, componentes)
+├── iosApp/               # Host nativo iOS (Swift / Xcode)
+├── functions/            # Firebase Cloud Functions (TypeScript)
+├── docs/                 # Guías y especificaciones técnicas
+├── gradle/               # Catálogo de versiones
+└── README.md
 ```
 
-### iOS
-Open `iosApp/iosApp.xcworkspace` in Xcode.
+### Features dentro de `composeApp/src/commonMain/`
 
-### Firebase Functions
+Cada feature sigue Clean Architecture con sus capas `domain/`, `data/`, `presentation/` y `di/`:
+
+| Feature | Responsabilidad |
+|---|---|
+| `auth/` | Inicio de sesión con Google y sesión persistente |
+| `home/` | Dashboard con KPIs y motivación diaria |
+| `todo/` | Lista de tareas con CRUD y fecha de vencimiento |
+| `habit/` | Seguimiento de hábitos con rachas y grilla de 7 días |
+| `settings/` | Tema, preferencias de notificación y logout |
+| `notification/` | Programación de notificaciones locales |
+| `onboarding/` | Flujo inicial localizado por idioma |
+| `journal/` | Entradas de diario con sincronización en Firestore |
+| `pomodoro/` | Temporizador de enfoque con tres modos |
+| `experiments/` | A/B testing y plan de usuario (Free / Premium) |
+| `shared/` | Infraestructura transversal: feature flags, remote config, DataStore, utilidades de color |
+
+## Arquitectura
+
+El proyecto sigue **Clean Architecture** con modularidad por feature. Cada feature contiene sus propias capas `Domain`, `Data` y `Presentation`. La lógica compartida vive en `commonMain`, con código específico de plataforma limitado a declaraciones `expect`/`actual`.
+
+Reglas clave:
+- **Sin imports de `java.*` en `commonMain`**.
+- **Fechas exclusivamente con `kotlinx-datetime`**.
+- Constructores específicos de plataforma (Room, DataStore, Firebase) mediante `expect`/`actual`.
+- **Toda la UI consume `AppTheme.colors` y `AppTheme.typography`** — sin colores ni tamaños de fuente hardcodeados.
+- **Sin strings hardcodeados** — todo texto visible al usuario se resuelve desde `strings.xml`.
+
+Para la especificación completa de arquitectura, consultá [`AGENTS.md`](AGENTS.md). Para guías detalladas:
+
+- [`docs/KMP_ARCHITECTURE.md`](docs/KMP_ARCHITECTURE.md) — modelo de compilación KMP, source sets, `expect`/`actual`
+- [`docs/TECH-STACK.md`](docs/TECH-STACK.md) — stack tecnológico completo
+- [`docs/guides/KOIN_IN_KMP.md`](docs/guides/KOIN_IN_KMP.md) — Inyección de dependencias
+- [`docs/guides/NAVIGATION_IN_KMP.md`](docs/guides/NAVIGATION_IN_KMP.md) — Routing con tipos seguros
+- [`docs/guides/FIREBASE_IN_KMP.md`](docs/guides/FIREBASE_IN_KMP.md) — Servicios de Firebase
+- [`docs/guides/WORKMANAGER_IN_KMP.md`](docs/guides/WORKMANAGER_IN_KMP.md) — Tareas en segundo plano
+- [`docs/IOS_DEFERRED.md`](docs/IOS_DEFERRED.md) — Estado de los stubs de iOS
+
+## Desarrollo
+
+### Requisitos
+
+- **JDK 11** o superior
+- **Android SDK** con `compileSdk = 36`, `minSdk = 24`
+- **Xcode** (sólo para iOS)
+- **Node 20** (para Firebase Cloud Functions)
+- **`curl`** disponible en el PATH (lo usan los scripts de Loco)
+
+### Comandos de build y test
+
+#### Android
+
+```shell
+./gradlew :composeApp:assembleDebug           # Build debug
+./gradlew :composeApp:testDebugUnitTest       # Tests unitarios
+./gradlew :composeApp:connectedAndroidTest    # Tests instrumentados
+```
+
+#### iOS
+
+Abrí `iosApp/iosApp.xcworkspace` en Xcode y compilá desde ahí. La mayoría de las features en iOS son **stubs** (devuelven valores vacíos o por defecto) — ver [`docs/IOS_DEFERRED.md`](docs/IOS_DEFERRED.md).
+
+#### Firebase Cloud Functions
+
 ```shell
 cd functions && npm run build && firebase deploy --only functions
 ```
 
-### Multiplatform Compliance
-- No `java.*` imports in `commonMain`.
-- Strictly use `kotlinx-datetime` for all date operations.
-- Platform-specific builders for Room, DataStore, and Firebase via `expect`/`actual`.
-- All UI consumes `AppTheme.colors` and `AppTheme.typography` tokens — no hardcoded colors or font sizes.
-
-### Localization (Loco)
-
-Translations are managed in [Loco](https://localise.biz) and synced to the repo via two Gradle tasks. The project has three locales: **`en`** (source, in git), **`es`**, and **`fr`**.
-
-#### API key
-
-Set `LOCO_API_KEY` once, picked up in this order:
-1. Shell environment variable
-2. `.env` file at the repo root (gitignored — copy `.env.example` to get started)
-3. `gradle.properties`
-
-A read-only **Export** key is sufficient for pulls; pushes need a **Full Access** key. Get one under [Developer Tools → API Keys](https://localise.biz).
-
-#### Tasks
-
-| Task | What it does | When to run |
-|---|---|---|
-| `:composeApp:pullTranslations` | Downloads `es` and `fr` from Loco into `values-es/strings.xml` and `values-fr/strings.xml`. Runs automatically on every `preBuild` (i.e. every `./gradlew assemble*`, test, IDE sync). | Automatic. |
-| `:composeApp:pushTranslations` | Uploads `values/strings.xml` to Loco as the `en` source. New keys get tagged `new`; updated keys get tagged `source-changed` so you can spot drift in the Loco dashboard. Existing `es`/`fr` translations are never deleted. | Run manually after editing English. |
+#### Limpieza
 
 ```shell
-./gradlew :composeApp:pushTranslations   # upload English to Loco
-./gradlew assembleDebug                  # pulls es/fr automatically, then builds
+./gradlew clean
 ```
 
-#### Workflow for adding or changing a string
+## Localización (Loco)
 
-1. Edit the English text in `composeApp/src/commonMain/composeResources/values/strings.xml`.
-2. Run `./gradlew :composeApp:pushTranslations` to upload it to Loco.
-3. In the Loco dashboard, either translate manually or trigger auto-translation. New and changed keys are pre-tagged for easy filtering.
-4. Run `./gradlew assembleDebug` (or any other build) to pull the latest `es`/`fr` translations back into the repo.
+Las traducciones se gestionan en [Loco](https://localise.biz) y se sincronizan con el repositorio mediante dos tareas de Gradle. El proyecto tiene tres idiomas: **`en`** (fuente, commiteado en git), **`es`** y **`fr`**.
 
-#### Important constraints
+Los archivos viven en `composeApp/src/commonMain/composeResources/`:
 
-- **Android printf placeholders** (`%1$s`, `%1$d`, `%2$s`, etc.) must survive every round trip. If you use Loco's machine translation, configure the Gemini system prompt to never alter or reorder these tokens.
-- The **English source is the source of truth** in git. `es` and `fr` files in git are overwritten on every build, so any hand-edits to those files will be lost.
-- Missing English keys in the source file are **not** deleted from Loco by `pushTranslations` — it only adds and updates. This protects your hand-tuned `es`/`fr` translations from accidental wipes.
+- `values/strings.xml` — fuente en inglés
+- `values-es/strings.xml` — español (generado)
+- `values-fr/strings.xml` — francés (generado)
+
+### API key
+
+La variable `LOCO_API_KEY` se resuelve en este orden:
+
+1. Variable de entorno del shell
+2. Archivo `.env` en la raíz del repo (gitignoreado — copiá `.env.example` para empezar)
+3. `gradle.properties`
+
+Una clave de **Export** de sólo lectura alcanza para los `pull`; los `push` requieren una clave de **Full Access**. Conseguila en [Developer Tools → API Keys](https://localise.biz).
+
+### Tareas de Gradle
+
+Ambas viven bajo el grupo `localization` (visible con `./gradlew tasks --group localization`).
+
+| Tarea | Qué hace | Cuándo se ejecuta |
+|---|---|---|
+| `:composeApp:pullTranslations` | Descarga `es` y `fr` desde Loco y los escribe en `values-es/strings.xml` y `values-fr/strings.xml`. Usa `curl` con un archivo `.tmp` y sólo renombra si el contenido cambió. | **Automática**, está enganchada a `preBuild`, así que corre en cada `./gradlew assemble*`, test o sync del IDE. |
+| `:composeApp:pushTranslations` | Sube `values/strings.xml` a Loco como fuente `en`. Las claves nuevas se taggean con `new`; las actualizadas con `source-changed` para detectar drift en el dashboard. Las traducciones existentes de `es`/`fr` **nunca** se eliminan. | Manual, después de editar inglés. |
+
+```shell
+./gradlew :composeApp:pushTranslations   # subir inglés a Loco
+./gradlew assembleDebug                  # pull automático de es/fr y luego build
+```
+
+### Flujo de trabajo para agregar o cambiar un string
+
+1. Editá el texto en inglés en `composeApp/src/commonMain/composeResources/values/strings.xml`.
+2. Ejecutá `./gradlew :composeApp:pushTranslations` para subirlo a Loco.
+3. En el dashboard de Loco, traducí manualmente o activá la auto-traducción. Las claves nuevas y modificadas ya están pre-tageadas para filtrarlas fácilmente.
+4. Ejecutá `./gradlew assembleDebug` (o cualquier otro build) para bajar las últimas traducciones de `es`/`fr` al repo.
+
+### Restricciones importantes
+
+- **Los placeholders printf de Android** (`%1$s`, `%1$d`, `%2$s`, etc.) deben sobrevivir todas las idas y vueltas. Si usás la auto-traducción de Loco, configurá el system prompt de Gemini para que nunca altere ni reordene esos tokens.
+- **La fuente en inglés es la fuente de verdad en git**. Los archivos `es` y `fr` commiteados se sobrescriben en cada build, así que cualquier edición manual de esos archivos se perderá.
+- Las **claves en inglés faltantes** en el archivo fuente **no se eliminan** de Loco por `pushTranslations` — sólo agrega y actualiza. Esto protege las traducciones a mano de `es`/`fr` contra borrados accidentales.
+
+## Recursos adicionales
+
+- `docs/MAIN_RUBRIC.md` — Checklist de cumplimiento del proyecto
+- `docs/GRADING_RUBRIC.md` — Rúbrica completa con el estado de cada criterio
+- `docs/superpowers/specs/` — Documentos de diseño de cada feature
+- `docs/superpowers/plans/` — Planes de implementación
+- `docs/superpowers/firestore.rules` — Reglas de seguridad de Firestore

@@ -44,6 +44,7 @@ import com.programovil.aura.designsystem.theme.AppTheme
 import com.programovil.aura.habit.domain.model.Habit
 import com.programovil.aura.habit.domain.model.RecurrenceType
 import com.programovil.aura.shared.parseHexColor
+import kotlin.time.Clock
 import aura_app.composeapp.generated.resources.Res
 import aura_app.composeapp.generated.resources.cancel
 import aura_app.composeapp.generated.resources.color_label
@@ -292,7 +293,7 @@ fun HabitDialog(
                                     recurrenceType = recurrenceType,
                                     targetCount = if (recurrenceType == RecurrenceType.DAILY) 1 else targetCount,
                                     color = selectedColor,
-                                    createdAt = habit?.createdAt ?: System.currentTimeMillis()
+                                    createdAt = habit?.createdAt ?: Clock.System.now().toEpochMilliseconds()
                                 )
                                 onSave(habitToSave)
                                 onDismiss()

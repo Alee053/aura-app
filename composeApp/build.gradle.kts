@@ -78,6 +78,7 @@ kotlin {
             implementation(libs.mockative)
             implementation(libs.androidx.room.runtime)
             implementation(libs.androidx.sqlite.bundled)
+            implementation(libs.datastore.preferences.core)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)

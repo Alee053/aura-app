@@ -11,7 +11,6 @@ import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -192,20 +191,6 @@ fun AuthenticatedApp(
                 containerColor = AppTheme.colors.surface,
                 contentColor = AppTheme.colors.primary
             ) {
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
-                    label = { Text(stringResource(Res.string.nav_home)) },
-                    selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Home>() } == true,
-                    onClick = {
-                        navController.navigate(NavRoute.Home) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                inclusive = false
-                            }
-                            launchSingleTop = true
-                        }
-                    },
-                    colors = navItemColors
-                )
                 if (showTodos) {
                     NavigationBarItem(
                         icon = { Icon(Icons.Default.Checklist, contentDescription = "Todos") },
@@ -238,6 +223,20 @@ fun AuthenticatedApp(
                         colors = navItemColors
                     )
                 }
+                NavigationBarItem(
+                    icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+                    label = { Text(stringResource(Res.string.nav_home)) },
+                    selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Home>() } == true,
+                    onClick = {
+                        navController.navigate(NavRoute.Home) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                inclusive = false
+                            }
+                            launchSingleTop = true
+                        }
+                    },
+                    colors = navItemColors
+                )
                 if (showPomodoro) {
                     NavigationBarItem(
                         icon = { Icon(Icons.Default.Timer, contentDescription = stringResource(Res.string.pomodoro_title)) },
@@ -270,20 +269,6 @@ fun AuthenticatedApp(
                         colors = navItemColors
                     )
                 }
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Settings, contentDescription = "Settings") },
-                    label = { Text(stringResource(Res.string.nav_settings)) },
-                    selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Settings>() } == true,
-                    onClick = {
-                        navController.navigate(NavRoute.Settings) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                inclusive = false
-                            }
-                            launchSingleTop = true
-                        }
-                    },
-                    colors = navItemColors
-                )
             }
         }
     ) { padding ->

@@ -62,9 +62,6 @@ import aura_app.composeapp.generated.resources.red_theme
 import aura_app.composeapp.generated.resources.dark_theme
 import aura_app.composeapp.generated.resources.high_contrast_theme
 import aura_app.composeapp.generated.resources.reminder_time_label
-import aura_app.composeapp.generated.resources.app_name_label
-import aura_app.composeapp.generated.resources.version
-import aura_app.composeapp.generated.resources.made_with_love
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -111,7 +108,7 @@ fun SettingsScreen(
         },
         containerColor = AppTheme.colors.background
     ) { padding ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
@@ -123,14 +120,10 @@ fun SettingsScreen(
                         )
                     )
                 )
+                .padding(horizontal = 24.dp)
+                .verticalScroll(rememberScrollState())
         ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 24.dp)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             Text(
                 text = stringResource(Res.string.themes_section),
@@ -285,34 +278,6 @@ fun SettingsScreen(
                     )
                 }
             }
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 32.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    stringResource(Res.string.app_name_label),
-                    style = AppTheme.typography.labelSmall,
-                    color = AppTheme.colors.textSecondary.copy(alpha = 0.7f),
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    stringResource(Res.string.version),
-                    style = AppTheme.typography.labelSmall,
-                    color = AppTheme.colors.textSecondary.copy(alpha = 0.5f)
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    stringResource(Res.string.made_with_love),
-                    style = AppTheme.typography.labelSmall,
-                    color = AppTheme.colors.textSecondary.copy(alpha = 0.3f)
-                )
-            }
-        }
     }
     }
 }

@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
  */
 @Mockable
 class FeatureFlagManager(
-    remoteConfigService: RemoteConfigService
+    private val remoteConfigService: RemoteConfigService
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     private val managers: Map<FeatureFlag, RemoteConfigValueManager<Boolean>> =
@@ -37,10 +37,18 @@ class FeatureFlagManager(
     val flags: StateFlow<Map<FeatureFlag, Boolean>> = _flags.asStateFlow()
 
     suspend fun initialize() {
-        managers.values.forEach { it.initialize() }
+        managers.values.forEach { it.refresh() }
+        remoteConfigService.registerOnConfigUpdateListener {
+            scope.launch {
+                println("[FeatureFlagManager] Config update received, refreshing all flags...")
+                managers.values.forEach { it.refresh() }
+                println("[FeatureFlagManager] All flags refreshed")
+            }
+        }
         managers.forEach { (flag, mgr) ->
             scope.launch {
                 mgr.value.collect { newValue ->
+                    println("[FeatureFlagManager] Flag ${flag.key} updated to $newValue")
                     _flags.update { it + (flag to newValue) }
                 }
             }

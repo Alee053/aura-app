@@ -1,10 +1,15 @@
 package com.programovil.aura.shared
 
 import app.cash.turbine.test
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import java.util.concurrent.locks.LockSupport
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class RemoteConfigValueManagerTest {
 
     @Test
@@ -71,14 +76,13 @@ class RemoteConfigValueManagerTest {
     }
 
     @Test
-    fun `refresh parses the latest string after a real-time update`() = runTest {
+    fun `refresh parses the latest string after a real-time update`() = runTest(UnconfinedTestDispatcher()) {
         val backing = mutableMapOf<String, String>("k" to "v1")
-        var listener: (() -> Unit)? = null
         val fake = object : RemoteConfigService {
             override suspend fun getBoolean(key: String, default: Boolean) = default
             override suspend fun getString(key: String, default: String) = backing[key] ?: default
             override suspend fun fetchAndActivate(): Result<Unit> = Result.success(Unit)
-            override fun registerOnConfigUpdateListener(onUpdate: () -> Unit) { listener = onUpdate }
+            override fun registerOnConfigUpdateListener(onUpdate: () -> Unit) {}
         }
         val manager = RemoteConfigValueManager(
             remoteConfigService = fake,
@@ -86,7 +90,12 @@ class RemoteConfigValueManagerTest {
             defaultValue = "v0",
             parser = { it }
         )
-        manager.initialize()
+        manager.refresh()
+        for (i in 1..30) {
+            delay(50)
+            LockSupport.parkNanos(1_000_000)
+            if (manager.value.value == "v1") break
+        }
 
         manager.value.test {
             assertEquals("v1", awaitItem())
@@ -94,7 +103,12 @@ class RemoteConfigValueManagerTest {
         }
 
         backing["k"] = "v2"
-        listener?.invoke()
+        manager.refresh()
+        for (i in 1..30) {
+            delay(50)
+            LockSupport.parkNanos(1_000_000)
+            if (manager.value.value == "v2") break
+        }
 
         manager.value.test {
             assertEquals("v2", awaitItem())

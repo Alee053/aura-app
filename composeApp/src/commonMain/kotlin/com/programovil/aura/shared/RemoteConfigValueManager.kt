@@ -49,7 +49,9 @@ class RemoteConfigValueManager<T>(
         scope.launch {
             remoteConfigService.fetchAndActivate()
             val raw = remoteConfigService.getString(key, defaultValue.toString())
-            _value.value = parser(raw)
+            val parsed = parser(raw)
+            println("[RemoteConfigValueManager] Refreshing key=$key, raw=$raw, parsed=$parsed, current=${_value.value}")
+            _value.value = parsed
         }
     }
 

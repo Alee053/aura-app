@@ -99,10 +99,10 @@ Para la especificación completa de arquitectura, consultá [`AGENTS.md`](AGENTS
 
 - [`docs/KMP_ARCHITECTURE.md`](docs/KMP_ARCHITECTURE.md) — modelo de compilación KMP, source sets, `expect`/`actual`
 - [`docs/TECH-STACK.md`](docs/TECH-STACK.md) — stack tecnológico completo
-- [`docs/guides/KOIN_IN_KMP.md`](docs/guides/KOIN_IN_KMP.md) — Inyección de dependencias
-- [`docs/guides/NAVIGATION_IN_KMP.md`](docs/guides/NAVIGATION_IN_KMP.md) — Routing con tipos seguros
-- [`docs/guides/FIREBASE_IN_KMP.md`](docs/guides/FIREBASE_IN_KMP.md) — Servicios de Firebase
-- [`docs/guides/WORKMANAGER_IN_KMP.md`](docs/guides/WORKMANAGER_IN_KMP.md) — Tareas en segundo plano
+- [`docs/guides/KOIN_IN_KMP.md`](docs/KOIN_IN_KMP.md) — Inyección de dependencias
+- [`docs/guides/NAVIGATION_IN_KMP.md`](docs/NAVIGATION_IN_KMP.md) — Routing con tipos seguros
+- [`docs/guides/FIREBASE_IN_KMP.md`](docs/FIREBASE_IN_KMP.md) — Servicios de Firebase
+- [`docs/guides/WORKMANAGER_IN_KMP.md`](docs/WORKMANAGER_IN_KMP.md) — Tareas en segundo plano
 - [`docs/IOS_DEFERRED.md`](docs/IOS_DEFERRED.md) — Estado de los stubs de iOS
 
 ## Desarrollo

@@ -11,7 +11,7 @@ Aplicación de productividad (Todo + Hábitos + Dashboard + Pomodoro + Ajustes) 
 - **Autenticación** — Inicio de sesión con Google y sesión persistente. Abstraído para SDKs nativos de cada plataforma (Android/iOS).
 - **Home / Dashboard** — Pantalla de inicio con tarjetas KPI y acceso rápido a todas las funciones.
 - **Todo** — CRUD completo con soporte de fecha de vencimiento. Respaldado por **Cloud Firestore** para sincronización entre dispositivos.
-- **Hábitos** — Seguimiento estricto de hábitos con rachas (Hoy, Mañana, Esta semana). Respaldado por **Room KMP (SQLite)**.
+- **Hábitos** — Seguimiento estricto de hábitos con rachas (Hoy, Mañana, Esta semana). Respaldado por **Cloud Firestore** para sincronización entre dispositivos.
 - **Ajustes** — Selector de tema con 5 paletas (Morado, Verde, Rojo, Oscuro, Alto contraste) persistido con DataStore KMP.
 - **Notificaciones** — Programación de notificaciones locales para resúmenes diarios y recordatorios de fecha de vencimiento. Abstraído para multiplataforma.
 - **Feature Flags** — Toggles mediante Firebase Remote Config para visibilidad condicional de funciones (Todos, Hábitos, Notificaciones, Journal, Pomodoro, Premium).
@@ -20,7 +20,7 @@ Aplicación de productividad (Todo + Hábitos + Dashboard + Pomodoro + Ajustes) 
 - **Onboarding** — Flujo inicial basado en JSON por idioma, localizado dinámicamente.
 - **Journal** — Entradas de diario con sincronización en Firestore.
 - **Pomodoro** — Temporizador de enfoque con tres modos (Pomodoro / Pausa corta / Pausa larga) y persistencia del estado.
-- **Experimentos A/B** — Infraestructura de experimentación (`Free` vs `Premium`), variantes de Home, variantes de notificaciones y frases de motivación.
+- **Experimentos A/B** — Infraestructura de experimentación (`Free` vs `Premium`), variantes de Home y frases de motivación.
 
 ## Stack tecnológico
 
@@ -103,7 +103,6 @@ Guías detalladas disponibles en `docs/`:
 
 - **JDK 11** o superior
 - **Android SDK** con `compileSdk = 36`, `minSdk = 24`
-- **Xcode** (sólo para iOS)
 - **Node 20** (para Firebase Cloud Functions)
 - **`curl`** disponible en el PATH (lo usan los scripts de Loco)
 
@@ -125,7 +124,7 @@ Guías detalladas disponibles en `docs/`:
 
 ## Testing
 
-El módulo `composeApp` incluye una suite de tests unitarios JVM en `composeApp/src/commonTest`. La suite completa son **45 clases de test, 178 tests** y corre en menos de 30 segundos con el daemon caliente.
+El módulo `composeApp` incluye una suite de tests unitarios JVM en `composeApp/src/commonTest`. La suite completa son **45 clases de test, 178 tests**.
 
 ### Cómo correr los tests
 
@@ -175,7 +174,6 @@ La suite cubre todos los use cases de dominio, todos los contratos de repositori
 - **Coroutines** — Los tests de ViewModel usan `StandardTestDispatcher` + `Dispatchers.setMain`; los use cases usan `runTest { ... }`. Un `@AfterTest` cancela cada `viewModelScope` creado para que los tickers colgados no bloqueen `runTest`.
 - **Flows** — El patrón estándar es `app.cash.turbine.test { awaitItem(); awaitComplete() }`.
 - **Naming** — `comportamiento bajo condición` entre comillas invertidas (p. ej. `` `successful dashboard emission clears loading and updates data` ``).
-- **Sin comentarios** en el código de test.
 
 ### Cómo agregar un test nuevo
 
@@ -198,7 +196,7 @@ Los archivos viven en `composeApp/src/commonMain/composeResources/`:
 La variable `LOCO_API_KEY` se resuelve en este orden:
 
 1. Variable de entorno del shell
-2. Archivo `.env` en la raíz del repo (gitignoreado — copiá `.env.example` para empezar)
+2. Archivo `.env` en la raíz del repo
 3. `gradle.properties`
 
 Una clave de **Export** de sólo lectura alcanza para los `pull`; los `push` requieren una clave de **Full Access**. Conseguila en [Developer Tools → API Keys](https://localise.biz).
@@ -219,10 +217,10 @@ Ambas viven bajo el grupo `localization` (visible con `./gradlew tasks --group l
 
 ### Flujo de trabajo para agregar o cambiar un string
 
-1. Editá el texto en inglés en `composeApp/src/commonMain/composeResources/values/strings.xml`.
-2. Ejecutá `./gradlew :composeApp:pushTranslations` para subirlo a Loco.
-3. En el dashboard de Loco, traducí manualmente o activá la auto-traducción. Las claves nuevas y modificadas ya están pre-tageadas para filtrarlas fácilmente.
-4. Ejecutá `./gradlew assembleDebug` (o cualquier otro build) para bajar las últimas traducciones de `es`/`fr` al repo.
+1. Edita el texto en inglés en `composeApp/src/commonMain/composeResources/values/strings.xml`.
+2. Ejecuta `./gradlew :composeApp:pushTranslations` para subirlo a Loco.
+3. En el dashboard de Loco, traduce manualmente o activa la auto-traducción. Las claves nuevas y modificadas ya están pre-tageadas para filtrarlas fácilmente.
+4. Ejecuta `./gradlew assembleDebug` (o cualquier otro build) para bajar las últimas traducciones de `es`/`fr` al repo.
 
 ### Restricciones importantes
 

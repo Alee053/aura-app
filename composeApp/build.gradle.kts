@@ -142,10 +142,6 @@ val pullTranslations by tasks.registering {
     )
 
     doLast {
-        // Resolution order for LOCO_API_KEY:
-        //   1. Real environment variable (so CI / shell overrides work).
-        //   2. Project root .env file (developer convenience, gitignored).
-        //   3. gradle.properties (escape hatch for systems without .env support).
         val key = providers.environmentVariable("LOCO_API_KEY").orNull
             ?: run {
                 val envFile = rootProject.file(".env")
@@ -210,15 +206,6 @@ tasks.named("preBuild") {
     dependsOn(pullTranslations)
 }
 
-// ---------------------------------------------------------------------------
-// Localization: push source English to Loco
-// ---------------------------------------------------------------------------
-// Usage: ./gradlew :composeApp:pushTranslations
-//
-// Uploads values/strings.xml to Loco as the `en` source. New keys get tagged
-// "new", updated keys get tagged "source-changed" so you can filter the
-// dashboard and re-translate as needed. Existing es/fr translations are
-// NEVER deleted by this task.
 val pushTranslations by tasks.registering {
     group = "localization"
     description = "Uploads values/strings.xml to Loco as the en source locale. Manual only."
@@ -231,7 +218,6 @@ val pushTranslations by tasks.registering {
             throw GradleException("[pushTranslations] ${sourceFile.relativeTo(rootDir)} does not exist.")
         }
 
-        // Same key resolution as pullTranslations.
         val key = providers.environmentVariable("LOCO_API_KEY").orNull
             ?: run {
                 val envFile = rootProject.file(".env")
@@ -252,13 +238,6 @@ val pushTranslations by tasks.registering {
             )
         }
 
-        // Loco's import endpoint. We:
-        //   - index by id (so the <string name="..."> attr is the asset id)
-        //   - target the en locale (this is the source)
-        //   - NOT delete-absent: keys removed locally stay in Loco (safer)
-        //   - tag new keys as "new" so they're easy to find
-        //   - tag updated keys as "source-changed" so you know to re-check translations
-        //   - ignore-blank: don't import empty <string> entries
         val url = "https://localise.biz/api/import/xml" +
             "?index=id" +
             "&locale=en" +

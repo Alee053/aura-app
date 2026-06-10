@@ -38,7 +38,7 @@ Productivity app (Todo + Habits + Dashboard + Settings) built with Kotlin Multip
 | **Feature Flags** | Firebase Remote Config |
 | **Push Notifications** | Firebase Cloud Messaging + WorkManager |
 | **Error Tracking** | Sentry |
-| **Testing** | kotlin-test + Turbine + Mockative |
+| **Testing** | kotlin-test + Turbine + Mockative (KSP) |
 
 ## Architecture
 
@@ -56,7 +56,7 @@ See [`AGENTS.md`](AGENTS.md) for the full architecture specification and [`docs/
 ### Android
 ```shell
 ./gradlew :composeApp:assembleDebug           # Build
-./gradlew :composeApp:testDebugUnitTest       # Unit tests
+./gradlew :composeApp:testDebugUnitTest       # Unit tests (see Testing below)
 ./gradlew :composeApp:connectedAndroidTest    # Instrumented tests
 ```
 
@@ -67,6 +67,66 @@ Open `iosApp/iosApp.xcworkspace` in Xcode.
 ```shell
 cd functions && npm run build && firebase deploy --only functions
 ```
+
+## Testing
+
+The `composeApp` module ships with a JVM unit-test suite under `composeApp/src/commonTest`. The full suite is **45 test classes, 178 tests** and runs in under 30 seconds on a warm daemon.
+
+### Running
+
+```shell
+# Run the whole suite
+./gradlew :composeApp:testDebugUnitTest
+
+# Run a single class
+./gradlew :composeApp:testDebugUnitTest \
+    --tests "com.programovil.aura.pomodoro.presentation.PomodoroViewModelTest"
+
+# Run a single test method
+./gradlew :composeApp:testDebugUnitTest \
+    --tests "com.programovil.aura.pomodoro.presentation.PomodoroViewModelTest.initial state is a 25-minute idle pomodoro"
+
+# Run multiple classes (wildcard)
+./gradlew :composeApp:testDebugUnitTest \
+    --tests "com.programovil.aura.todo.domain.usecase.*"
+```
+
+For faster local runs, skip the Loco translation pull and the `preBuild` hook:
+
+```shell
+./gradlew :composeApp:testDebugUnitTest -x pullTranslations -x preBuild --offline
+```
+
+HTML reports land in `composeApp/build/reports/tests/testDebugUnitTest/`. JUnit XML results live next to them under `composeApp/build/test-results/testDebugUnitTest/` and are suitable for CI ingestion.
+
+### Test distribution
+
+| Layer | Test classes | Tests |
+|---|---|---|
+| Presentation — ViewModels | 9 | 66 |
+| Domain — use cases | 20 | 50 |
+| Pure-function state machines / models | 5 | 32 |
+| Presentation — mappers | 4 | 18 |
+| Shared infrastructure (`*Manager`) | 4 | 11 |
+| Repository contracts (Android-only) | 1 | 1 |
+| Shared helpers (`FakeRemoteConfigService`) | 2 | — |
+| **Total** | **45** | **178** |
+
+The suite covers every domain use case, every `@Mockable` repository contract (via its use case), every presentation ViewModel, every data mapper, and the shared infrastructure helpers (`MotivationPhraseManager`, `UserPlanManager`, `RemoteConfigValueManager`, `FeatureFlagManager`, `ColorUtils`).
+
+### Conventions
+
+- **Test doubles** — `@Mockable` interfaces are mocked with `mock(of<T>())`; everything else uses hand-rolled fakes (e.g. `FakeJournalRepository`, `FakeAuthService`, `InMemoryPreferenceDataStore`). See `AGENTS.md` for the full rationale.
+- **Coroutines** — ViewModel tests use `StandardTestDispatcher` + `Dispatchers.setMain`; use cases use `runTest { ... }`. A `@AfterTest` cancels each created `viewModelScope` so leaked tickers don't block `runTest`.
+- **Flows** — `app.cash.turbine.test { awaitItem(); awaitComplete() }` is the standard pattern.
+- **Naming** — backticked `behavior under condition` (e.g. `` `successful dashboard emission clears loading and updates data` ``).
+- **No comments** in test code.
+
+### Adding a new test
+
+1. Mirror the production package layout (e.g. source at `…/todo/domain/usecase/` → test at `…/todo/domain/usecase/`).
+2. If the dependency is `@Mockable`, use `mock(of<T>())`. Otherwise extend the interface or write a small fake.
+3. Register any `ViewModel` created in a test against a list in `@AfterTest` and call `viewModel.viewModelScope.cancel()` on it — otherwise the test will hang in `runTest` waiting on a ticker.
 
 ### Multiplatform Compliance
 - No `java.*` imports in `commonMain`.

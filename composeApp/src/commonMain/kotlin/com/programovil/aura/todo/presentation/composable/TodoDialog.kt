@@ -43,6 +43,7 @@ import aura_app.composeapp.generated.resources.Res
 import aura_app.composeapp.generated.resources.add_due_date
 import aura_app.composeapp.generated.resources.cancel
 import aura_app.composeapp.generated.resources.clear_due_date
+import aura_app.composeapp.generated.resources.delete_action
 import aura_app.composeapp.generated.resources.edit_todo
 import aura_app.composeapp.generated.resources.new_todo
 import aura_app.composeapp.generated.resources.save
@@ -195,7 +196,7 @@ fun TodoDialog(
                             onDismiss()
                         }) {
                             Text(
-                                text = "Delete",
+                                text = stringResource(Res.string.delete_action),
                                 style = AppTheme.typography.labelLarge,
                                 color = AppTheme.colors.error
                             )

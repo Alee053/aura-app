@@ -59,6 +59,9 @@ import aura_app.composeapp.generated.resources.red_theme
 import aura_app.composeapp.generated.resources.dark_theme
 import aura_app.composeapp.generated.resources.high_contrast_theme
 import aura_app.composeapp.generated.resources.reminder_time_label
+import aura_app.composeapp.generated.resources.notifications
+import aura_app.composeapp.generated.resources.notifications_subtitle
+import aura_app.composeapp.generated.resources.time_separator
 import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -173,8 +176,8 @@ fun SettingsScreen(
             )
 
             PreferenceItem(
-                title = "Notifications",
-                subtitle = "Receive daily task reminders",
+                title = stringResource(Res.string.notifications),
+                subtitle = stringResource(Res.string.notifications_subtitle),
                 checked = uiState.notificationsEnabled,
                 onCheckedChange = { enabled ->
                     if (enabled) {
@@ -240,7 +243,7 @@ fun SettingsScreen(
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
                     Text(
-                        text = " : ",
+                        text = stringResource(Res.string.time_separator),
                         style = AppTheme.typography.bodyMedium,
                         color = AppTheme.colors.textPrimary,
                         modifier = Modifier.padding(horizontal = 4.dp)

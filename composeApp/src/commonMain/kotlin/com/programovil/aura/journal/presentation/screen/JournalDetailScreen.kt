@@ -56,8 +56,9 @@ fun JournalDetailScreen(
         if (uiState.isSaved) onNavigateBack()
     }
 
-    LaunchedEffect(uiState.error) {
-        uiState.error?.let {
+    val errorMessage = uiState.error?.asString()
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let {
             snackbarHostState.showSnackbar(it)
             viewModel.clearError()
         }

@@ -24,6 +24,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import aura_app.composeapp.generated.resources.Res
+import aura_app.composeapp.generated.resources.habit_day_short_fri
+import aura_app.composeapp.generated.resources.habit_day_short_mon
+import aura_app.composeapp.generated.resources.habit_day_short_sat
+import aura_app.composeapp.generated.resources.habit_day_short_sun
+import aura_app.composeapp.generated.resources.habit_day_short_thu
+import aura_app.composeapp.generated.resources.habit_day_short_tue
+import aura_app.composeapp.generated.resources.habit_day_short_wed
+import aura_app.composeapp.generated.resources.habit_period_day
+import aura_app.composeapp.generated.resources.habit_period_month
+import aura_app.composeapp.generated.resources.habit_period_progress
+import aura_app.composeapp.generated.resources.habit_period_week
+import aura_app.composeapp.generated.resources.habit_streak_content_description
 import com.programovil.aura.designsystem.theme.AppTheme
 import com.programovil.aura.habit.domain.model.DayCompletion
 import com.programovil.aura.habit.domain.model.HabitWithStatus
@@ -32,6 +45,7 @@ import com.programovil.aura.shared.parseHexColor
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun HabitCard(
@@ -85,12 +99,12 @@ fun HabitCard(
                 // Progress info (subtle)
                 if (habit.recurrenceType != RecurrenceType.DAILY) {
                     val periodLabel = when (habit.recurrenceType) {
-                        RecurrenceType.WEEKLY -> "week"
-                        RecurrenceType.MONTHLY -> "month"
-                        RecurrenceType.DAILY -> "day"
+                        RecurrenceType.WEEKLY -> stringResource(Res.string.habit_period_week)
+                        RecurrenceType.MONTHLY -> stringResource(Res.string.habit_period_month)
+                        RecurrenceType.DAILY -> stringResource(Res.string.habit_period_day)
                     }
                     Text(
-                        text = "$completed/$target $periodLabel",
+                        text = stringResource(Res.string.habit_period_progress, completed, target, periodLabel),
                         style = AppTheme.typography.labelMedium,
                         color = AppTheme.colors.textSecondary.copy(alpha = 0.6f)
                     )
@@ -104,7 +118,7 @@ fun HabitCard(
                     ) {
                         Icon(
                             imageVector = Icons.Default.LocalFireDepartment,
-                            contentDescription = "streak",
+                            contentDescription = stringResource(Res.string.habit_streak_content_description),
                             tint = AppTheme.colors.textSecondary,
                             modifier = Modifier.size(16.dp)
                         )
@@ -145,7 +159,15 @@ private fun SevenDayGrid(
     today: kotlinx.datetime.LocalDate,
     onToggle: (date: String) -> Unit
 ) {
-    val dayLabels = listOf("M", "T", "W", "T", "F", "S", "S")
+    val dayLabels = listOf(
+        stringResource(Res.string.habit_day_short_mon),
+        stringResource(Res.string.habit_day_short_tue),
+        stringResource(Res.string.habit_day_short_wed),
+        stringResource(Res.string.habit_day_short_thu),
+        stringResource(Res.string.habit_day_short_fri),
+        stringResource(Res.string.habit_day_short_sat),
+        stringResource(Res.string.habit_day_short_sun)
+    )
 
     Row(
         horizontalArrangement = Arrangement.spacedBy(4.dp),

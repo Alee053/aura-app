@@ -6,6 +6,8 @@ import com.programovil.aura.journal.domain.model.JournalEntry
 import com.programovil.aura.journal.domain.usecase.AddJournalEntryUseCase
 import com.programovil.aura.journal.domain.usecase.GetJournalEntryUseCase
 import com.programovil.aura.journal.domain.usecase.UpdateJournalEntryUseCase
+import com.programovil.aura.shared.presentation.ErrorKey
+import com.programovil.aura.shared.presentation.UiText
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +19,7 @@ data class JournalDetailUiState(
     val content: String = "",
     val isLoading: Boolean = false,
     val isSaved: Boolean = false,
-    val error: String? = null
+    val error: UiText? = null
 )
 
 class JournalDetailViewModel(
@@ -50,7 +52,7 @@ class JournalDetailViewModel(
             } else {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    error = "Entry not found"
+                    error = ErrorKey.JournalNotFound
                 )
             }
         }
@@ -83,7 +85,7 @@ class JournalDetailViewModel(
             result.onSuccess {
                 _uiState.value = _uiState.value.copy(isSaved = true)
             }.onFailure {
-                _uiState.value = _uiState.value.copy(error = "Failed to save entry")
+                _uiState.value = _uiState.value.copy(error = ErrorKey.JournalSave)
             }
         }
     }

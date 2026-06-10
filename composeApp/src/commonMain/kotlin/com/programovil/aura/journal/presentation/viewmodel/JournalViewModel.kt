@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.programovil.aura.journal.domain.model.JournalEntry
 import com.programovil.aura.journal.domain.usecase.DeleteJournalEntryUseCase
 import com.programovil.aura.journal.domain.usecase.GetJournalEntriesUseCase
+import com.programovil.aura.shared.presentation.ErrorKey
+import com.programovil.aura.shared.presentation.UiText
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,7 +15,7 @@ import kotlinx.coroutines.launch
 data class JournalUiState(
     val entries: List<JournalEntry> = emptyList(),
     val isLoading: Boolean = true,
-    val error: String? = null
+    val error: UiText? = null
 )
 
 class JournalViewModel(
@@ -37,10 +39,10 @@ class JournalViewModel(
                         isLoading = false,
                         error = null
                     )
-                }.onFailure { error ->
+                }.onFailure { _ ->
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        error = error.message ?: "Failed to load journal entries"
+                        error = ErrorKey.JournalLoad
                     )
                 }
             }
@@ -50,7 +52,7 @@ class JournalViewModel(
     fun deleteEntry(entry: JournalEntry) {
         viewModelScope.launch {
             deleteEntryUseCase(entry).onFailure {
-                _uiState.value = _uiState.value.copy(error = "Failed to delete entry")
+                _uiState.value = _uiState.value.copy(error = ErrorKey.JournalDelete)
             }
         }
     }

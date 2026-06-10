@@ -62,6 +62,10 @@ import aura_app.composeapp.generated.resources.nav_todos
 import aura_app.composeapp.generated.resources.nav_habits
 import aura_app.composeapp.generated.resources.nav_settings
 import aura_app.composeapp.generated.resources.nav_journal
+import aura_app.composeapp.generated.resources.nav_content_description_todos
+import aura_app.composeapp.generated.resources.nav_content_description_habits
+import aura_app.composeapp.generated.resources.nav_content_description_home
+import aura_app.composeapp.generated.resources.nav_content_description_journal
 import aura_app.composeapp.generated.resources.pomodoro_title
 import org.jetbrains.compose.resources.stringResource
 import kotlinx.coroutines.flow.collect
@@ -193,7 +197,7 @@ fun AuthenticatedApp(
             ) {
                 if (showTodos) {
                     NavigationBarItem(
-                        icon = { Icon(Icons.Default.Checklist, contentDescription = "Todos") },
+                        icon = { Icon(Icons.Default.Checklist, contentDescription = stringResource(Res.string.nav_content_description_todos)) },
                         label = { Text(stringResource(Res.string.nav_todos)) },
                         selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Todo>() } == true,
                         onClick = {
@@ -209,7 +213,7 @@ fun AuthenticatedApp(
                 }
                 if (showHabitsAccessible) {
                     NavigationBarItem(
-                        icon = { Icon(Icons.Default.DateRange, contentDescription = "Habits") },
+                        icon = { Icon(Icons.Default.DateRange, contentDescription = stringResource(Res.string.nav_content_description_habits)) },
                         label = { Text(stringResource(Res.string.nav_habits)) },
                         selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Habit>() } == true,
                         onClick = {
@@ -224,7 +228,7 @@ fun AuthenticatedApp(
                     )
                 }
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+                    icon = { Icon(Icons.Default.Home, contentDescription = stringResource(Res.string.nav_content_description_home)) },
                     label = { Text(stringResource(Res.string.nav_home)) },
                     selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Home>() } == true,
                     onClick = {
@@ -255,7 +259,7 @@ fun AuthenticatedApp(
                 }
                 if (showJournals) {
                     NavigationBarItem(
-                        icon = { Icon(Icons.Default.Book, contentDescription = "Journal") },
+                        icon = { Icon(Icons.Default.Book, contentDescription = stringResource(Res.string.nav_content_description_journal)) },
                         label = { Text(stringResource(Res.string.nav_journal)) },
                         selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Journal>() } == true,
                         onClick = {

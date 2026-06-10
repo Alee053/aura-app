@@ -4,6 +4,7 @@ import com.programovil.aura.journal.domain.model.JournalEntry
 import com.programovil.aura.journal.domain.repository.JournalRepository
 import com.programovil.aura.journal.domain.usecase.DeleteJournalEntryUseCase
 import com.programovil.aura.journal.domain.usecase.GetJournalEntriesUseCase
+import com.programovil.aura.shared.presentation.ErrorKey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -54,7 +55,7 @@ class JournalViewModelTest {
     }
 
     @Test
-    fun `loadEntries surfaces repository failure`() = runTest(testDispatcher) {
+    fun `loadEntries surfaces repository failure as JournalLoad error key`() = runTest(testDispatcher) {
         val viewModel = createViewModel(
             flowOf(Result.failure(IllegalStateException("User not authenticated")))
         )
@@ -63,7 +64,7 @@ class JournalViewModelTest {
 
         assertEquals(emptyList(), viewModel.uiState.value.entries)
         assertEquals(false, viewModel.uiState.value.isLoading)
-        assertEquals("User not authenticated", viewModel.uiState.value.error)
+        assertEquals(ErrorKey.JournalLoad, viewModel.uiState.value.error)
     }
 
     private fun createViewModel(

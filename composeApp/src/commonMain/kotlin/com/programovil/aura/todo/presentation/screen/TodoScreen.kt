@@ -66,8 +66,9 @@ fun TodoScreen(
 
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(error) {
-        error?.let {
+    val errorMessage = error?.asString()
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let {
             snackbarHostState.showSnackbar(it)
             viewModel.clearError()
         }

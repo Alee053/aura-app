@@ -134,4 +134,44 @@
     <string name="home_dashboard_motivation_subtitle">%1$s</string>
     <string name="home_dashboard_motivation_value_greeting">Sigue así</string>
     <string name="home_dashboard_motivation_value_premium">Mantén el enfoque</string>
+
+    <!-- Navigation content descriptions -->
+    <string name="nav_content_description_todos">Tareas</string>
+    <string name="nav_content_description_habits">Hábitos</string>
+    <string name="nav_content_description_home">Inicio</string>
+    <string name="nav_content_description_journal">Diario</string>
+
+    <!-- Habits -->
+    <string name="habit_delete">Eliminar</string>
+    <string name="delete_action">Eliminar</string>
+    <string name="habit_period_day">día</string>
+    <string name="habit_period_week">semana</string>
+    <string name="habit_period_month">mes</string>
+    <string name="habit_period_progress">%1$d/%2$d %3$s</string>
+    <string name="habit_streak_content_description">Racha</string>
+    <string name="habit_day_short_mon">L</string>
+    <string name="habit_day_short_tue">M</string>
+    <string name="habit_day_short_wed">X</string>
+    <string name="habit_day_short_thu">J</string>
+    <string name="habit_day_short_fri">V</string>
+    <string name="habit_day_short_sat">S</string>
+    <string name="habit_day_short_sun">D</string>
+
+    <!-- Settings -->
+    <string name="time_separator">:</string>
+
+    <!-- Errors -->
+    <string name="error_unknown">Ha ocurrido un error desconocido</string>
+    <string name="error_todo_load">Error al cargar las tareas</string>
+    <string name="error_todo_add">Error al agregar la tarea</string>
+    <string name="error_todo_update">Error al actualizar la tarea</string>
+    <string name="error_todo_delete">Error al eliminar la tarea</string>
+    <string name="error_habit_load">Error al cargar los hábitos</string>
+    <string name="error_habit_add">Error al agregar el hábito</string>
+    <string name="error_habit_update">Error al actualizar el hábito</string>
+    <string name="error_habit_delete">Error al eliminar el hábito</string>
+    <string name="error_journal_load">Error al cargar las entradas del diario</string>
+    <string name="error_journal_save">Error al guardar la entrada</string>
+    <string name="error_journal_delete">Error al eliminar la entrada</string>
+    <string name="error_journal_not_found">Entrada no encontrada</string>
 </resources>

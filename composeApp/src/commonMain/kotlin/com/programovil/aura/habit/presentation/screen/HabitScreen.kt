@@ -55,8 +55,9 @@ fun HabitScreen(
 
     val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
 
-    LaunchedEffect(uiState.error) {
-        uiState.error?.let { error ->
+    val errorMessage = uiState.error?.asString()
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let { error ->
             snackbarHostState.showSnackbar(error)
             viewModel.clearError()
         }

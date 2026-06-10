@@ -140,4 +140,44 @@
     <string name="home_dashboard_motivation_subtitle">%1$s</string>
     <string name="home_dashboard_motivation_value_greeting">Continuez</string>
     <string name="home_dashboard_motivation_value_premium">Restez concentré</string>
+
+    <!-- Navigation content descriptions -->
+    <string name="nav_content_description_todos">Tâches</string>
+    <string name="nav_content_description_habits">Habitudes</string>
+    <string name="nav_content_description_home">Accueil</string>
+    <string name="nav_content_description_journal">Journal</string>
+
+    <!-- Habits -->
+    <string name="habit_delete">Supprimer</string>
+    <string name="delete_action">Supprimer</string>
+    <string name="habit_period_day">jour</string>
+    <string name="habit_period_week">semaine</string>
+    <string name="habit_period_month">mois</string>
+    <string name="habit_period_progress">%1$d/%2$d %3$s</string>
+    <string name="habit_streak_content_description">Série</string>
+    <string name="habit_day_short_mon">L</string>
+    <string name="habit_day_short_tue">M</string>
+    <string name="habit_day_short_wed">M</string>
+    <string name="habit_day_short_thu">J</string>
+    <string name="habit_day_short_fri">V</string>
+    <string name="habit_day_short_sat">S</string>
+    <string name="habit_day_short_sun">D</string>
+
+    <!-- Settings -->
+    <string name="time_separator">:</string>
+
+    <!-- Errors -->
+    <string name="error_unknown">Une erreur inconnue s\'est produite</string>
+    <string name="error_todo_load">Échec du chargement des tâches</string>
+    <string name="error_todo_add">Échec de l\'ajout de la tâche</string>
+    <string name="error_todo_update">Échec de la mise à jour de la tâche</string>
+    <string name="error_todo_delete">Échec de la suppression de la tâche</string>
+    <string name="error_habit_load">Échec du chargement des habitudes</string>
+    <string name="error_habit_add">Échec de l\'ajout de l\'habitude</string>
+    <string name="error_habit_update">Échec de la mise à jour de l\'habitude</string>
+    <string name="error_habit_delete">Échec de la suppression de l\'habitude</string>
+    <string name="error_journal_load">Échec du chargement des entrées du journal</string>
+    <string name="error_journal_save">Échec de l\'enregistrement de l\'entrée</string>
+    <string name="error_journal_delete">Échec de la suppression de l\'entrée</string>
+    <string name="error_journal_not_found">Entrée introuvable</string>
 </resources>

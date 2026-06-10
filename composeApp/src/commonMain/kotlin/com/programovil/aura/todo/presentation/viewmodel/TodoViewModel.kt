@@ -2,6 +2,8 @@ package com.programovil.aura.todo.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.programovil.aura.shared.presentation.ErrorKey
+import com.programovil.aura.shared.presentation.UiText
 import com.programovil.aura.todo.domain.model.Todo
 import com.programovil.aura.todo.domain.usecase.AddTodoUseCase
 import com.programovil.aura.todo.domain.usecase.DeleteTodoUseCase
@@ -21,11 +23,11 @@ class TodoViewModel(
 ) : ViewModel() {
 
     private val _todos = MutableStateFlow<List<Todo>>(emptyList())
-    private val _error = MutableStateFlow<String?>(null)
+    private val _error = MutableStateFlow<UiText?>(null)
     private val _isLoading = MutableStateFlow(true)
 
     val todos: StateFlow<List<Todo>> = _todos
-    val error: StateFlow<String?> = _error
+    val error: StateFlow<UiText?> = _error
     val isLoading: StateFlow<Boolean> = _isLoading
 
     init {
@@ -36,7 +38,7 @@ class TodoViewModel(
         viewModelScope.launch {
             getTodosUseCase().collect { result ->
                 result.onSuccess { _todos.value = it }
-                    .onFailure { _error.value = it.message ?: "Unknown error" }
+                    .onFailure { _error.value = ErrorKey.TodoLoad }
                 _isLoading.value = false
             }
         }
@@ -47,7 +49,7 @@ class TodoViewModel(
         _error.value = null
         viewModelScope.launch {
             addTodoUseCase(title.trim(), description?.trim(), dueDate)
-                .onFailure { _error.value = "Failed to add todo" }
+                .onFailure { _error.value = ErrorKey.TodoAdd }
         }
     }
 
@@ -55,7 +57,7 @@ class TodoViewModel(
         _error.value = null
         viewModelScope.launch {
             toggleTodoUseCase(todoId, isCompleted)
-                .onFailure { _error.value = "Failed to update todo" }
+                .onFailure { _error.value = ErrorKey.TodoUpdate }
         }
     }
 
@@ -63,7 +65,7 @@ class TodoViewModel(
         _error.value = null
         viewModelScope.launch {
             deleteTodoUseCase(todoId)
-                .onFailure { _error.value = "Failed to delete todo" }
+                .onFailure { _error.value = ErrorKey.TodoDelete }
         }
     }
 
@@ -71,7 +73,7 @@ class TodoViewModel(
         _error.value = null
         viewModelScope.launch {
             updateTodoUseCase(todo)
-                .onFailure { _error.value = "Failed to update todo" }
+                .onFailure { _error.value = ErrorKey.TodoUpdate }
         }
     }
 

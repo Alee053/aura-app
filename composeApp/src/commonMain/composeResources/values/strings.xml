@@ -144,6 +144,46 @@
     <string name="home_dashboard_motivation_value_greeting">Keep going</string>
     <string name="home_dashboard_motivation_value_premium">Stay focused</string>
 
+    <!-- Navigation content descriptions -->
+    <string name="nav_content_description_todos">Todos</string>
+    <string name="nav_content_description_habits">Habits</string>
+    <string name="nav_content_description_home">Home</string>
+    <string name="nav_content_description_journal">Journal</string>
+
+    <!-- Habits -->
+    <string name="habit_delete">Delete</string>
+    <string name="delete_action">Delete</string>
+    <string name="habit_period_day">day</string>
+    <string name="habit_period_week">week</string>
+    <string name="habit_period_month">month</string>
+    <string name="habit_period_progress">%1$d/%2$d %3$s</string>
+    <string name="habit_streak_content_description">Streak</string>
+    <string name="habit_day_short_mon">M</string>
+    <string name="habit_day_short_tue">T</string>
+    <string name="habit_day_short_wed">W</string>
+    <string name="habit_day_short_thu">T</string>
+    <string name="habit_day_short_fri">F</string>
+    <string name="habit_day_short_sat">S</string>
+    <string name="habit_day_short_sun">S</string>
+
+    <!-- Settings -->
+    <string name="time_separator">:</string>
+
+    <!-- Errors -->
+    <string name="error_unknown">An unknown error occurred</string>
+    <string name="error_todo_load">Failed to load todos</string>
+    <string name="error_todo_add">Failed to add todo</string>
+    <string name="error_todo_update">Failed to update todo</string>
+    <string name="error_todo_delete">Failed to delete todo</string>
+    <string name="error_habit_load">Failed to load habits</string>
+    <string name="error_habit_add">Failed to add habit</string>
+    <string name="error_habit_update">Failed to update habit</string>
+    <string name="error_habit_delete">Failed to delete habit</string>
+    <string name="error_journal_load">Failed to load journal entries</string>
+    <string name="error_journal_save">Failed to save entry</string>
+    <string name="error_journal_delete">Failed to delete entry</string>
+    <string name="error_journal_not_found">Entry not found</string>
+
     <!-- Pomodoro Screen -->
     <string name="pomodoro_title">Pomodoro</string>
     <string name="pomodoro_status_pomodoro">POMODORO</string>

@@ -13,6 +13,8 @@ import com.programovil.aura.habit.domain.usecase.DeleteHabitUseCase
 import com.programovil.aura.habit.domain.usecase.GetHabitsWithStatusUseCase
 import com.programovil.aura.habit.domain.usecase.ToggleHabitCompletionUseCase
 import com.programovil.aura.habit.domain.usecase.UpdateHabitUseCase
+import com.programovil.aura.shared.presentation.ErrorKey
+import com.programovil.aura.shared.presentation.UiText
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -23,7 +25,7 @@ import kotlinx.datetime.toLocalDateTime
 data class HabitListUiState(
     val habits: List<HabitWithStatus> = emptyList(),
     val isLoading: Boolean = true,
-    val error: String? = null
+    val error: UiText? = null
 )
 
 sealed class HabitEvent {
@@ -71,10 +73,10 @@ class HabitViewModel(
                         habits = habits,
                         isLoading = false
                     )
-                }.onFailure { error ->
+                }.onFailure { _ ->
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        error = error.message ?: "Failed to load habits"
+                        error = ErrorKey.HabitLoad
                     )
                 }
             }
@@ -84,28 +86,28 @@ class HabitViewModel(
     private fun toggleCompletion(habitId: String, date: String) {
         viewModelScope.launch {
             toggleHabitCompletionUseCase(habitId, date)
-                .onFailure { _uiState.value = _uiState.value.copy(error = "Failed to update habit") }
+                .onFailure { _uiState.value = _uiState.value.copy(error = ErrorKey.HabitUpdate) }
         }
     }
 
     private fun addHabit(name: String, recurrenceType: RecurrenceType, targetCount: Int, color: String) {
         viewModelScope.launch {
             addHabitUseCase(name, recurrenceType, targetCount, color)
-                .onFailure { _uiState.value = _uiState.value.copy(error = "Failed to add habit") }
+                .onFailure { _uiState.value = _uiState.value.copy(error = ErrorKey.HabitAdd) }
         }
     }
 
     private fun updateHabit(habit: Habit) {
         viewModelScope.launch {
             updateHabitUseCase(habit)
-                .onFailure { _uiState.value = _uiState.value.copy(error = "Failed to update habit") }
+                .onFailure { _uiState.value = _uiState.value.copy(error = ErrorKey.HabitUpdate) }
         }
     }
 
     private fun deleteHabit(habitId: String) {
         viewModelScope.launch {
             deleteHabitUseCase(habitId)
-                .onFailure { _uiState.value = _uiState.value.copy(error = "Failed to delete habit") }
+                .onFailure { _uiState.value = _uiState.value.copy(error = ErrorKey.HabitDelete) }
         }
     }
 

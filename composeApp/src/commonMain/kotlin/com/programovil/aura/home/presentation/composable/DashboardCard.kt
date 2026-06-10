@@ -12,6 +12,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.programovil.aura.designsystem.theme.AppTheme
 
@@ -21,7 +22,8 @@ fun DashboardCard(
     value: String,
     subtitle: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    valueStyle: TextStyle = AppTheme.typography.displayLarge
 ) {
     Surface(
         modifier = modifier
@@ -42,15 +44,17 @@ fun DashboardCard(
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = value,
-                style = AppTheme.typography.displayLarge,
+                style = valueStyle,
                 color = AppTheme.colors.textPrimary
             )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = subtitle,
-                style = AppTheme.typography.labelMedium,
-                color = AppTheme.colors.textSecondary
-            )
+            if (subtitle.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = subtitle,
+                    style = AppTheme.typography.labelMedium,
+                    color = AppTheme.colors.textSecondary
+                )
+            }
         }
     }
 }

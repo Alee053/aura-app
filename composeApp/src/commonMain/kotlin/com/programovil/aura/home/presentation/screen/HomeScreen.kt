@@ -116,9 +116,10 @@ fun HomeScreen(
             }
             DashboardCard(
                 title = stringResource(Res.string.home_dashboard_motivation_title),
-                value = "✦",
-                subtitle = stringResource(Res.string.home_dashboard_motivation_subtitle, motivation),
-                onClick = {}
+                value = motivation,
+                subtitle = "",
+                onClick = {},
+                valueStyle = AppTheme.typography.titleMedium
             )
         }
     }

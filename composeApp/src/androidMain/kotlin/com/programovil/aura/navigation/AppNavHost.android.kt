@@ -5,11 +5,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.programovil.aura.regionsync.presentation.RegionSyncScreen
+import com.programovil.aura.todo.presentation.viewmodel.TodoViewModel
 
 @Composable
-actual fun AppNavHost(
+fun AppNavHost(
     navController: NavHostController,
-    todoViewModel: com.programovil.aura.todo.presentation.viewmodel.TodoViewModel,
+    todoViewModel: TodoViewModel,
     onSignOut: () -> Unit
 ) {
     NavHost(navController = navController, startDestination = NavRoute.RegionSync) {

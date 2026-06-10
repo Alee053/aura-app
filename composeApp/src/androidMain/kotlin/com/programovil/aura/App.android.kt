@@ -24,8 +24,6 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
 import com.programovil.aura.navigation.AppNavHost
 import com.programovil.aura.navigation.NavRoute
 import com.programovil.aura.shared.FeatureFlag
@@ -52,7 +50,7 @@ fun AuthenticatedApp(
     onSignOut: () -> Unit
 ) {
     val navController = rememberNavController()
-    val todoViewModel: TodoViewModel = koinViewModel()
+    val todoViewModel = koinViewModel<TodoViewModel>()
     val featureFlagManager: FeatureFlagManager = koinInject()
     val featureFlags by featureFlagManager.flags.collectAsState()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -101,4 +99,3 @@ fun AuthenticatedApp(
         }
     }
 }
-

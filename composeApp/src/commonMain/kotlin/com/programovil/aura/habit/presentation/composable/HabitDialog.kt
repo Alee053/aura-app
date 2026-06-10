@@ -172,7 +172,7 @@ private fun TargetCountStepper(
     }
 }
 
-@OptIn(kotlin.uuid.ExperimentalUuidApi::class)
+@OptIn(kotlin.uuid.ExperimentalUuidApi::class, kotlin.time.ExperimentalTime::class)
 @Composable
 fun HabitDialog(
     habit: Habit?,

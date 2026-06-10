@@ -1,6 +1,8 @@
+@file:OptIn(kotlin.time.ExperimentalTime::class)
+
 package com.programovil.aura.habit.domain.model
 
-import kotlin.time.Clock
+import kotlinx.datetime.Clock
 
 data class Habit(
     val id: String,

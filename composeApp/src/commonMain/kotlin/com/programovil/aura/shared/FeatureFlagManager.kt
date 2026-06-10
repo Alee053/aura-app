@@ -1,5 +1,6 @@
 package com.programovil.aura.shared
 
+import io.mockative.Mockable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -15,6 +16,7 @@ import kotlinx.coroutines.launch
  * from Remote Config. Internally composes one [RemoteConfigValueManager] per
  * flag entry; no polling loop is started.
  */
+@Mockable
 class FeatureFlagManager(
     remoteConfigService: RemoteConfigService
 ) {

@@ -4,6 +4,7 @@ import com.programovil.aura.experiments.domain.model.UserPlan
 import com.programovil.aura.experiments.domain.usecase.GetUserPlanUseCase
 import com.programovil.aura.shared.FeatureFlag
 import com.programovil.aura.shared.FeatureFlagManager
+import io.mockative.Mockable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.combine
  * Consumers should subscribe via [invoke] rather than re-deriving the rule
  * from the two flows.
  */
+@Mockable
 class GetHabitsAccessibilityUseCase(
     private val featureFlagManager: FeatureFlagManager,
     private val getUserPlanUseCase: GetUserPlanUseCase

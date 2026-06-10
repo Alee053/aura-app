@@ -1,6 +1,7 @@
 package com.programovil.aura.shared
 
 import com.programovil.aura.experiments.domain.model.UserPlan
+import io.mockative.Mockable
 import kotlinx.coroutines.flow.StateFlow
 
 /**
@@ -8,6 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
  * from Remote Config. Internally owns a [RemoteConfigValueManager]; no polling
  * loop is started.
  */
+@Mockable
 class UserPlanManager(
     remoteConfigService: RemoteConfigService
 ) {

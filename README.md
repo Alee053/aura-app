@@ -1,8 +1,8 @@
 # Aura
 
-Aplicación de productividad (Todo + Hábitos + Dashboard + Ajustes) construida con **Kotlin Multiplatform**, con soporte para Android e iOS.
+Aplicación de productividad (Todo + Hábitos + Dashboard + Pomodoro + Ajustes) construida con **Kotlin Multiplatform**, con soporte para Android
 
-> Documentación adicional: [`AGENTS.md`](AGENTS.md) (especificación de arquitectura para agentes de IA) y la carpeta [`docs/`](docs/) (guías técnicas detalladas).
+> Documentación adicional en la carpeta [`docs/`](docs/) (guías técnicas detalladas).
 
 ## Características y módulos
 
@@ -22,10 +22,6 @@ Aplicación de productividad (Todo + Hábitos + Dashboard + Ajustes) construida 
 - **Pomodoro** — Temporizador de enfoque con tres modos (Pomodoro / Pausa corta / Pausa larga) y persistencia del estado.
 - **Experimentos A/B** — Infraestructura de experimentación (`Free` vs `Premium`), variantes de Home, variantes de notificaciones y frases de motivación.
 
-### Planificadas
-
-- **Agenda** — Vista de calendario combinando Todos y Hábitos.
-
 ## Stack tecnológico
 
 | Capa | Tecnología |
@@ -34,7 +30,6 @@ Aplicación de productividad (Todo + Hábitos + Dashboard + Ajustes) construida 
 | **UI** | Compose Multiplatform |
 | **Arquitectura** | Clean Architecture + MVVM/MVI |
 | **DI** | Koin 4.1.1 (módulos por feature) |
-| **Base de datos local** | Room KMP (SQLite) |
 | **Base de datos remota** | Cloud Firestore + Firebase Realtime Database |
 | **Autenticación** | Firebase Auth (Google Sign-In) |
 | **Navegación** | Navigation Compose + kotlinx-serialization |
@@ -43,8 +38,7 @@ Aplicación de productividad (Todo + Hábitos + Dashboard + Ajustes) construida 
 | **Feature Flags** | Firebase Remote Config |
 | **Notificaciones push** | Firebase Cloud Messaging + WorkManager |
 | **Internacionalización** | Compose `composeResources` + [Loco](https://localise.biz) |
-| **Tareas en segundo plano** | WorkManager (Android) / `UNUserNotificationCenter` (iOS) |
-| **Tracking de errores** | Sentry |
+| **Tareas en segundo plano** | WorkManager (Android)|
 | **Testing** | kotlin-test + Turbine + Mockative |
 
 ## Estructura del proyecto
@@ -95,15 +89,13 @@ Reglas clave:
 - **Toda la UI consume `AppTheme.colors` y `AppTheme.typography`** — sin colores ni tamaños de fuente hardcodeados.
 - **Sin strings hardcodeados** — todo texto visible al usuario se resuelve desde `strings.xml`.
 
-Para la especificación completa de arquitectura, consultá [`AGENTS.md`](AGENTS.md). Para guías detalladas:
+Guías detalladas disponibles en `docs/`:
 
 - [`docs/KMP_ARCHITECTURE.md`](docs/KMP_ARCHITECTURE.md) — modelo de compilación KMP, source sets, `expect`/`actual`
-- [`docs/TECH-STACK.md`](docs/TECH-STACK.md) — stack tecnológico completo
-- [`docs/guides/KOIN_IN_KMP.md`](docs/KOIN_IN_KMP.md) — Inyección de dependencias
-- [`docs/guides/NAVIGATION_IN_KMP.md`](docs/NAVIGATION_IN_KMP.md) — Routing con tipos seguros
-- [`docs/guides/FIREBASE_IN_KMP.md`](docs/FIREBASE_IN_KMP.md) — Servicios de Firebase
-- [`docs/guides/WORKMANAGER_IN_KMP.md`](docs/WORKMANAGER_IN_KMP.md) — Tareas en segundo plano
-- [`docs/IOS_DEFERRED.md`](docs/IOS_DEFERRED.md) — Estado de los stubs de iOS
+- [`docs/KOIN_IN_KMP.md`](docs/KOIN_IN_KMP.md) — Inyección de dependencias
+- [`docs/NAVIGATION_IN_KMP.md`](docs/NAVIGATION_IN_KMP.md) — Routing con tipos seguros
+- [`docs/FIREBASE_IN_KMP.md`](docs/FIREBASE_IN_KMP.md) — Servicios de Firebase
+- [`docs/WORKMANAGER_IN_KMP.md`](docs/WORKMANAGER_IN_KMP.md) — Tareas en segundo plano
 
 ## Desarrollo
 
@@ -123,16 +115,6 @@ Para la especificación completa de arquitectura, consultá [`AGENTS.md`](AGENTS
 ./gradlew :composeApp:assembleDebug           # Build debug
 ./gradlew :composeApp:testDebugUnitTest       # Tests unitarios
 ./gradlew :composeApp:connectedAndroidTest    # Tests instrumentados
-```
-
-#### iOS
-
-Abrí `iosApp/iosApp.xcworkspace` en Xcode y compilá desde ahí. La mayoría de las features en iOS son **stubs** (devuelven valores vacíos o por defecto) — ver [`docs/IOS_DEFERRED.md`](docs/IOS_DEFERRED.md).
-
-#### Firebase Cloud Functions
-
-```shell
-cd functions && npm run build && firebase deploy --only functions
 ```
 
 #### Limpieza
@@ -188,10 +170,4 @@ Ambas viven bajo el grupo `localization` (visible con `./gradlew tasks --group l
 - **La fuente en inglés es la fuente de verdad en git**. Los archivos `es` y `fr` commiteados se sobrescriben en cada build, así que cualquier edición manual de esos archivos se perderá.
 - Las **claves en inglés faltantes** en el archivo fuente **no se eliminan** de Loco por `pushTranslations` — sólo agrega y actualiza. Esto protege las traducciones a mano de `es`/`fr` contra borrados accidentales.
 
-## Recursos adicionales
 
-- `docs/MAIN_RUBRIC.md` — Checklist de cumplimiento del proyecto
-- `docs/GRADING_RUBRIC.md` — Rúbrica completa con el estado de cada criterio
-- `docs/superpowers/specs/` — Documentos de diseño de cada feature
-- `docs/superpowers/plans/` — Planes de implementación
-- `docs/superpowers/firestore.rules` — Reglas de seguridad de Firestore

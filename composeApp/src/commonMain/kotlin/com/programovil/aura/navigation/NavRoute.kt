@@ -20,5 +20,8 @@ sealed class NavRoute {
     data object Journal : NavRoute()
 
     @Serializable
+    data object Pomodoro : NavRoute()
+
+    @Serializable
     data class JournalDetail(val entryId: String? = null) : NavRoute()
 }

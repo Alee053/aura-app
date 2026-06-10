@@ -2,11 +2,13 @@ package com.programovil.aura.notification.domain
 
 import android.util.Log
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.programovil.aura.experiments.domain.usecase.GetNotificationVariantUseCase
 import com.programovil.aura.notification.presentation.worker.DailySummaryWorker
+import com.programovil.aura.notification.presentation.worker.PomodoroCompletionWorker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -84,6 +86,29 @@ class AndroidNotificationScheduler(
     override fun cancelDailySummary() {
         workManager.cancelUniqueWork(DailySummaryWorker.WORK_NAME)
         workManager.cancelUniqueWork("daily_summary_work_evening")
+    }
+
+    override fun schedulePomodoroCompletion(delayMillis: Long) {
+        val workRequest = OneTimeWorkRequestBuilder<PomodoroCompletionWorker>()
+            .setInitialDelay(delayMillis, TimeUnit.MILLISECONDS)
+            .build()
+
+        workManager.enqueueUniqueWork(
+            PomodoroCompletionWorker.WORK_NAME,
+            ExistingWorkPolicy.REPLACE,
+            workRequest
+        )
+    }
+
+    override fun cancelPomodoroCompletion() {
+        workManager.cancelUniqueWork(PomodoroCompletionWorker.WORK_NAME)
+    }
+
+    override fun showPomodoroCompletionNow() {
+        val request = OneTimeWorkRequestBuilder<PomodoroCompletionWorker>()
+            .setInputData(PomodoroCompletionWorker.forceNotifyInputData())
+            .build()
+        workManager.enqueue(request)
     }
 
     override fun testNotification() {

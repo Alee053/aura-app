@@ -55,6 +55,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.play.services)
             implementation(libs.workmanager.ktx)
             implementation(libs.datastore.preferences)
+            implementation(libs.androidx.lifecycle.process)
         }
         commonMain.dependencies {
             implementation(project(":designsystem"))

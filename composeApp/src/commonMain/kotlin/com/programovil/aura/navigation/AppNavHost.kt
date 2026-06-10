@@ -13,6 +13,8 @@ import com.programovil.aura.journal.presentation.screen.JournalDetailScreen
 import com.programovil.aura.journal.presentation.screen.JournalScreen
 import com.programovil.aura.journal.presentation.viewmodel.JournalDetailViewModel
 import com.programovil.aura.journal.presentation.viewmodel.JournalViewModel
+import com.programovil.aura.pomodoro.presentation.PomodoroScreen
+import com.programovil.aura.pomodoro.presentation.PomodoroViewModel
 import com.programovil.aura.settings.presentation.screen.SettingsScreen
 import com.programovil.aura.settings.presentation.viewmodel.SettingsViewModel
 import com.programovil.aura.shared.FeatureFlag
@@ -25,6 +27,7 @@ import org.koin.core.parameter.parametersOf
 fun AppNavHost(
     navController: NavHostController,
     todoViewModel: TodoViewModel,
+    pomodoroViewModel: PomodoroViewModel,
     currentThemeMode: ThemeMode,
     onThemeChange: (ThemeMode) -> Unit,
     onSignOut: () -> Unit,
@@ -104,6 +107,19 @@ fun AppNavHost(
                         }
                         navController.popBackStack()
                     }
+                )
+            }
+        }
+
+        if (featureFlags[FeatureFlag.POMODORO_ENABLED] != false) {
+            composable<NavRoute.Pomodoro> {
+                PomodoroScreen(
+                    viewModel = pomodoroViewModel,
+                    featureFlags = featureFlags,
+                    onFeatureDisabled = {
+                        navController.popBackStack(NavRoute.Home, inclusive = false)
+                    },
+                    onSettingsClick = { navController.navigate(NavRoute.Settings) }
                 )
             }
         }

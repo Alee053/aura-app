@@ -50,6 +50,40 @@ class IosNotificationScheduler : NotificationScheduler {
         notificationCenter.removePendingNotificationRequestsWithIdentifiers(listOf(DAILY_SUMMARY_ID))
     }
 
+    override fun schedulePomodoroCompletion(delayMillis: Long) {
+        val content = UNMutableNotificationContent().apply {
+            setTitle("TIME IS UP")
+            setBody("To continue your Pomodoro open Aura")
+            setSound(UNNotificationSound.defaultSound)
+        }
+
+        val trigger = UNTimeIntervalNotificationTrigger.triggerWithTimeInterval(
+            timeInterval = delayMillis.toDouble() / 1000.0,
+            repeats = false
+        )
+
+        val request = UNNotificationRequest.requestWithIdentifier(
+            POMODORO_NOTIFICATION_ID,
+            content = content,
+            trigger = trigger
+        )
+
+        notificationCenter.removePendingNotificationRequestsWithIdentifiers(listOf(POMODORO_NOTIFICATION_ID))
+        notificationCenter.addNotificationRequest(request) { error ->
+            if (error != null) {
+                println("Error scheduling pomodoro notification: $error")
+            }
+        }
+    }
+
+    override fun cancelPomodoroCompletion() {
+        notificationCenter.removePendingNotificationRequestsWithIdentifiers(listOf(POMODORO_NOTIFICATION_ID))
+    }
+
+    override fun showPomodoroCompletionNow() {
+        schedulePomodoroCompletion(delayMillis = 1000L)
+    }
+
     override fun testNotification() {
         val content = UNMutableNotificationContent().apply {
             setTitle("Test Notification")
@@ -77,6 +111,7 @@ class IosNotificationScheduler : NotificationScheduler {
 
     companion object {
         private const val DAILY_SUMMARY_ID = "daily_summary"
+        private const val POMODORO_NOTIFICATION_ID = "pomodoro_completion"
         private const val TEST_NOTIFICATION_ID = "test_notification"
     }
 }

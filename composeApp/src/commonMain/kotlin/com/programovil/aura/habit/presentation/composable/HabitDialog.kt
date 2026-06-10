@@ -45,6 +45,7 @@ import com.programovil.aura.habit.domain.model.Habit
 import com.programovil.aura.habit.domain.model.RecurrenceType
 import com.programovil.aura.shared.parseHexColor
 import kotlin.time.Clock
+import kotlin.uuid.Uuid
 import aura_app.composeapp.generated.resources.Res
 import aura_app.composeapp.generated.resources.cancel
 import aura_app.composeapp.generated.resources.color_label
@@ -171,6 +172,7 @@ private fun TargetCountStepper(
     }
 }
 
+@OptIn(kotlin.uuid.ExperimentalUuidApi::class)
 @Composable
 fun HabitDialog(
     habit: Habit?,
@@ -288,7 +290,7 @@ fun HabitDialog(
                         onClick = {
                             if (name.isNotBlank()) {
                                 val habitToSave = Habit(
-                                    id = habit?.id ?: java.util.UUID.randomUUID().toString(),
+                                    id = habit?.id ?: Uuid.random().toString(),
                                     name = name.trim(),
                                     recurrenceType = recurrenceType,
                                     targetCount = if (recurrenceType == RecurrenceType.DAILY) 1 else targetCount,

@@ -68,7 +68,10 @@ fun HabitScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text(stringResource(Res.string.habits_title))
+                        Text(
+                            text = stringResource(Res.string.habits_title),
+                            style = AppTheme.typography.headlineSmall
+                        )
                         Text(
                             text = today.toString(),
                             style = AppTheme.typography.labelLarge,

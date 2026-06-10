@@ -37,8 +37,7 @@ import org.jetbrains.compose.resources.stringResource
 fun PomodoroScreen(
     viewModel: PomodoroViewModel,
     featureFlags: Map<FeatureFlag, Boolean> = emptyMap(),
-    onFeatureDisabled: () -> Unit = {},
-    onSettingsClick: () -> Unit = {}
+    onFeatureDisabled: () -> Unit = {}
 ) {
     LaunchedEffect(featureFlags) {
         if (featureFlags[FeatureFlag.POMODORO_ENABLED] == false) {
@@ -51,19 +50,16 @@ fun PomodoroScreen(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { },
-                actions = {
-                    IconButton(onClick = onSettingsClick) {
-                        Icon(
-                            Icons.Default.Settings,
-                            contentDescription = stringResource(Res.string.pomodoro_content_description_settings),
-                            tint = AppTheme.colors.textPrimary
-                        )
-                    }
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(Res.string.pomodoro_title),
+                        style = AppTheme.typography.headlineSmall
+                    )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent
+                    containerColor = AppTheme.colors.surface,
+                    titleContentColor = AppTheme.colors.textPrimary
                 )
             )
         },

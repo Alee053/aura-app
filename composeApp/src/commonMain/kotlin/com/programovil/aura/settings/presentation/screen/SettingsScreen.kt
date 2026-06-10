@@ -17,11 +17,15 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -63,6 +67,7 @@ import aura_app.composeapp.generated.resources.version
 import aura_app.composeapp.generated.resources.made_with_love
 import org.jetbrains.compose.resources.stringResource
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel,
@@ -80,57 +85,52 @@ fun SettingsScreen(
         }
     )
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        AppTheme.colors.background,
-                        AppTheme.colors.surface
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(Res.string.settings_title),
+                        style = AppTheme.typography.headlineSmall
                     )
+                },
+                actions = {
+                    IconButton(onClick = onSignOut) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Logout,
+                            contentDescription = stringResource(Res.string.logout_button),
+                            tint = AppTheme.colors.textPrimary
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = AppTheme.colors.surface,
+                    titleContentColor = AppTheme.colors.textPrimary
                 )
             )
-    ) {
-        Column(
+        },
+        containerColor = AppTheme.colors.background
+    ) { padding ->
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .statusBarsPadding()
-                .padding(horizontal = 24.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Spacer(modifier = Modifier.size(48.dp))
-                Text(
-                    text = stringResource(Res.string.settings_title),
-                    style = AppTheme.typography.headlineLarge,
-                    color = AppTheme.colors.textPrimary,
-                    modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.Center
+                .padding(padding)
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            AppTheme.colors.background,
+                            AppTheme.colors.surface
+                        )
+                    )
                 )
-                TextButton(onClick = onSignOut) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Logout,
-                        contentDescription = "Sign out",
-                        tint = AppTheme.colors.textSecondary,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.size(4.dp))
-                    Text(
-                        text = stringResource(Res.string.logout_button),
-                        style = AppTheme.typography.labelLarge,
-                        color = AppTheme.colors.textSecondary
-                    )
-                }
-                Spacer(modifier = Modifier.size(8.dp))
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 24.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Spacer(modifier = Modifier.height(24.dp))
 
             Text(
                 text = stringResource(Res.string.themes_section),
@@ -313,5 +313,6 @@ fun SettingsScreen(
                 )
             }
         }
+    }
     }
 }

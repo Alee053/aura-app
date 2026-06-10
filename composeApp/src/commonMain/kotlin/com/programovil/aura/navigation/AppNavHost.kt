@@ -119,8 +119,7 @@ fun AppNavHost(
                     featureFlags = featureFlags,
                     onFeatureDisabled = {
                         navController.popBackStack(NavRoute.Home, inclusive = false)
-                    },
-                    onSettingsClick = { navController.navigate(NavRoute.Settings) }
+                    }
                 )
             }
         }

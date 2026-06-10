@@ -145,7 +145,7 @@ El módulo `composeApp` incluye una suite de tests unitarios JVM en `composeApp/
     --tests "com.programovil.aura.todo.domain.usecase.*"
 ```
 
-Para corridas locales más rápidas, salteá el pull de traducciones de Loco y el hook de `preBuild`:
+Para corridas locales más rápidas, salta el pull de traducciones de Loco y el hook de `preBuild`:
 
 ```shell
 ./gradlew :composeApp:testDebugUnitTest -x pullTranslations -x preBuild --offline

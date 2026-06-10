@@ -1,33 +1,38 @@
-<resources>
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Loco xml export: Android strings
+ Project: Aura App
+ Locale: fr, French
+ Exported by: Ale Castro
+ Exported at: Wed, 10 Jun 2026 01:14:34 -0400
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <!-- Navigation -->
     <string name="nav_home">Accueil</string>
     <string name="nav_todos">Tâches</string>
     <string name="nav_habits">Habitudes</string>
     <string name="nav_settings">Paramètres</string>
     <string name="nav_journal">Journal</string>
-
     <!-- Todo Screen -->
-    <string name="todos_title">Mes Tâches</string>
+    <string name="todos_title">Mes tâches</string>
     <string name="add_todo">Ajouter une tâche</string>
     <string name="new_todo_hint">Nouvelle tâche</string>
-    <string name="empty_todos">Pas encore de tâches. Ajoutez la première !</string>
+    <string name="empty_todos">Aucune tâche pour le moment. Ajoutez la première !</string>
     <string name="delete">X</string>
-    <string name="sign_out">Se déconnecter</string>
-    <string name="select_due_date">Sélectionner une date</string>
-    <string name="due_date_label">Date : %1$s</string>
+    <string name="sign_out">Déconnexion</string>
+    <string name="select_due_date">Sélectionner une date d\'échéance</string>
+    <string name="due_date_label">Date d\'échéance : %1$s</string>
     <string name="ok">OK</string>
     <string name="cancel">Annuler</string>
-
     <!-- Todo Dialog -->
     <string name="new_todo">Nouvelle tâche</string>
     <string name="edit_todo">Modifier la tâche</string>
     <string name="todo_name_hint">Nom de la tâche</string>
     <string name="todo_description_hint">Description (facultatif)</string>
-    <string name="add_due_date">Ajouter une date</string>
+    <string name="add_due_date">Ajouter une date d\'échéance</string>
     <string name="clear_due_date">Effacer</string>
     <string name="add_first_todo">Ajouter la première tâche</string>
-    <string name="completed_section">Terminées</string>
-
+    <string name="completed_section">Terminé</string>
     <!-- Habit Screen -->
     <string name="habits_title">Habitudes</string>
     <string name="add_habit">Ajouter une habitude</string>
@@ -35,8 +40,7 @@
     <string name="today">Aujourd\'hui</string>
     <string name="tomorrow">Demain</string>
     <string name="this_week">Cette semaine</string>
-    <string name="empty_habits">Pas encore d\'habitudes. Ajoutez la première !</string>
-
+    <string name="empty_habits">Aucune habitude pour le moment. Ajoutez la première !</string>
     <!-- Add Habit Dialog -->
     <string name="new_habit">Nouvelle habitude</string>
     <string name="edit_habit">Modifier l\'habitude</string>
@@ -58,37 +62,35 @@
     <string name="day_fri">V</string>
     <string name="day_sat">S</string>
     <string name="day_sun">D</string>
-
     <!-- Notification Settings -->
     <string name="notification_settings">Paramètres de notification</string>
     <string name="back">Retour</string>
     <string name="daily_summary">Résumé quotidien</string>
     <string name="enabled">Activé</string>
-    <string name="test_notification">Tester la notification</string>
+    <string name="test_notification">Notification test</string>
     <string name="notification_time">Heure de notification</string>
-    <string name="notification_helper">Les notifications seront envoyées quotidiennement à l\'heure définie.</string>
+    <string name="notification_helper">Les notifications seront envoyées quotidiennement à l\'heure définie ci-dessus.</string>
     <string name="notification_permission">Autorisation de notification</string>
-    <string name="notification_permission_text">Autorisez les notifications pour recevoir les résumés quotidiens et les rappels.</string>
+    <string name="notification_permission_text">Autorisez les notifications pour recevoir des résumés quotidiens et des rappels d\'échéance.</string>
     <string name="allow">Autoriser</string>
     <string name="deny">Refuser</string>
     <string name="due_label">Échéance : %1$s</string>
-
     <!-- Settings Screen -->
     <string name="settings">Paramètres</string>
     <string name="settings_title">Paramètres</string>
-    <string name="logout_button">Se déconnecter</string>
+    <string name="logout_button">Déconnexion</string>
     <string name="themes">Thèmes</string>
     <string name="themes_section">Thèmes</string>
-    <string name="purple_theme">Nuit Arctique</string>
-    <string name="green_theme">Aube Forestière</string>
-    <string name="red_theme">Désert Silencieux</string>
+    <string name="purple_theme">Nuit arctique</string>
+    <string name="green_theme">Aube en forêt</string>
+    <string name="red_theme">Désert silencieux</string>
     <string name="dark_theme">Minuit</string>
-    <string name="high_contrast_theme">Contraste Élevé</string>
+    <string name="high_contrast_theme">Contraste élevé</string>
     <string name="preferences">Préférences</string>
     <string name="preferences_section">Préférences</string>
     <string name="notifications">Notifications</string>
-    <string name="notifications_subtitle">Recevoir des rappels quotidiens</string>
-    <string name="reminder_time_label">Heure du rappel</string>
+    <string name="notifications_subtitle">Recevoir des rappels de tâches quotidiens</string>
+    <string name="reminder_time_label">Heure de rappel</string>
     <string name="sounds">Sons</string>
     <string name="sounds_subtitle">Effets sonores subtils</string>
     <string name="vibration">Vibration</string>
@@ -96,29 +98,32 @@
     <string name="app_name_label">AURA</string>
     <string name="version">Version 1.0.0</string>
     <string name="made_with_love">Fait avec amour pour une productivité consciente</string>
-
     <!-- Sign In Screen -->
     <string name="sign_in_title">Aura</string>
-    <string name="sign_in_subtitle">Connectez-vous pour synchroniser vos tâches</string>
+    <string name="sign_in_subtitle">Connectez-vous pour synchroniser vos tâches sur tous vos appareils</string>
     <string name="sign_in_button">Se connecter avec Google</string>
-
+    <string name="auth_error_no_credential">Aucun compte Google disponible. Veuillez en ajouter un et réessayer.</string>
+    <string name="auth_error_no_token">Impossible de récupérer le jeton de connexion Google. Veuillez réessayer.</string>
+    <string name="auth_error_unknown">Échec de la connexion : %1$s</string>
     <!-- Home Screen -->
-    <string name="home_dashboard_todos_title">TÂCHES AUJOURD\'HUI</string>
+    <string name="home_dashboard_todos_title">TÂCHES DU JOUR</string>
     <string name="home_dashboard_habits_title">SÉRIE D\'HABITUDES</string>
-    <string name="home_dashboard_todos_subtitle">%1$d restantes</string>
-    <string name="home_dashboard_habits_subtitle">%1$d/%2$d faites aujourd\'hui</string>
+    <string name="home_dashboard_todos_subtitle">%1$d restant</string>
+    <string name="home_dashboard_habits_subtitle">%1$d/%2$d terminés aujourd\'hui</string>
     <string name="settings_content_description">Paramètres</string>
-
     <!-- Habit Item -->
     <string name="streak_format">%1$d</string>
-
     <!-- Common -->
     <string name="content_description_back">Retour</string>
     <string name="content_description_delete">Supprimer</string>
-
+    <!-- Onboarding -->
+    <string name="onboarding_skip">Passer</string>
+    <string name="onboarding_next">Suivant</string>
+    <string name="onboarding_previous">Précédent</string>
+    <string name="onboarding_start">Commencer</string>
     <!-- Journal -->
     <string name="journal_title">Journal</string>
-    <string name="journal_empty">Pas encore d\'entrées</string>
+    <string name="journal_empty">Aucune entrée de journal pour le moment</string>
     <string name="journal_empty_subtitle">Appuyez sur + pour écrire votre première entrée</string>
     <string name="journal_title_hint">Titre</string>
     <string name="journal_content_hint">Écrivez vos pensées...</string>
@@ -128,25 +133,16 @@
     <string name="journal_new_entry">Nouvelle entrée</string>
     <string name="journal_edit_entry">Modifier l\'entrée</string>
     <string name="journal_add_entry">Ajouter une entrée</string>
-
-    <!-- Onboarding -->
-    <string name="onboarding_skip">Passer</string>
-    <string name="onboarding_next">Suivant</string>
-    <string name="onboarding_previous">Précédent</string>
-    <string name="onboarding_start">Commencer</string>
-
     <!-- Experiments / A/B testing -->
     <string name="home_dashboard_motivation_title">MOTIVATION QUOTIDIENNE</string>
     <string name="home_dashboard_motivation_subtitle">%1$s</string>
-    <string name="home_dashboard_motivation_value_greeting">Continuez</string>
+    <string name="home_dashboard_motivation_value_greeting">Continuez comme ça</string>
     <string name="home_dashboard_motivation_value_premium">Restez concentré</string>
-
     <!-- Navigation content descriptions -->
     <string name="nav_content_description_todos">Tâches</string>
     <string name="nav_content_description_habits">Habitudes</string>
     <string name="nav_content_description_home">Accueil</string>
     <string name="nav_content_description_journal">Journal</string>
-
     <!-- Habits -->
     <string name="habit_delete">Supprimer</string>
     <string name="delete_action">Supprimer</string>
@@ -162,12 +158,10 @@
     <string name="habit_day_short_fri">V</string>
     <string name="habit_day_short_sat">S</string>
     <string name="habit_day_short_sun">D</string>
-
     <!-- Settings -->
     <string name="time_separator">:</string>
-
     <!-- Errors -->
-    <string name="error_unknown">Une erreur inconnue s\'est produite</string>
+    <string name="error_unknown">Une erreur inconnue est survenue</string>
     <string name="error_todo_load">Échec du chargement des tâches</string>
     <string name="error_todo_add">Échec de l\'ajout de la tâche</string>
     <string name="error_todo_update">Échec de la mise à jour de la tâche</string>
@@ -180,4 +174,25 @@
     <string name="error_journal_save">Échec de l\'enregistrement de l\'entrée</string>
     <string name="error_journal_delete">Échec de la suppression de l\'entrée</string>
     <string name="error_journal_not_found">Entrée introuvable</string>
+    <!-- Pomodoro Screen -->
+    <string name="pomodoro_title">Pomodoro</string>
+    <string name="pomodoro_status_pomodoro">POMODORO</string>
+    <string name="pomodoro_status_short_break">COURTE PAUSE</string>
+    <string name="pomodoro_status_long_break">LONGUE PAUSE</string>
+    <string name="pomodoro_5m">5m</string>
+    <string name="pomodoro_10m">10m</string>
+    <string name="pomodoro_25m">25m</string>
+    <string name="pomodoro_sessions_completed">SESSIONS TERMINÉES : %1$d</string>
+    <string name="pomodoro_next_session">SUIVANT : %1$s</string>
+    <string name="pomodoro_status_summary">%1$s | %2$s</string>
+    <string name="pomodoro_completion_title">Session terminée</string>
+    <string name="pomodoro_completion_pomodoro_message">Votre session de concentration est terminée.</string>
+    <string name="pomodoro_completion_break_message">Votre pause est terminée.</string>
+    <string name="pomodoro_completion_next">Ensuite : %1$s</string>
+    <string name="pomodoro_completion_close">Fermer</string>
+    <string name="pomodoro_content_description_settings">Paramètres</string>
+    <string name="pomodoro_content_description_reset">Réinitialiser</string>
+    <string name="pomodoro_content_description_play">Lire</string>
+    <string name="pomodoro_content_description_pause">Pause</string>
+    <string name="pomodoro_content_description_skip">Passer</string>
 </resources>

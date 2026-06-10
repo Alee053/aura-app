@@ -1,48 +1,58 @@
-<resources>
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Loco xml export: Android strings
+ Project: Aura App
+ Locale: es, Spanish
+ Exported by: Ale Castro
+ Exported at: Wed, 10 Jun 2026 01:14:33 -0400
+-->
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <!-- Navigation -->
     <string name="nav_home">Inicio</string>
     <string name="nav_todos">Tareas</string>
     <string name="nav_habits">Hábitos</string>
     <string name="nav_settings">Ajustes</string>
     <string name="nav_journal">Diario</string>
-
     <!-- Todo Screen -->
-    <string name="todos_title">Mis Tareas</string>
-    <string name="add_todo">Agregar tarea</string>
+    <string name="todos_title">Mis tareas</string>
+    <string name="add_todo">Añadir tarea</string>
     <string name="new_todo_hint">Nueva tarea</string>
-    <string name="empty_todos">No hay tareas. ¡Agrega la primera!</string>
+    <string name="empty_todos">Aún no hay tareas. ¡Añade la primera!</string>
     <string name="delete">X</string>
     <string name="sign_out">Cerrar sesión</string>
-    <string name="select_due_date">Seleccionar fecha</string>
-    <string name="due_date_label">Fecha: %1$s</string>
+    <string name="select_due_date">Seleccionar fecha de vencimiento</string>
+    <string name="due_date_label">Fecha de vencimiento: %1$s</string>
     <string name="ok">Aceptar</string>
     <string name="cancel">Cancelar</string>
-
     <!-- Todo Dialog -->
     <string name="new_todo">Nueva tarea</string>
     <string name="edit_todo">Editar tarea</string>
     <string name="todo_name_hint">Nombre de la tarea</string>
     <string name="todo_description_hint">Descripción (opcional)</string>
-    <string name="add_due_date">Agregar fecha</string>
+    <string name="add_due_date">Añadir fecha de vencimiento</string>
     <string name="clear_due_date">Borrar</string>
-    <string name="add_first_todo">Agregar primera tarea</string>
-    <string name="completed_section">Completadas</string>
-
+    <string name="add_first_todo">Añadir primera tarea</string>
+    <string name="completed_section">Completado</string>
     <!-- Habit Screen -->
     <string name="habits_title">Hábitos</string>
-    <string name="add_habit">Agregar hábito</string>
+    <string name="add_habit">Añadir hábito</string>
+    <string name="add_first_habit">Añadir primer hábito</string>
     <string name="today">Hoy</string>
     <string name="tomorrow">Mañana</string>
     <string name="this_week">Esta semana</string>
-    <string name="empty_habits">No hay hábitos. ¡Toca + para agregar uno!</string>
-
+    <string name="empty_habits">Aún no hay hábitos. ¡Añade el primero!</string>
     <!-- Add Habit Dialog -->
     <string name="new_habit">Nuevo hábito</string>
+    <string name="edit_habit">Editar hábito</string>
+    <string name="delete_habit">Eliminar</string>
     <string name="habit_name">Nombre del hábito</string>
     <string name="daily">Diario</string>
     <string name="daily_badge">Diario</string>
     <string name="weekly">Semanal</string>
-    <string name="repeat_on">Repetir en:</string>
+    <string name="monthly">Mensual</string>
+    <string name="per_week">/ semana</string>
+    <string name="per_month">/ mes</string>
+    <string name="repeat_on">Repetir los:</string>
     <string name="color_label">Color:</string>
     <string name="save">Guardar</string>
     <string name="day_mon">L</string>
@@ -52,95 +62,87 @@
     <string name="day_fri">V</string>
     <string name="day_sat">S</string>
     <string name="day_sun">D</string>
-
     <!-- Notification Settings -->
-    <string name="notification_settings">Configuración de notificaciones</string>
-    <string name="back">Volver</string>
+    <string name="notification_settings">Ajustes de notificaciones</string>
+    <string name="back">Atrás</string>
     <string name="daily_summary">Resumen diario</string>
     <string name="enabled">Activado</string>
     <string name="test_notification">Probar notificación</string>
     <string name="notification_time">Hora de notificación</string>
-    <string name="notification_helper">Las notificaciones se enviarán diariamente a la hora configurada.</string>
-    <string name="notification_permission">Permiso de notificación</string>
-    <string name="notification_permission_text">Permite recibir notificaciones para resúmenes diarios y recordatorios de fechas.</string>
+    <string name="notification_helper">Las notificaciones se enviarán diariamente a la hora establecida arriba.</string>
+    <string name="notification_permission">Permiso de notificaciones</string>
+    <string name="notification_permission_text">Permite las notificaciones para recibir resúmenes diarios y recordatorios de fechas de vencimiento.</string>
     <string name="allow">Permitir</string>
     <string name="deny">Denegar</string>
-    <string name="due_label">Fecha: %1$s</string>
-
+    <string name="due_label">Vence: %1$s</string>
     <!-- Settings Screen -->
     <string name="settings">Ajustes</string>
     <string name="settings_title">Ajustes</string>
     <string name="logout_button">Cerrar sesión</string>
     <string name="themes">Temas</string>
     <string name="themes_section">Temas</string>
-    <string name="purple_theme">Noche Ártica</string>
-    <string name="green_theme">Amanecer del Bosque</string>
-    <string name="red_theme">Desierto Silencioso</string>
+    <string name="purple_theme">Noche ártica</string>
+    <string name="green_theme">Amanecer en el bosque</string>
+    <string name="red_theme">Desierto silencioso</string>
     <string name="dark_theme">Medianoche</string>
-    <string name="high_contrast_theme">Alto Contraste</string>
+    <string name="high_contrast_theme">Alto contraste</string>
     <string name="preferences">Preferencias</string>
     <string name="preferences_section">Preferencias</string>
     <string name="notifications">Notificaciones</string>
-    <string name="notifications_subtitle">Recibir recordatorios diarios</string>
-    <string name="reminder_time_label">Hora de recordatorio</string>
+    <string name="notifications_subtitle">Recibir recordatorios diarios de tareas</string>
+    <string name="reminder_time_label">Hora del recordatorio</string>
     <string name="sounds">Sonidos</string>
     <string name="sounds_subtitle">Efectos de sonido sutiles</string>
     <string name="vibration">Vibración</string>
-    <string name="vibration_subtitle">Retroalimentación háptica</string>
+    <string name="vibration_subtitle">Respuesta háptica</string>
     <string name="app_name_label">AURA</string>
     <string name="version">Versión 1.0.0</string>
-    <string name="made_with_love">Hecho con amor para productividad consciente</string>
-
+    <string name="made_with_love">Hecho con amor para una productividad consciente</string>
     <!-- Sign In Screen -->
     <string name="sign_in_title">Aura</string>
-    <string name="sign_in_subtitle">Inicia sesión para sincronizar tus tareas</string>
+    <string name="sign_in_subtitle">Inicia sesión para sincronizar tus tareas en todos tus dispositivos</string>
     <string name="sign_in_button">Iniciar sesión con Google</string>
-
+    <string name="auth_error_no_credential">No hay ninguna cuenta de Google disponible. Por favor, añade una e inténtalo de nuevo.</string>
+    <string name="auth_error_no_token">No se pudo obtener el token de inicio de sesión de Google. Por favor, inténtalo de nuevo.</string>
+    <string name="auth_error_unknown">Error al iniciar sesión: %1$s</string>
     <!-- Home Screen -->
-    <string name="home_dashboard_todos_title">TAREAS HOY</string>
+    <string name="home_dashboard_todos_title">TAREAS DE HOY</string>
     <string name="home_dashboard_habits_title">RACHA DE HÁBITOS</string>
     <string name="home_dashboard_todos_subtitle">%1$d restantes</string>
-    <string name="home_dashboard_habits_subtitle">%1$d/%2$d hechos hoy</string>
+    <string name="home_dashboard_habits_subtitle">%1$d/%2$d completado hoy</string>
     <string name="settings_content_description">Ajustes</string>
-
     <!-- Habit Item -->
     <string name="streak_format">%1$d</string>
-
     <!-- Common -->
-    <string name="content_description_back">Volver</string>
+    <string name="content_description_back">Atrás</string>
     <string name="content_description_delete">Eliminar</string>
-
     <!-- Onboarding -->
     <string name="onboarding_skip">Omitir</string>
     <string name="onboarding_next">Siguiente</string>
     <string name="onboarding_previous">Anterior</string>
-    <string name="onboarding_start">Comenzar</string>
-
+    <string name="onboarding_start">Empezar</string>
     <!-- Journal -->
     <string name="journal_title">Diario</string>
-    <string name="journal_empty">Aún no hay entradas</string>
+    <string name="journal_empty">Aún no hay entradas en el diario</string>
     <string name="journal_empty_subtitle">Toca + para escribir tu primera entrada</string>
     <string name="journal_title_hint">Título</string>
     <string name="journal_content_hint">Escribe tus pensamientos...</string>
     <string name="journal_save">Guardar</string>
     <string name="journal_delete">Eliminar</string>
-    <string name="journal_back">Volver</string>
+    <string name="journal_back">Atrás</string>
     <string name="journal_new_entry">Nueva entrada</string>
     <string name="journal_edit_entry">Editar entrada</string>
-    <string name="journal_add_entry">Agregar entrada</string>
-
+    <string name="journal_add_entry">Añadir entrada</string>
     <!-- Experiments / A/B testing -->
     <string name="home_dashboard_motivation_title">MOTIVACIÓN DIARIA</string>
     <string name="home_dashboard_motivation_subtitle">%1$s</string>
     <string name="home_dashboard_motivation_value_greeting">Sigue así</string>
-    <string name="home_dashboard_motivation_value_premium">Mantén el enfoque</string>
-
+    <string name="home_dashboard_motivation_value_premium">Mantente concentrado</string>
     <!-- Navigation content descriptions -->
     <string name="nav_content_description_todos">Tareas</string>
     <string name="nav_content_description_habits">Hábitos</string>
     <string name="nav_content_description_home">Inicio</string>
     <string name="nav_content_description_journal">Diario</string>
-
     <!-- Habits -->
     <string name="habit_delete">Eliminar</string>
     <string name="delete_action">Eliminar</string>
@@ -156,22 +158,41 @@
     <string name="habit_day_short_fri">V</string>
     <string name="habit_day_short_sat">S</string>
     <string name="habit_day_short_sun">D</string>
-
     <!-- Settings -->
     <string name="time_separator">:</string>
-
     <!-- Errors -->
-    <string name="error_unknown">Ha ocurrido un error desconocido</string>
+    <string name="error_unknown">Se ha producido un error desconocido</string>
     <string name="error_todo_load">Error al cargar las tareas</string>
-    <string name="error_todo_add">Error al agregar la tarea</string>
+    <string name="error_todo_add">Error al añadir la tarea</string>
     <string name="error_todo_update">Error al actualizar la tarea</string>
     <string name="error_todo_delete">Error al eliminar la tarea</string>
     <string name="error_habit_load">Error al cargar los hábitos</string>
-    <string name="error_habit_add">Error al agregar el hábito</string>
+    <string name="error_habit_add">Error al añadir el hábito</string>
     <string name="error_habit_update">Error al actualizar el hábito</string>
     <string name="error_habit_delete">Error al eliminar el hábito</string>
     <string name="error_journal_load">Error al cargar las entradas del diario</string>
     <string name="error_journal_save">Error al guardar la entrada</string>
     <string name="error_journal_delete">Error al eliminar la entrada</string>
     <string name="error_journal_not_found">Entrada no encontrada</string>
+    <!-- Pomodoro Screen -->
+    <string name="pomodoro_title">Pomodoro</string>
+    <string name="pomodoro_status_pomodoro">POMODORO</string>
+    <string name="pomodoro_status_short_break">DESCANSO CORTO</string>
+    <string name="pomodoro_status_long_break">DESCANSO LARGO</string>
+    <string name="pomodoro_5m">5m</string>
+    <string name="pomodoro_10m">10m</string>
+    <string name="pomodoro_25m">25m</string>
+    <string name="pomodoro_sessions_completed">SESIONES COMPLETADAS: %1$d</string>
+    <string name="pomodoro_next_session">SIGUIENTE: %1$s</string>
+    <string name="pomodoro_status_summary">%1$s | %2$s</string>
+    <string name="pomodoro_completion_title">Sesión finalizada</string>
+    <string name="pomodoro_completion_pomodoro_message">Tu sesión de concentración ha terminado.</string>
+    <string name="pomodoro_completion_break_message">Tu descanso ha terminado.</string>
+    <string name="pomodoro_completion_next">A continuación: %1$s</string>
+    <string name="pomodoro_completion_close">Cerrar</string>
+    <string name="pomodoro_content_description_settings">Ajustes</string>
+    <string name="pomodoro_content_description_reset">Restablecer</string>
+    <string name="pomodoro_content_description_play">Reproducir</string>
+    <string name="pomodoro_content_description_pause">Pausa</string>
+    <string name="pomodoro_content_description_skip">Saltar</string>
 </resources>

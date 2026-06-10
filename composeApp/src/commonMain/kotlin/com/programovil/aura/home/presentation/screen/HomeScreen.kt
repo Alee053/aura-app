@@ -110,7 +110,7 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(16.dp))
             DashboardCard(
                 title = stringResource(Res.string.home_dashboard_motivation_title),
-                value = uiState.homeVariant.motivationPhrase,
+                value = uiState.resolvedMotivationPhrase,
                 subtitle = "",
                 onClick = {},
                 valueStyle = AppTheme.typography.titleMedium

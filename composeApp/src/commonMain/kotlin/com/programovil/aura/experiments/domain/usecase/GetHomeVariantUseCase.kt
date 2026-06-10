@@ -14,7 +14,6 @@ class GetHomeVariantUseCase(
         getUserPlanUseCase(),
         getMotivationPhraseUseCase()
     ) { plan, phrase ->
-        println("[GetHomeVariantUseCase] combine fired: plan=$plan, phrase='$phrase'")
         when (plan) {
             UserPlan.Free -> HomeVariant(showsDailyMotivation = false, tone = Tone.Gentle, motivationPhrase = phrase)
             UserPlan.Premium -> HomeVariant(showsDailyMotivation = true, tone = Tone.Direct, motivationPhrase = phrase)

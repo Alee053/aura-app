@@ -15,5 +15,8 @@ enum class StringRemoteConfigFlag(
     val key: String,
     val defaultValue: String
 ) {
-    MOTIVATION_PHRASE("motivation_phrase", "Stay focused");
+    MOTIVATION_PHRASE(
+        "motivation_phrase",
+        """{"en":"Stay focused","es":"Mantén el enfoque","fr":"Reste concentré"}"""
+    );
 }

@@ -19,16 +19,23 @@ data class HomeUiState(
     val homeVariant: HomeVariant = HomeVariant(
         showsDailyMotivation = false,
         tone = Tone.Gentle,
-        motivationPhrase = "Stay focused"
-    )
-)
+        motivationPhrase = emptyMap()
+    ),
+    val locale: String = "en"
+) {
+    val resolvedMotivationPhrase: String
+        get() = homeVariant.motivationPhrase[locale]
+            ?: homeVariant.motivationPhrase["en"]
+            ?: ""
+}
 
 class HomeViewModel(
     private val getDashboardDataUseCase: GetDashboardDataUseCase,
-    private val getHomeVariantUseCase: GetHomeVariantUseCase
+    private val getHomeVariantUseCase: GetHomeVariantUseCase,
+    locale: String
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(HomeUiState())
+    private val _uiState = MutableStateFlow(HomeUiState(locale = locale))
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     init {
@@ -43,7 +50,6 @@ class HomeViewModel(
         }
         viewModelScope.launch {
             getHomeVariantUseCase().collect { variant ->
-                println("[HomeViewModel] HomeVariant updated: phrase='${variant.motivationPhrase}', showsDaily=${variant.showsDailyMotivation}")
                 _uiState.update { state -> state.copy(homeVariant = variant) }
             }
         }

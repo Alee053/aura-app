@@ -24,7 +24,7 @@ class GetHomeVariantUseCaseTest {
     @Test
     fun `Free plan returns variant with no daily motivation`() = runTest {
         every { repository.observeUserPlan() } returns MutableStateFlow(UserPlan.Free)
-        every { getMotivationPhraseUseCase() } returns MutableStateFlow("Any phrase")
+        every { getMotivationPhraseUseCase() } returns MutableStateFlow(mapOf("en" to "Any"))
 
         useCase().test {
             val variant = awaitItem()
@@ -37,7 +37,7 @@ class GetHomeVariantUseCaseTest {
     @Test
     fun `Premium plan returns variant with daily motivation and direct tone`() = runTest {
         every { repository.observeUserPlan() } returns MutableStateFlow(UserPlan.Premium)
-        every { getMotivationPhraseUseCase() } returns MutableStateFlow("Any phrase")
+        every { getMotivationPhraseUseCase() } returns MutableStateFlow(mapOf("en" to "Any"))
 
         useCase().test {
             val variant = awaitItem()
@@ -48,13 +48,14 @@ class GetHomeVariantUseCaseTest {
     }
 
     @Test
-    fun `motivation phrase flows through to HomeVariant`() = runTest {
+    fun `motivation phrase map flows through to HomeVariant`() = runTest {
+        val phrases = mapOf("en" to "Stay focused", "es" to "Mantén el enfoque")
         every { repository.observeUserPlan() } returns MutableStateFlow(UserPlan.Premium)
-        every { getMotivationPhraseUseCase() } returns MutableStateFlow("Hello from RC")
+        every { getMotivationPhraseUseCase() } returns MutableStateFlow(phrases)
 
         useCase().test {
             val variant = awaitItem()
-            assertEquals("Hello from RC", variant.motivationPhrase)
+            assertEquals(phrases, variant.motivationPhrase)
             cancelAndIgnoreRemainingEvents()
         }
     }

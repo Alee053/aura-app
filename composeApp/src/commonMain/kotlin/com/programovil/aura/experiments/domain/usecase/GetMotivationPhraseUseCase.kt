@@ -8,5 +8,5 @@ import kotlinx.coroutines.flow.Flow
 class GetMotivationPhraseUseCase(
     private val motivationPhraseManager: MotivationPhraseManager
 ) {
-    operator fun invoke(): Flow<String> = motivationPhraseManager.phrase
+    operator fun invoke(): Flow<Map<String, String>> = motivationPhraseManager.phrase
 }

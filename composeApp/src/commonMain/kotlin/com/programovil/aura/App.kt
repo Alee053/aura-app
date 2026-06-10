@@ -41,6 +41,7 @@ import com.programovil.aura.auth.presentation.screen.authErrorMessage
 import com.programovil.aura.designsystem.theme.AppTheme
 import com.programovil.aura.designsystem.theme.DsTheme
 import com.programovil.aura.designsystem.theme.ThemeMode
+import com.programovil.aura.habit.domain.usecase.GetHabitsAccessibilityUseCase
 import com.programovil.aura.navigation.AppNavHost
 import com.programovil.aura.navigation.NavRoute
 import com.programovil.aura.onboarding.data.OnboardingPreferences
@@ -125,26 +126,22 @@ fun AuthenticatedApp(
     val todoViewModel: TodoViewModel = koinViewModel()
     val featureFlagManager: FeatureFlagManager = koinInject()
     val featureFlags by featureFlagManager.flags.collectAsState()
-    val getUserPlanUseCase: com.programovil.aura.experiments.domain.usecase.GetUserPlanUseCase = koinInject()
-    val userPlan by getUserPlanUseCase().collectAsState(initial = com.programovil.aura.experiments.domain.model.UserPlan.Free)
+    val getHabitsAccessibilityUseCase: GetHabitsAccessibilityUseCase = koinInject()
+    val showHabitsAccessible: Boolean by getHabitsAccessibilityUseCase()
+        .collectAsState(initial = true)
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
     LaunchedEffect(Unit) {
         featureFlagManager.initialize()
-        getUserPlanUseCase.refresh()
     }
 
     val showTodos by remember(featureFlags) {
         mutableStateOf(featureFlags[FeatureFlag.TODOS_ENABLED] ?: true)
     }
-    val showHabits by remember(featureFlags) {
-        mutableStateOf(featureFlags[FeatureFlag.HABITS_ENABLED] ?: true)
-    }
     val showJournals by remember(featureFlags) {
         mutableStateOf(featureFlags[FeatureFlag.JOURNAL_ENABLED] ?: true)
     }
-    val showPremiumFeatures = userPlan is com.programovil.aura.experiments.domain.model.UserPlan.Premium
 
     val navItemColors = NavigationBarItemDefaults.colors(
         selectedIconColor = AppTheme.colors.primary,
@@ -192,7 +189,7 @@ fun AuthenticatedApp(
                         colors = navItemColors
                     )
                 }
-                if (showHabits && showPremiumFeatures) {
+                if (showHabitsAccessible) {
                     NavigationBarItem(
                         icon = { Icon(Icons.Default.DateRange, contentDescription = "Habits") },
                         label = { Text(stringResource(Res.string.nav_habits)) },
@@ -208,7 +205,7 @@ fun AuthenticatedApp(
                         colors = navItemColors
                     )
                 }
-                if (showJournals && showPremiumFeatures) {
+                if (showJournals) {
                     NavigationBarItem(
                         icon = { Icon(Icons.Default.Book, contentDescription = "Journal") },
                         label = { Text(stringResource(Res.string.nav_journal)) },

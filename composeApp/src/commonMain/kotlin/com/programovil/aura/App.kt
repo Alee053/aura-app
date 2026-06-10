@@ -52,6 +52,7 @@ import com.programovil.aura.pomodoro.presentation.pomodoroNextSessionLabel
 import com.programovil.aura.shared.AppLifecycleEvents
 import com.programovil.aura.shared.FeatureFlag
 import com.programovil.aura.shared.FeatureFlagManager
+import com.programovil.aura.shared.MotivationPhraseManager
 import com.programovil.aura.shared.PomodoroLaunchEvents
 import com.programovil.aura.todo.presentation.viewmodel.TodoViewModel
 import org.koin.compose.koinInject
@@ -139,6 +140,7 @@ fun AuthenticatedApp(
     val pomodoroUiState by pomodoroViewModel.uiState.collectAsState()
     val featureFlagManager: FeatureFlagManager = koinInject()
     val featureFlags by featureFlagManager.flags.collectAsState()
+    val motivationPhraseManager: MotivationPhraseManager = koinInject()
     val getHabitsAccessibilityUseCase: GetHabitsAccessibilityUseCase = koinInject()
     val showHabitsAccessible: Boolean by getHabitsAccessibilityUseCase()
         .collectAsState(initial = true)
@@ -147,6 +149,7 @@ fun AuthenticatedApp(
 
     LaunchedEffect(Unit) {
         featureFlagManager.initialize()
+        motivationPhraseManager.initialize()
     }
 
     LaunchedEffect(Unit) {

@@ -5,9 +5,11 @@ import com.programovil.aura.experiments.domain.repository.UserPlanRepository
 import com.programovil.aura.experiments.domain.repository.createExperimentRepository
 import com.programovil.aura.experiments.domain.repository.createUserPlanRepository
 import com.programovil.aura.experiments.domain.usecase.GetHomeVariantUseCase
+import com.programovil.aura.experiments.domain.usecase.GetMotivationPhraseUseCase
 import com.programovil.aura.experiments.domain.usecase.GetNotificationVariantUseCase
 import com.programovil.aura.experiments.domain.usecase.GetUserPlanUseCase
 import com.programovil.aura.experiments.domain.usecase.LogExperimentEventUseCase
+import com.programovil.aura.shared.MotivationPhraseManager
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.bind
@@ -17,6 +19,8 @@ val experimentsModule: Module = module {
     single { createUserPlanRepository() } bind UserPlanRepository::class
     single { createExperimentRepository() } bind ExperimentRepository::class
 
+    single { MotivationPhraseManager(get()) }
+    factoryOf(::GetMotivationPhraseUseCase)
     factoryOf(::GetUserPlanUseCase)
     factoryOf(::GetHomeVariantUseCase)
     factoryOf(::GetNotificationVariantUseCase)

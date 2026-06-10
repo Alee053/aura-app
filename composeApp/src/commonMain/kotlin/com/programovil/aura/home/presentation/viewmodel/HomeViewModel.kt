@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.programovil.aura.experiments.domain.model.HomeVariant
 import com.programovil.aura.experiments.domain.model.Tone
 import com.programovil.aura.experiments.domain.usecase.GetHomeVariantUseCase
-import com.programovil.aura.experiments.domain.usecase.GetUserPlanUseCase
 import com.programovil.aura.home.domain.model.DashboardData
 import com.programovil.aura.home.domain.usecase.GetDashboardDataUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,13 +16,16 @@ import kotlinx.coroutines.launch
 data class HomeUiState(
     val dashboardData: DashboardData = DashboardData(),
     val isLoading: Boolean = true,
-    val homeVariant: HomeVariant = HomeVariant(showsDailyMotivation = false, tone = Tone.Gentle)
+    val homeVariant: HomeVariant = HomeVariant(
+        showsDailyMotivation = false,
+        tone = Tone.Gentle,
+        motivationPhrase = "Stay focused"
+    )
 )
 
 class HomeViewModel(
     private val getDashboardDataUseCase: GetDashboardDataUseCase,
-    private val getHomeVariantUseCase: GetHomeVariantUseCase,
-    private val getUserPlanUseCase: GetUserPlanUseCase
+    private val getHomeVariantUseCase: GetHomeVariantUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -40,8 +42,8 @@ class HomeViewModel(
             }
         }
         viewModelScope.launch {
-            getUserPlanUseCase().collect {
-                val variant = getHomeVariantUseCase()
+            getHomeVariantUseCase().collect { variant ->
+                println("[HomeViewModel] HomeVariant updated: phrase='${variant.motivationPhrase}', showsDaily=${variant.showsDailyMotivation}")
                 _uiState.update { state -> state.copy(homeVariant = variant) }
             }
         }

@@ -140,9 +140,6 @@
 
     <!-- Experiments / A/B testing -->
     <string name="home_dashboard_motivation_title">DAILY MOTIVATION</string>
-    <string name="home_dashboard_motivation_subtitle">%1$s</string>
-    <string name="home_dashboard_motivation_value_greeting">Keep going</string>
-    <string name="home_dashboard_motivation_value_premium">Stay focused</string>
 
     <!-- Navigation content descriptions -->
     <string name="nav_content_description_todos">Todos</string>

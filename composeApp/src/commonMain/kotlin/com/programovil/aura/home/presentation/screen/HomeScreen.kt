@@ -22,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.dp
 import com.programovil.aura.designsystem.theme.AppTheme
-import com.programovil.aura.experiments.domain.model.Tone
 import com.programovil.aura.home.presentation.composable.DashboardCard
 import com.programovil.aura.home.presentation.viewmodel.HomeViewModel
 import aura_app.composeapp.generated.resources.Res
@@ -109,14 +108,9 @@ fun HomeScreen(
 
         if (uiState.homeVariant.showsDailyMotivation) {
             Spacer(modifier = Modifier.height(16.dp))
-            val motivation = if (uiState.homeVariant.tone == Tone.Direct) {
-                stringResource(Res.string.home_dashboard_motivation_value_premium)
-            } else {
-                stringResource(Res.string.home_dashboard_motivation_value_greeting)
-            }
             DashboardCard(
                 title = stringResource(Res.string.home_dashboard_motivation_title),
-                value = motivation,
+                value = uiState.homeVariant.motivationPhrase,
                 subtitle = "",
                 onClick = {},
                 valueStyle = AppTheme.typography.titleMedium

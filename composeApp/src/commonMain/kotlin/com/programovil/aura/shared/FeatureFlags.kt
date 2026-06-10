@@ -10,3 +10,10 @@ enum class FeatureFlag(
     POMODORO_ENABLED("pomodoro_enabled", true),
     IS_PREMIUM("is_premium", false);
 }
+
+enum class StringRemoteConfigFlag(
+    val key: String,
+    val defaultValue: String
+) {
+    MOTIVATION_PHRASE("motivation_phrase", "Stay focused");
+}

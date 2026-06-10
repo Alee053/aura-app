@@ -171,7 +171,7 @@ La suite cubre todos los use cases de dominio, todos los contratos de repositori
 
 ### Convenciones
 
-- **Test doubles** — Las interfaces `@Mockable` se mockean con `mock(of<T>())`; todo lo demás usa fakes hechos a mano (p. ej. `FakeJournalRepository`, `FakeAuthService`, `InMemoryPreferenceDataStore`). En `AGENTS.md` está la justificación completa.
+- **Test doubles** — Las interfaces `@Mockable` se mockean con `mock(of<T>())`; todo lo demás usa fakes hechos a mano (p. ej. `FakeJournalRepository`, `FakeAuthService`, `InMemoryPreferenceDataStore`).
 - **Coroutines** — Los tests de ViewModel usan `StandardTestDispatcher` + `Dispatchers.setMain`; los use cases usan `runTest { ... }`. Un `@AfterTest` cancela cada `viewModelScope` creado para que los tickers colgados no bloqueen `runTest`.
 - **Flows** — El patrón estándar es `app.cash.turbine.test { awaitItem(); awaitComplete() }`.
 - **Naming** — `comportamiento bajo condición` entre comillas invertidas (p. ej. `` `successful dashboard emission clears loading and updates data` ``).

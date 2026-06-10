@@ -123,6 +123,66 @@ Guías detalladas disponibles en `docs/`:
 ./gradlew clean
 ```
 
+## Testing
+
+El módulo `composeApp` incluye una suite de tests unitarios JVM en `composeApp/src/commonTest`. La suite completa son **45 clases de test, 178 tests** y corre en menos de 30 segundos con el daemon caliente.
+
+### Cómo correr los tests
+
+```shell
+# Toda la suite
+./gradlew :composeApp:testDebugUnitTest
+
+# Una sola clase
+./gradlew :composeApp:testDebugUnitTest \
+    --tests "com.programovil.aura.pomodoro.presentation.PomodoroViewModelTest"
+
+# Un solo método de test
+./gradlew :composeApp:testDebugUnitTest \
+    --tests "com.programovil.aura.pomodoro.presentation.PomodoroViewModelTest.initial state is a 25-minute idle pomodoro"
+
+# Varias clases (wildcard)
+./gradlew :composeApp:testDebugUnitTest \
+    --tests "com.programovil.aura.todo.domain.usecase.*"
+```
+
+Para corridas locales más rápidas, salteá el pull de traducciones de Loco y el hook de `preBuild`:
+
+```shell
+./gradlew :composeApp:testDebugUnitTest -x pullTranslations -x preBuild --offline
+```
+
+Los reportes HTML quedan en `composeApp/build/reports/tests/testDebugUnitTest/`. Los resultados JUnit XML viven al lado, en `composeApp/build/test-results/testDebugUnitTest/`, y son aptos para que los consuma CI.
+
+### Distribución de los tests
+
+| Capa | Clases de test | Tests |
+|---|---|---|
+| Presentation — ViewModels | 9 | 66 |
+| Domain — use cases | 20 | 50 |
+| Máquinas de estado puras / modelos | 5 | 32 |
+| Presentation — mappers | 4 | 18 |
+| Infraestructura compartida (`*Manager`) | 4 | 11 |
+| Contratos de repositorio (sólo Android) | 1 | 1 |
+| Helpers compartidos (`FakeRemoteConfigService`) | 2 | — |
+| **Total** | **45** | **178** |
+
+La suite cubre todos los use cases de dominio, todos los contratos de repositorio `@Mockable` (vía su use case), todos los ViewModel de presentation, todos los data mappers y los helpers de infraestructura compartida (`MotivationPhraseManager`, `UserPlanManager`, `RemoteConfigValueManager`, `FeatureFlagManager`, `ColorUtils`).
+
+### Convenciones
+
+- **Test doubles** — Las interfaces `@Mockable` se mockean con `mock(of<T>())`; todo lo demás usa fakes hechos a mano (p. ej. `FakeJournalRepository`, `FakeAuthService`, `InMemoryPreferenceDataStore`). En `AGENTS.md` está la justificación completa.
+- **Coroutines** — Los tests de ViewModel usan `StandardTestDispatcher` + `Dispatchers.setMain`; los use cases usan `runTest { ... }`. Un `@AfterTest` cancela cada `viewModelScope` creado para que los tickers colgados no bloqueen `runTest`.
+- **Flows** — El patrón estándar es `app.cash.turbine.test { awaitItem(); awaitComplete() }`.
+- **Naming** — `comportamiento bajo condición` entre comillas invertidas (p. ej. `` `successful dashboard emission clears loading and updates data` ``).
+- **Sin comentarios** en el código de test.
+
+### Cómo agregar un test nuevo
+
+1. Reflejá el layout de paquetes del código de producción (p. ej. fuente en `…/todo/domain/usecase/` → test en `…/todo/domain/usecase/`).
+2. Si la dependencia es `@Mockable`, usá `mock(of<T>())`. Si no, extendé la interfaz o escribí un fake chico.
+3. Registrá cualquier `ViewModel` creado en el test en una lista dentro de `@AfterTest` y llamá `viewModel.viewModelScope.cancel()` — si no, el test se cuelga en `runTest` esperando un ticker.
+
 ## Localización (Loco)
 
 Las traducciones se gestionan en [Loco](https://localise.biz) y se sincronizan con el repositorio mediante dos tareas de Gradle. El proyecto tiene tres idiomas: **`en`** (fuente, commiteado en git), **`es`** y **`fr`**.

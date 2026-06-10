@@ -5,10 +5,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 /**
@@ -43,6 +45,14 @@ class FeatureFlagManager(
                 println("[FeatureFlagManager] Config update received, refreshing all flags...")
                 managers.values.forEach { it.refresh() }
                 println("[FeatureFlagManager] All flags refreshed")
+            }
+        }
+        // Polling fallback: refresh every 5 seconds to ensure updates even if real-time listener fails
+        scope.launch {
+            while (isActive) {
+                delay(5000)
+                println("[FeatureFlagManager] Polling: refreshing all flags...")
+                managers.values.forEach { it.refresh() }
             }
         }
         managers.forEach { (flag, mgr) ->

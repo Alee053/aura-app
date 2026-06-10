@@ -5,9 +5,7 @@ sealed class UserPlan {
     data object Premium : UserPlan()
 
     companion object {
-        fun fromRemoteConfigString(raw: String?): UserPlan = when (raw) {
-            "Premium" -> Premium
-            else -> Free
-        }
+        fun fromRemoteConfigBoolean(isPremium: Boolean?): UserPlan =
+            if (isPremium == true) Premium else Free
     }
 }

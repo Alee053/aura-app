@@ -26,10 +26,7 @@ class FirebaseRemoteConfigService(context: Context) : RemoteConfigService {
         val flagDefaults: Map<String, Any> = FeatureFlag.entries.associate { flag ->
             flag.key to flag.defaultValue
         }
-        val userPlanDefaults: Map<String, Any> = UserPlanFlag.entries.associate { flag ->
-            flag.key to flag.defaultValue
-        }
-        remoteConfig.setDefaultsAsync(flagDefaults + userPlanDefaults)
+        remoteConfig.setDefaultsAsync(flagDefaults)
     }
 
     override suspend fun getBoolean(key: String, default: Boolean): Boolean {

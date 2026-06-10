@@ -2,29 +2,20 @@ package com.programovil.aura.shared
 
 import com.programovil.aura.experiments.domain.model.UserPlan
 import io.mockative.Mockable
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 /**
- * Typed wrapper that exposes the current [UserPlan] (Free or Premium) sourced
- * from Remote Config. Internally owns a [RemoteConfigValueManager]; no polling
- * loop is started.
+ * Typed wrapper that exposes the current [UserPlan] (Free or Premium) derived
+ * from the [FeatureFlag.IS_PREMIUM] flag in [FeatureFlagManager].
+ *
+ * [UserPlan] is a domain concept (Free/Premium today, more tiers later) sourced
+ * from a single boolean remote-config flag. This class owns the mapping.
  */
 @Mockable
 class UserPlanManager(
-    remoteConfigService: RemoteConfigService
+    featureFlagManager: FeatureFlagManager
 ) {
-    private val manager = RemoteConfigValueManager(
-        remoteConfigService = remoteConfigService,
-        key = UserPlanFlag.USER_PLAN.key,
-        defaultValue = UserPlan.fromRemoteConfigString(UserPlanFlag.USER_PLAN.defaultValue),
-        parser = { raw -> UserPlan.fromRemoteConfigString(raw) }
-    )
-
-    val userPlan: StateFlow<UserPlan> = manager.value
-
-    suspend fun initialize() = manager.initialize()
-
-    fun refresh() = manager.refresh()
-
-    fun stop() = manager.stop()
+    val userPlan: Flow<UserPlan> = featureFlagManager.flags
+        .map { flags -> UserPlan.fromRemoteConfigBoolean(flags[FeatureFlag.IS_PREMIUM]) }
 }

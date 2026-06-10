@@ -6,27 +6,17 @@ import kotlin.test.assertEquals
 class UserPlanTest {
 
     @Test
-    fun `fromRemoteConfigString Premium maps to Premium`() {
-        assertEquals(UserPlan.Premium, UserPlan.fromRemoteConfigString("Premium"))
+    fun `fromRemoteConfigBoolean true maps to Premium`() {
+        assertEquals(UserPlan.Premium, UserPlan.fromRemoteConfigBoolean(true))
     }
 
     @Test
-    fun `fromRemoteConfigString Free maps to Free`() {
-        assertEquals(UserPlan.Free, UserPlan.fromRemoteConfigString("Free"))
+    fun `fromRemoteConfigBoolean false maps to Free`() {
+        assertEquals(UserPlan.Free, UserPlan.fromRemoteConfigBoolean(false))
     }
 
     @Test
-    fun `fromRemoteConfigString null maps to Free (safe default)`() {
-        assertEquals(UserPlan.Free, UserPlan.fromRemoteConfigString(null))
-    }
-
-    @Test
-    fun `fromRemoteConfigString unknown value maps to Free`() {
-        assertEquals(UserPlan.Free, UserPlan.fromRemoteConfigString("Platinum"))
-    }
-
-    @Test
-    fun `fromRemoteConfigString case-sensitive rejects lowercase premium`() {
-        assertEquals(UserPlan.Free, UserPlan.fromRemoteConfigString("premium"))
+    fun `fromRemoteConfigBoolean null maps to Free (safe default)`() {
+        assertEquals(UserPlan.Free, UserPlan.fromRemoteConfigBoolean(null))
     }
 }

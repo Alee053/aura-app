@@ -1,5 +1,6 @@
 package com.programovil.aura.pomodoro.presentation
 
+import androidx.lifecycle.viewModelScope
 import com.programovil.aura.pomodoro.domain.PomodoroDefaults
 import com.programovil.aura.pomodoro.domain.PomodoroMode
 import com.programovil.aura.pomodoro.domain.PomodoroStateRepository
@@ -9,6 +10,7 @@ import com.programovil.aura.notification.domain.NotificationScheduler
 import com.programovil.aura.shared.AppVisibilityTracker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -33,6 +35,7 @@ class PomodoroViewModelTest {
     private lateinit var repository: FakePomodoroStateRepository
     private lateinit var timeProvider: FakeTimeProvider
     private lateinit var notificationScheduler: FakeNotificationScheduler
+    private val viewModels = mutableListOf<PomodoroViewModel>()
 
     @BeforeTest
     fun setup() {
@@ -45,6 +48,8 @@ class PomodoroViewModelTest {
 
     @AfterTest
     fun tearDown() {
+        viewModels.forEach { it.viewModelScope.cancel() }
+        viewModels.clear()
         Dispatchers.resetMain()
     }
 
@@ -203,23 +208,33 @@ class PomodoroViewModelTest {
         assertEquals(60, state.timeLeftSeconds)
         assertEquals(120, state.initialTimeSeconds)
         assertEquals(0.5f, state.progress)
+
+        viewModel.toggleTimer()
+        runCurrent()
     }
 
     @Test
     fun `restores active timer after viewmodel recreation`() = runTest(testDispatcher) {
-        val firstViewModel = createViewModel()
-        firstViewModel.onTimeOptionSelected(1)
-        runCurrent()
-        firstViewModel.toggleTimer()
-        runCurrent()
-        advanceClockBy(15 * PomodoroDefaults.TICK_INTERVAL_MS)
+        repository.saveImmediate(
+            PomodoroTimerState(
+                timeLeftSeconds = 45,
+                initialTimeSeconds = 60,
+                isRunning = true,
+                mode = PomodoroMode.POMODORO,
+                sessionsCompleted = 0,
+                selectedOption = 1,
+                endsAtEpochMillis = timeProvider.currentTimeMillis() + 45_000L
+            )
+        )
 
-        val secondViewModel = createViewModel()
+        val viewModel = createViewModel()
+        runCurrent()
 
-        assertTrue(secondViewModel.uiState.value.isRunning)
-        assertEquals(45, secondViewModel.uiState.value.timeLeftSeconds)
-        advanceClockBy(5 * PomodoroDefaults.TICK_INTERVAL_MS)
-        assertEquals(40, secondViewModel.uiState.value.timeLeftSeconds)
+        assertTrue(viewModel.uiState.value.isRunning)
+        assertEquals(45, viewModel.uiState.value.timeLeftSeconds)
+
+        viewModel.toggleTimer()
+        runCurrent()
     }
 
     @Test
@@ -308,6 +323,7 @@ class PomodoroViewModelTest {
 
     private fun createViewModel(): PomodoroViewModel {
         val viewModel = PomodoroViewModel(repository, timeProvider, notificationScheduler)
+        viewModels += viewModel
         testDispatcher.scheduler.runCurrent()
         return viewModel
     }

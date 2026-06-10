@@ -30,10 +30,7 @@ import aura_app.composeapp.generated.resources.home_dashboard_todos_title
 import aura_app.composeapp.generated.resources.home_dashboard_habits_title
 import aura_app.composeapp.generated.resources.home_dashboard_todos_subtitle
 import aura_app.composeapp.generated.resources.home_dashboard_habits_subtitle
-import aura_app.composeapp.generated.resources.home_dashboard_motivation_subtitle
 import aura_app.composeapp.generated.resources.home_dashboard_motivation_title
-import aura_app.composeapp.generated.resources.home_dashboard_motivation_value_greeting
-import aura_app.composeapp.generated.resources.home_dashboard_motivation_value_premium
 import aura_app.composeapp.generated.resources.settings_content_description
 import org.jetbrains.compose.resources.stringResource
 

@@ -4,7 +4,7 @@
  Project: Aura App
  Locale: fr, French
  Exported by: Ale Castro
- Exported at: Wed, 10 Jun 2026 01:39:15 -0400
+ Exported at: Wed, 10 Jun 2026 15:15:32 -0400
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <!-- Navigation -->
@@ -135,9 +135,6 @@
     <string name="journal_add_entry">Ajouter une entrée</string>
     <!-- Experiments / A/B testing -->
     <string name="home_dashboard_motivation_title">MOTIVATION QUOTIDIENNE</string>
-    <string name="home_dashboard_motivation_subtitle">%1$s</string>
-    <string name="home_dashboard_motivation_value_greeting">Continuez comme ça</string>
-    <string name="home_dashboard_motivation_value_premium">Restez concentré</string>
     <!-- Navigation content descriptions -->
     <string name="nav_content_description_todos">Tâches</string>
     <string name="nav_content_description_habits">Habitudes</string>
@@ -170,18 +167,18 @@
     <string name="error_habit_add">Échec de l\'ajout de l\'habitude</string>
     <string name="error_habit_update">Échec de la mise à jour de l\'habitude</string>
     <string name="error_habit_delete">Échec de la suppression de l\'habitude</string>
-    <string name="error_journal_load">Échec du chargement des entrées du journal</string>
+    <string name="error_journal_load">Échec du chargement des entrées de journal</string>
     <string name="error_journal_save">Échec de l\'enregistrement de l\'entrée</string>
     <string name="error_journal_delete">Échec de la suppression de l\'entrée</string>
     <string name="error_journal_not_found">Entrée introuvable</string>
     <!-- Pomodoro Screen -->
     <string name="pomodoro_title">Pomodoro</string>
     <string name="pomodoro_status_pomodoro">POMODORO</string>
-    <string name="pomodoro_status_short_break">COURTE PAUSE</string>
-    <string name="pomodoro_status_long_break">LONGUE PAUSE</string>
-    <string name="pomodoro_5m">5m</string>
-    <string name="pomodoro_10m">10m</string>
-    <string name="pomodoro_25m">25m</string>
+    <string name="pomodoro_status_short_break">PAUSE COURTE</string>
+    <string name="pomodoro_status_long_break">PAUSE LONGUE</string>
+    <string name="pomodoro_5m">5 min</string>
+    <string name="pomodoro_10m">10 min</string>
+    <string name="pomodoro_25m">25 min</string>
     <string name="pomodoro_sessions_completed">SESSIONS TERMINÉES : %1$d</string>
     <string name="pomodoro_next_session">SUIVANT : %1$s</string>
     <string name="pomodoro_status_summary">%1$s | %2$s</string>

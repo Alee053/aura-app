@@ -4,7 +4,7 @@
  Project: Aura App
  Locale: es, Spanish
  Exported by: Ale Castro
- Exported at: Wed, 10 Jun 2026 01:39:14 -0400
+ Exported at: Wed, 10 Jun 2026 15:15:31 -0400
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <!-- Navigation -->
@@ -102,7 +102,7 @@
     <string name="sign_in_title">Aura</string>
     <string name="sign_in_subtitle">Inicia sesión para sincronizar tus tareas en todos tus dispositivos</string>
     <string name="sign_in_button">Iniciar sesión con Google</string>
-    <string name="auth_error_no_credential">No hay ninguna cuenta de Google disponible. Por favor, añade una e inténtalo de nuevo.</string>
+    <string name="auth_error_no_credential">No hay ninguna cuenta de Google disponible. Añade una e inténtalo de nuevo.</string>
     <string name="auth_error_no_token">No se pudo obtener el token de inicio de sesión de Google. Por favor, inténtalo de nuevo.</string>
     <string name="auth_error_unknown">Error al iniciar sesión: %1$s</string>
     <!-- Home Screen -->
@@ -135,9 +135,6 @@
     <string name="journal_add_entry">Añadir entrada</string>
     <!-- Experiments / A/B testing -->
     <string name="home_dashboard_motivation_title">MOTIVACIÓN DIARIA</string>
-    <string name="home_dashboard_motivation_subtitle">%1$s</string>
-    <string name="home_dashboard_motivation_value_greeting">Sigue así</string>
-    <string name="home_dashboard_motivation_value_premium">Mantente concentrado</string>
     <!-- Navigation content descriptions -->
     <string name="nav_content_description_todos">Tareas</string>
     <string name="nav_content_description_habits">Hábitos</string>
@@ -186,7 +183,7 @@
     <string name="pomodoro_next_session">SIGUIENTE: %1$s</string>
     <string name="pomodoro_status_summary">%1$s | %2$s</string>
     <string name="pomodoro_completion_title">Sesión finalizada</string>
-    <string name="pomodoro_completion_pomodoro_message">Tu sesión de concentración ha terminado.</string>
+    <string name="pomodoro_completion_pomodoro_message">Tu sesión de enfoque ha terminado.</string>
     <string name="pomodoro_completion_break_message">Tu descanso ha terminado.</string>
     <string name="pomodoro_completion_next">A continuación: %1$s</string>
     <string name="pomodoro_completion_close">Cerrar</string>

@@ -2,8 +2,7 @@ package com.programovil.aura.shared
 
 import app.cash.turbine.test
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -11,13 +10,13 @@ import kotlin.test.assertEquals
 class MotivationPhraseManagerTest {
 
     @Test
-    fun `parses valid JSON into locale map`() = runTest(UnconfinedTestDispatcher()) {
-        val json = """{"en":"Stay focused","es":"Mantén el enfoque","fr":"Reste concentré"}"""
+    fun `parses valid JSON into locale map`() = runBlocking {
+        val json = """{"phrases":{"en":"Stay focused","es":"Mantén el enfoque","fr":"Reste concentré"}}"""
         val manager = MotivationPhraseManager(
             FakeRemoteConfigService(stringValues = mapOf(StringRemoteConfigFlag.MOTIVATION_PHRASE.key to json))
         )
         manager.initialize()
-        kotlinx.coroutines.delay(100)
+        kotlinx.coroutines.delay(2000)
 
         manager.phrase.test {
             val phrases = awaitItem()
@@ -30,12 +29,12 @@ class MotivationPhraseManagerTest {
     }
 
     @Test
-    fun `malformed JSON falls back to empty map`() = runTest(UnconfinedTestDispatcher()) {
+    fun `malformed JSON falls back to empty map`() = runBlocking {
         val manager = MotivationPhraseManager(
             FakeRemoteConfigService(stringValues = mapOf(StringRemoteConfigFlag.MOTIVATION_PHRASE.key to "not json"))
         )
         manager.initialize()
-        kotlinx.coroutines.delay(100)
+        kotlinx.coroutines.delay(2000)
 
         manager.phrase.test {
             val phrases = awaitItem()

@@ -1,5 +1,6 @@
 package com.programovil.aura.shared
 
+import app.cash.turbine.test
 import com.programovil.aura.experiments.domain.model.UserPlan
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -16,7 +17,10 @@ class UserPlanManagerTest {
 
         manager.initialize()
 
-        assertEquals(UserPlan.Premium, manager.userPlan.value)
+        manager.userPlan.test {
+            assertEquals(UserPlan.Premium, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
@@ -28,6 +32,9 @@ class UserPlanManagerTest {
 
         manager.initialize()
 
-        assertEquals(UserPlan.Free, manager.userPlan.value)
+        manager.userPlan.test {
+            assertEquals(UserPlan.Free, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 }

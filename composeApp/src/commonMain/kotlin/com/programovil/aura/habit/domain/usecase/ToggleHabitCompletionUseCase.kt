@@ -1,7 +1,9 @@
 package com.programovil.aura.habit.domain.usecase
 
 import com.programovil.aura.habit.domain.repository.HabitRepository
+import io.mockative.Mockable
 
+@Mockable
 class ToggleHabitCompletionUseCase(private val repository: HabitRepository) {
     suspend operator fun invoke(habitId: String, date: String): Result<Unit> {
         if (habitId.isBlank()) return Result.failure(IllegalArgumentException("Habit ID cannot be empty"))

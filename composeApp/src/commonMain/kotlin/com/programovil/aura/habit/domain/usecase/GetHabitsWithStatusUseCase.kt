@@ -6,10 +6,12 @@ import com.programovil.aura.habit.domain.model.HabitCompletion
 import com.programovil.aura.habit.domain.model.HabitWithStatus
 import com.programovil.aura.habit.domain.model.RecurrenceType
 import com.programovil.aura.habit.domain.repository.HabitRepository
+import io.mockative.Mockable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.datetime.*
 
+@Mockable
 class GetHabitsWithStatusUseCase(private val repository: HabitRepository) {
 
     operator fun invoke(): Flow<Result<List<HabitWithStatus>>> {

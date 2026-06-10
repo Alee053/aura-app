@@ -3,8 +3,10 @@ package com.programovil.aura.habit.domain.usecase
 import com.programovil.aura.habit.domain.model.Habit
 import com.programovil.aura.habit.domain.model.RecurrenceType
 import com.programovil.aura.habit.domain.repository.HabitRepository
+import io.mockative.Mockable
 import kotlinx.datetime.Clock
 
+@Mockable
 class AddHabitUseCase(private val repository: HabitRepository) {
     suspend operator fun invoke(
         name: String,

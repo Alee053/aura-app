@@ -8,6 +8,7 @@ import io.mockative.every
 import io.mockative.mock
 import io.mockative.of
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
@@ -26,18 +27,7 @@ class GetHabitsAccessibilityUseCaseTest {
         )
         every { getUserPlanUseCase() } returns flowOf(UserPlan.Premium)
 
-        val result = useCase().let { flow ->
-            var collected = false
-            var value = false
-            flow.collect {
-                collected = true
-                value = it
-            }
-            if (!collected) error("use case emitted no value")
-            value
-        }
-
-        assertEquals(true, result)
+        assertEquals(true, useCase().first())
     }
 
     @Test
@@ -47,10 +37,7 @@ class GetHabitsAccessibilityUseCaseTest {
         )
         every { getUserPlanUseCase() } returns flowOf(UserPlan.Free)
 
-        val collected = mutableListOf<Boolean>()
-        useCase().collect { collected += it }
-
-        assertEquals(listOf(false), collected)
+        assertEquals(false, useCase().first())
     }
 
     @Test
@@ -60,9 +47,6 @@ class GetHabitsAccessibilityUseCaseTest {
         )
         every { getUserPlanUseCase() } returns flowOf(UserPlan.Premium)
 
-        val collected = mutableListOf<Boolean>()
-        useCase().collect { collected += it }
-
-        assertEquals(listOf(false), collected)
+        assertEquals(false, useCase().first())
     }
 }

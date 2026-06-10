@@ -42,6 +42,7 @@ import com.programovil.aura.designsystem.theme.AppTheme
 import com.programovil.aura.designsystem.theme.DsTheme
 import com.programovil.aura.designsystem.theme.ThemeMode
 import com.programovil.aura.habit.domain.usecase.GetHabitsAccessibilityUseCase
+import com.programovil.aura.shared.UserPlanManager
 import com.programovil.aura.navigation.AppNavHost
 import com.programovil.aura.navigation.NavRoute
 import com.programovil.aura.onboarding.data.OnboardingPreferences
@@ -126,6 +127,7 @@ fun AuthenticatedApp(
     val todoViewModel: TodoViewModel = koinViewModel()
     val featureFlagManager: FeatureFlagManager = koinInject()
     val featureFlags by featureFlagManager.flags.collectAsState()
+    val userPlanManager: UserPlanManager = koinInject()
     val getHabitsAccessibilityUseCase: GetHabitsAccessibilityUseCase = koinInject()
     val showHabitsAccessible: Boolean by getHabitsAccessibilityUseCase()
         .collectAsState(initial = true)
@@ -134,6 +136,7 @@ fun AuthenticatedApp(
 
     LaunchedEffect(Unit) {
         featureFlagManager.initialize()
+        userPlanManager.initialize()
     }
 
     val showTodos by remember(featureFlags) {

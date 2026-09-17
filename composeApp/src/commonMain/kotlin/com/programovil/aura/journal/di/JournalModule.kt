@@ -25,6 +25,6 @@ val journalModule = module {
 
     viewModelOf(::JournalViewModel)
     viewModel { (entryId: String?) ->
-        JournalDetailViewModel(entryId, get(), get(), get())
+        JournalDetailViewModel(entryId, get(), get(), get(), get(), get())
     }
 }

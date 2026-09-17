@@ -1,193 +1,94 @@
 package com.programovil.aura.habit.presentation.screen
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.programovil.aura.habit.presentation.composable.HabitDialog
-import com.programovil.aura.habit.presentation.composable.HabitCard
-import com.programovil.aura.designsystem.theme.AppTheme
-import com.programovil.aura.designsystem.components.button.PrimaryButton
+import aura_app.composeapp.generated.resources.*
+import com.programovil.aura.designsystem.components.header.AuraScreenHeader
+import com.programovil.aura.designsystem.components.state.*
+import com.programovil.aura.designsystem.theme.*
 import com.programovil.aura.habit.domain.model.Habit
-import com.programovil.aura.habit.presentation.viewmodel.HabitEvent
-import com.programovil.aura.habit.presentation.viewmodel.HabitViewModel
 import com.programovil.aura.habit.domain.usecase.GetHabitsAccessibilityUseCase
+import com.programovil.aura.habit.presentation.composable.*
+import com.programovil.aura.habit.presentation.viewmodel.*
 import com.programovil.aura.shared.FeatureFlag
-import kotlinx.datetime.*
-import aura_app.composeapp.generated.resources.Res
-import aura_app.composeapp.generated.resources.habits_title
-import aura_app.composeapp.generated.resources.add_habit
-import aura_app.composeapp.generated.resources.empty_habits
-import aura_app.composeapp.generated.resources.add_first_habit
+import com.programovil.aura.shared.presentation.*
+import com.programovil.aura.shared.presentation.composable.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HabitScreen(
-    featureFlags: Map<FeatureFlag, Boolean> = emptyMap(),
-    onFeatureDisabled: () -> Unit = {},
-    viewModel: HabitViewModel = koinInject(),
-    getHabitsAccessibilityUseCase: GetHabitsAccessibilityUseCase = koinInject()
-) {
-    val showHabitsAccessible by getHabitsAccessibilityUseCase()
-        .collectAsState(initial = true)
-    LaunchedEffect(showHabitsAccessible) { if (!showHabitsAccessible) { onFeatureDisabled() } }
-
-    val uiState by viewModel.uiState.collectAsState()
-    var editingHabit by remember { mutableStateOf<Habit?>(null) }
-    var showDialog by remember { mutableStateOf(false) }
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
-
-    val errorMessage = uiState.error?.asString()
-    LaunchedEffect(errorMessage) {
-        errorMessage?.let { error ->
-            snackbarHostState.showSnackbar(error)
-            viewModel.clearError()
+fun HabitScreen(featureFlags: Map<FeatureFlag, Boolean> = emptyMap(), onFeatureDisabled: () -> Unit = {},
+    viewModel: HabitViewModel = koinViewModel(),
+    getHabitsAccessibilityUseCase: GetHabitsAccessibilityUseCase = koinInject()) {
+    val state by viewModel.uiState.collectAsState()
+    val operations by viewModel.operations.states.collectAsState()
+    var showEditor by rememberSaveable { mutableStateOf(false) }
+    var editingId by rememberSaveable { mutableStateOf<String?>(null) }
+    var editingHabit by rememberSaveable(stateSaver = HabitEditorSaver) { mutableStateOf<Habit?>(null) }
+    val selected = editingHabit ?: state.habits.find { it.habit.id == editingId }?.habit
+    val editor = operations["editor"]
+    val openNew = { viewModel.operations.clearCompleted(); editingId = null; editingHabit = null; showEditor = true }
+    ObserveToggleFeedback(operations, viewModel.operations)
+    LaunchedEffect(editor?.requestId, editor?.status) {
+        if (editor?.status == OperationStatus.Succeeded) {
+            showEditor = false; editingHabit = null; editingId = null
+            viewModel.operations.consume("editor", editor.requestId)
         }
     }
-
-    Scaffold(
-        containerColor = AppTheme.colors.background,
-        topBar = {
-            TopAppBar(
-                title = {
-                    Column {
-                        Text(
-                            text = stringResource(Res.string.habits_title),
-                            style = AppTheme.typography.headlineSmall
-                        )
-                        Text(
-                            text = today.toString(),
-                            style = AppTheme.typography.labelLarge,
-                            color = AppTheme.colors.textSecondary
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = AppTheme.colors.surface,
-                    titleContentColor = AppTheme.colors.textPrimary
-                )
-            )
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+    Scaffold(containerColor = AppTheme.colors.background, contentWindowInsets = WindowInsets(0,0,0,0),
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    editingHabit = null
-                    showDialog = true
-                },
-                containerColor = AppTheme.colors.primary
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(Res.string.add_habit),
-                    tint = AppTheme.colors.textPrimary
-                )
-            }
+            if (state.habits.isNotEmpty()) ExtendedFloatingActionButton(onClick = openNew,
+                icon = { Icon(Icons.Outlined.Add, null) }, text = { Text(stringResource(Res.string.rd_new_habit)) },
+                containerColor = AppTheme.colors.primary, contentColor = AppTheme.colors.onPrimary)
         }
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 16.dp)
-        ) {
-            if (uiState.isLoading) {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = AppTheme.colors.primary)
+        LazyColumn(Modifier.fillMaxSize().padding(padding).padding(horizontal = LocalAuraGutter.current),
+            verticalArrangement = Arrangement.spacedBy(AuraSpacing.sm),
+            contentPadding = PaddingValues(bottom = AuraSpacing.section + AuraSpacing.xl)) {
+            item { AuraScreenHeader(stringResource(Res.string.habits_title), auraDate(todayDate())) }
+            state.loadError?.let { error -> item {
+                AuraInlineNotice(error.asString(), actionLabel = stringResource(Res.string.rd_retry), onAction = viewModel::retryLoad)
+            } }
+            operations.values.firstOrNull { it.kind == "toggle" && it.status == OperationStatus.Failed }?.let { operation ->
+                item { AuraInlineNotice(operation.error!!.asString(), actionLabel = stringResource(Res.string.rd_close),
+                    onAction = { viewModel.operations.consume(operation.target, operation.requestId) }) }
+            }
+            operations.values.firstOrNull { it.pending && it.longRunning }?.let { op ->
+                item { OperationNotice(op) }
+            }
+            when {
+                state.isLoading -> item { AuraSkeleton(rows = 2, label = stringResource(Res.string.rd_loading)) }
+                state.habits.isEmpty() && state.loadError == null -> item {
+                    AuraEmptyState(stringResource(Res.string.rd_empty_habits), stringResource(Res.string.rd_empty_habits_body),
+                        stringResource(Res.string.rd_new_habit), openNew,
+                        illustration = { AuraScene(2, Modifier.size(AuraSpacing.control * 2)) })
                 }
-            } else {
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(uiState.habits, key = { it.habit.id }) { habitItem ->
-                        HabitCard(
-                            habitWithStatus = habitItem,
-                            onToggle = { date ->
-                                viewModel.onEvent(
-                                    HabitEvent.ToggleCompletion(
-                                        habitItem.habit.id,
-                                        date
-                                    )
-                                )
-                            },
-                            onLongClick = {
-                                editingHabit = habitItem.habit
-                                showDialog = true
-                            }
-                        )
+                else -> {
+                    item {
+                        Text("${stringResource(Res.string.rd_marked_today)} · ${state.habits.count { it.last7Days.lastOrNull()?.isCompleted == true }} / ${state.habits.size}",
+                            Modifier.padding(bottom = AuraSpacing.md), style = AppTheme.typography.labelLarge, color = AppTheme.colors.primary)
                     }
-
-                    if (uiState.habits.isEmpty()) {
-                        item {
-                            Box(
-                                modifier = Modifier.fillMaxSize().padding(32.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.spacedBy(16.dp)
-                                ) {
-                                    Text(
-                                        text = stringResource(Res.string.empty_habits),
-                                        style = AppTheme.typography.bodyMedium,
-                                        color = AppTheme.colors.textSecondary
-                                    )
-                                    PrimaryButton(
-                                        text = stringResource(Res.string.add_first_habit),
-                                        onClick = {
-                                            editingHabit = null
-                                            showDialog = true
-                                        }
-                                    )
-                                }
-                            }
-                        }
+                    items(state.habits, key = { it.habit.id }) { item ->
+                        HabitCard(item, { date -> viewModel.onEvent(HabitEvent.ToggleCompletion(item.habit.id, date)) },
+                            { viewModel.operations.clearCompleted(); editingId = item.habit.id; editingHabit = item.habit; showEditor = true },
+                            Modifier.animateItem(), pendingDates = operations.values.filter { it.pending && it.target.startsWith("toggle:${item.habit.id}:") }
+                                .map { it.target.substringAfterLast(":") }.toSet())
                     }
+                    item { Text(stringResource(Res.string.rd_streak_help), Modifier.padding(top = AuraSpacing.md),
+                        style = AppTheme.typography.bodyMedium, color = AppTheme.colors.textSecondary) }
                 }
             }
         }
     }
-
-    if (showDialog) {
-        HabitDialog(
-            habit = editingHabit,
-            onDismiss = {
-                showDialog = false
-                editingHabit = null
-            },
-            onSave = { habit ->
-                viewModel.onEvent(HabitEvent.UpdateHabit(habit))
-                showDialog = false
-                editingHabit = null
-            },
-            onDelete = editingHabit?.let { habit ->
-                {
-                    viewModel.onEvent(HabitEvent.DeleteHabit(habit.id))
-                    showDialog = false
-                    editingHabit = null
-                }
-            }
-        )
-    }
+    if (showEditor) HabitDialog(selected, { showEditor = false; editingId = null; editingHabit = null },
+        { viewModel.onEvent(HabitEvent.UpdateHabit(it)) },
+        selected?.let { { viewModel.onEvent(HabitEvent.DeleteHabit(it.id)) } }, editor)
 }

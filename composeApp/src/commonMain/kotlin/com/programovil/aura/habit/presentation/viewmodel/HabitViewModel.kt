@@ -1,121 +1,80 @@
-@file:OptIn(kotlin.time.ExperimentalTime::class)
-
 package com.programovil.aura.habit.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.programovil.aura.habit.domain.model.HabitWithStatus
-import com.programovil.aura.habit.domain.model.RecurrenceType
+import com.programovil.aura.habit.domain.model.*
 import com.programovil.aura.habit.domain.repository.HabitRepository
-import com.programovil.aura.habit.domain.model.Habit
-import com.programovil.aura.habit.domain.usecase.AddHabitUseCase
-import com.programovil.aura.habit.domain.usecase.DeleteHabitUseCase
-import com.programovil.aura.habit.domain.usecase.GetHabitsWithStatusUseCase
-import com.programovil.aura.habit.domain.usecase.ToggleHabitCompletionUseCase
-import com.programovil.aura.habit.domain.usecase.UpdateHabitUseCase
-import com.programovil.aura.shared.presentation.ErrorKey
-import com.programovil.aura.shared.presentation.UiText
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
+import com.programovil.aura.habit.domain.usecase.*
+import com.programovil.aura.shared.presentation.*
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
+import kotlinx.datetime.*
 
 data class HabitListUiState(
-    val habits: List<HabitWithStatus> = emptyList(),
-    val isLoading: Boolean = true,
-    val error: UiText? = null
+    val habits: List<HabitWithStatus> = emptyList(), val isLoading: Boolean = true,
+    val error: UiText? = null, val loadError: UiText? = null
 )
-
 sealed class HabitEvent {
     data class ToggleCompletion(val habitId: String, val date: String) : HabitEvent()
-    data class AddHabit(
-        val name: String,
-        val recurrenceType: RecurrenceType,
-        val targetCount: Int,
-        val color: String
-    ) : HabitEvent()
+    data class AddHabit(val name: String, val recurrenceType: RecurrenceType, val targetCount: Int, val color: String) : HabitEvent()
     data class UpdateHabit(val habit: Habit) : HabitEvent()
     data class DeleteHabit(val habitId: String) : HabitEvent()
 }
-
 class HabitViewModel(
     private val repository: HabitRepository,
     private val getHabitsWithStatusUseCase: GetHabitsWithStatusUseCase,
-    private val addHabitUseCase: AddHabitUseCase,
-    private val updateHabitUseCase: UpdateHabitUseCase,
+    private val addHabitUseCase: AddHabitUseCase, private val updateHabitUseCase: UpdateHabitUseCase,
     private val toggleHabitCompletionUseCase: ToggleHabitCompletionUseCase,
     private val deleteHabitUseCase: DeleteHabitUseCase
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(HabitListUiState())
-    val uiState: StateFlow<HabitListUiState> = _uiState
-
-    init {
-        loadHabits()
+    val uiState = _uiState.asStateFlow()
+    val operations = UiOperations(viewModelScope)
+    private var loadJob: Job? = null
+    private var latestHabits = emptyList<HabitWithStatus>()
+    private val heldHabits = mutableMapOf<String, HabitWithStatus>()
+    private fun publishHabits() {
+        val visible = latestHabits.map { heldHabits[it.habit.id] ?: it } + heldHabits.values.filter { held -> latestHabits.none { it.habit.id == held.habit.id } }
+        _uiState.update { it.copy(habits = visible) }
     }
-
-    fun onEvent(event: HabitEvent) {
-        when (event) {
-            is HabitEvent.ToggleCompletion -> toggleCompletion(event.habitId, event.date)
-            is HabitEvent.AddHabit -> addHabit(event.name, event.recurrenceType, event.targetCount, event.color)
-            is HabitEvent.UpdateHabit -> updateHabit(event.habit)
-            is HabitEvent.DeleteHabit -> deleteHabit(event.habitId)
-        }
+    private fun hold(id: String) { if (id !in heldHabits) _uiState.value.habits.find { it.habit.id == id }?.let { heldHabits[id] = it } }
+    private fun release(id: String, key: String, result: Result<Unit>) {
+        if (operations.states.value.any { (other, op) -> other != key && other.startsWith("toggle:$id:") && op.pending }) return
+        val previous = heldHabits.remove(id)
+        if (result.isFailure && previous != null) latestHabits = latestHabits.filterNot { it.habit.id == id } + previous
+        publishHabits()
     }
-
-    private fun loadHabits() {
-        viewModelScope.launch {
-            getHabitsWithStatusUseCase().collect { result ->
-                result.onSuccess { habits ->
-                    _uiState.value = HabitListUiState(
-                        habits = habits,
-                        isLoading = false
-                    )
-                }.onFailure { _ ->
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        error = ErrorKey.HabitLoad
-                    )
-                }
+    init { retryLoad() }
+    fun retryLoad() {
+        loadJob?.cancel()
+        _uiState.update { it.copy(isLoading = it.habits.isEmpty()) }
+        loadJob = viewModelScope.launch {
+            getHabitsWithStatusUseCase().catch { emit(Result.failure(it)) }.collect { result ->
+                result.onSuccess { habits -> latestHabits = habits; publishHabits(); _uiState.update { it.copy(isLoading = false, loadError = null) } }
+                    .onFailure { _uiState.update { it.copy(isLoading = false, loadError = ErrorKey.HabitLoad, error = ErrorKey.HabitLoad) } }
             }
         }
     }
-
-    private fun toggleCompletion(habitId: String, date: String) {
-        viewModelScope.launch {
-            toggleHabitCompletionUseCase(habitId, date)
-                .onFailure { _uiState.value = _uiState.value.copy(error = ErrorKey.HabitUpdate) }
+    private fun run(key: String, kind: String, error: UiText, habitId: String? = null, action: suspend () -> Result<Unit>) {
+        if (operations.isPending(key)) return
+        habitId?.let(::hold)
+        operations.launch(key, kind, error, { result ->
+            habitId?.let { release(it, key, result) }
+            if (result.isFailure) _uiState.update { it.copy(error = error) }
+        }, action)
+    }
+    fun onEvent(event: HabitEvent) {
+        when (event) {
+            is HabitEvent.ToggleCompletion -> run("toggle:${event.habitId}:${event.date}", "toggle", ErrorKey.HabitUpdate, event.habitId) {
+                toggleHabitCompletionUseCase(event.habitId, event.date)
+            }
+            is HabitEvent.AddHabit -> run("editor", "save", ErrorKey.HabitAdd) {
+                addHabitUseCase(event.name, event.recurrenceType, event.targetCount, event.color)
+            }
+            is HabitEvent.UpdateHabit -> run("editor", "save", ErrorKey.HabitUpdate, event.habit.id) { updateHabitUseCase(event.habit) }
+            is HabitEvent.DeleteHabit -> run("editor", "delete", ErrorKey.HabitDelete, event.habitId) { deleteHabitUseCase(event.habitId) }
         }
     }
-
-    private fun addHabit(name: String, recurrenceType: RecurrenceType, targetCount: Int, color: String) {
-        viewModelScope.launch {
-            addHabitUseCase(name, recurrenceType, targetCount, color)
-                .onFailure { _uiState.value = _uiState.value.copy(error = ErrorKey.HabitAdd) }
-        }
-    }
-
-    private fun updateHabit(habit: Habit) {
-        viewModelScope.launch {
-            updateHabitUseCase(habit)
-                .onFailure { _uiState.value = _uiState.value.copy(error = ErrorKey.HabitUpdate) }
-        }
-    }
-
-    private fun deleteHabit(habitId: String) {
-        viewModelScope.launch {
-            deleteHabitUseCase(habitId)
-                .onFailure { _uiState.value = _uiState.value.copy(error = ErrorKey.HabitDelete) }
-        }
-    }
-
-    fun clearError() {
-        _uiState.value = _uiState.value.copy(error = null)
-    }
-
-    fun getTodayDate(): String {
-        return Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toString()
-    }
+    fun clearError() { _uiState.update { it.copy(error = null) } }
+    fun getTodayDate() = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toString()
 }

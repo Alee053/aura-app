@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import com.programovil.aura.MainActivity
 import androidx.core.app.NotificationCompat
+import androidx.annotation.RequiresApi
 import com.programovil.aura.R
 
 object NotificationHelper {
@@ -15,6 +16,7 @@ object NotificationHelper {
     const val CHANNEL_DUE_DATE_REMINDER = "due_date_reminder"
     const val CHANNEL_POMODORO = "pomodoro_completion"
 
+    @RequiresApi(26)
     fun createNotificationChannels(context: Context) {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 

@@ -1,6 +1,7 @@
 package com.programovil.aura
 
 import android.app.Application
+import android.os.Build
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -20,7 +21,9 @@ class AndroidApp : Application() {
         FirebaseConfig.initialize(this)
         FirebaseConfig.messaging.subscribeToTopic("test-notifications")
             .addOnCompleteListener { }
-        NotificationHelper.createNotificationChannels(this)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationHelper.createNotificationChannels(this)
+        }
         ProcessLifecycleOwner.get().lifecycle.addObserver(
             object : DefaultLifecycleObserver {
                 override fun onStart(owner: LifecycleOwner) {

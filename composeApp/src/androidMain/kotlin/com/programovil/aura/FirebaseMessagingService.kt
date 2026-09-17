@@ -1,5 +1,6 @@
 package com.programovil.aura
 
+import android.os.Build
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.programovil.aura.notification.NotificationHelper
@@ -10,7 +11,9 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         val title = remoteMessage.notification?.title ?: "Test Notification"
         val body = remoteMessage.notification?.body ?: "This is a test push notification"
 
-        NotificationHelper.createNotificationChannels(this)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationHelper.createNotificationChannels(this)
+        }
         showNotification(title, body)
     }
 

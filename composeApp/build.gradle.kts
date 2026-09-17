@@ -60,6 +60,7 @@ kotlin {
         commonMain.dependencies {
             implementation(project(":designsystem"))
             implementation(libs.compose.runtime)
+            implementation(libs.compose.animation)
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)
             implementation(libs.compose.ui)
@@ -88,6 +89,8 @@ kotlin {
         }
         androidInstrumentedTest.dependencies {
             implementation(libs.compose.ui.test.junit4)
+            implementation(libs.androidx.test.runner)
+            implementation(libs.androidx.test.espresso.core)
         }
     }
 }
@@ -102,7 +105,7 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "1.0"
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.programovil.aura.ui.AuraUiTestRunner"
     }
     packaging {
         resources {
@@ -122,6 +125,7 @@ android {
 
 dependencies {
     debugImplementation(libs.compose.uiTooling)
+    debugImplementation(libs.compose.ui.test.manifest)
     add("kspAndroid", libs.androidx.room.compiler)
     add("kspIosSimulatorArm64", libs.androidx.room.compiler)
     add("kspIosArm64", libs.androidx.room.compiler)
@@ -203,9 +207,13 @@ val pullTranslations by tasks.registering {
     }
 }
 
-tasks.named("preBuild") {
-    dependsOn(pullTranslations)
-}
+// NOTE: `pullTranslations` is intentionally NOT wired into `preBuild`/`assemble`.
+// It is a manual maintenance task that downloads translations from Loco and
+// requires LOCO_API_KEY. Forcing it during every build would break the build
+// for any contributor without the key. To refresh translations, run:
+//   ./gradlew :composeApp:pullTranslations
+// The committed values-es/ and values-fr/ strings.xml files in commonMain
+// are picked up automatically by Compose Multiplatform Resources.
 
 val pushTranslations by tasks.registering {
     group = "localization"

@@ -37,6 +37,11 @@ sqlite = "2.6.2"
 ksp = "2.2.10-2.0.2"
 
 [libraries]
+androidx-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version = "3.7.0" }
+androidx-test-runner = { module = "androidx.test:runner", version = "1.7.0" }
+# Test host aligned with the Android UI runtime resolved by Compose Multiplatform 1.10.3.
+compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version = "1.10.5" }
+compose-animation = { module = "org.jetbrains.compose.animation:animation", version.ref = "composeMultiplatform" }
 firebase-config-ktx = { module = "com.google.firebase:firebase-config-ktx", version.ref = "firebaseConfigKtx" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }

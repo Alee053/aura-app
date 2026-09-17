@@ -1,221 +1,103 @@
 package com.programovil.aura.habit.presentation.composable
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.LocalFireDepartment
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.material.icons.outlined.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.*
 import androidx.compose.ui.unit.dp
-import aura_app.composeapp.generated.resources.Res
-import aura_app.composeapp.generated.resources.habit_day_short_fri
-import aura_app.composeapp.generated.resources.habit_day_short_mon
-import aura_app.composeapp.generated.resources.habit_day_short_sat
-import aura_app.composeapp.generated.resources.habit_day_short_sun
-import aura_app.composeapp.generated.resources.habit_day_short_thu
-import aura_app.composeapp.generated.resources.habit_day_short_tue
-import aura_app.composeapp.generated.resources.habit_day_short_wed
-import aura_app.composeapp.generated.resources.habit_period_day
-import aura_app.composeapp.generated.resources.habit_period_month
-import aura_app.composeapp.generated.resources.habit_period_progress
-import aura_app.composeapp.generated.resources.habit_period_week
-import aura_app.composeapp.generated.resources.habit_streak_content_description
-import com.programovil.aura.designsystem.theme.AppTheme
-import com.programovil.aura.habit.domain.model.DayCompletion
-import com.programovil.aura.habit.domain.model.HabitWithStatus
-import com.programovil.aura.habit.domain.model.RecurrenceType
+import aura_app.composeapp.generated.resources.*
+import com.programovil.aura.designsystem.theme.*
+import com.programovil.aura.habit.domain.model.*
 import com.programovil.aura.shared.parseHexColor
-import kotlinx.datetime.Clock
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
+import com.programovil.aura.shared.presentation.*
 import org.jetbrains.compose.resources.stringResource
+import kotlinx.datetime.LocalDate
 
 @Composable
-fun HabitCard(
-    habitWithStatus: HabitWithStatus,
-    onToggle: (date: String) -> Unit,
-    onLongClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val habit = habitWithStatus.habit
-    val (completed, target) = habitWithStatus.currentPeriodProgress
-    val streak = habitWithStatus.streak
-    val last7Days = habitWithStatus.last7Days
-    val habitColor = parseHexColor(habit.color)
-
-    val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
-
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(onClick = onLongClick),
-        colors = CardDefaults.cardColors(
-            containerColor = AppTheme.colors.surface,
-            contentColor = AppTheme.colors.textPrimary
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
-        ) {
-            // Single row: Color indicator, Habit name, Progress, Streak, Checkbox
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(12.dp)
-                        .clip(CircleShape)
-                        .background(habitColor)
-                )
-
-                Text(
-                    text = habit.name,
-                    style = AppTheme.typography.bodyMedium,
-                    color = AppTheme.colors.textPrimary,
-                    modifier = Modifier.weight(1f)
-                )
-
-                // Progress info (subtle)
-                if (habit.recurrenceType != RecurrenceType.DAILY) {
-                    val periodLabel = when (habit.recurrenceType) {
-                        RecurrenceType.WEEKLY -> stringResource(Res.string.habit_period_week)
-                        RecurrenceType.MONTHLY -> stringResource(Res.string.habit_period_month)
-                        RecurrenceType.DAILY -> stringResource(Res.string.habit_period_day)
-                    }
-                    Text(
-                        text = stringResource(Res.string.habit_period_progress, completed, target, periodLabel),
-                        style = AppTheme.typography.labelMedium,
-                        color = AppTheme.colors.textSecondary.copy(alpha = 0.6f)
-                    )
+fun HabitCard(habitWithStatus: HabitWithStatus, onToggle: (String) -> Unit, onLongClick: () -> Unit,
+    modifier: Modifier = Modifier, pendingDates: Set<String> = emptySet()) {
+    val item = habitWithStatus
+    val habit = item.habit
+    val c = AppTheme.colors
+    val today = todayDate().toString()
+    val progress by animateFloatAsState((item.currentPeriodProgress.first.toFloat() /
+        item.currentPeriodProgress.second.coerceAtLeast(1)).coerceIn(0f,1f),
+        tween(LocalAuraMotion.current.duration(240)), label = "habit progress")
+    Surface(modifier.fillMaxWidth(), shape = AuraShapes.card, color = c.surface,
+        border = if (c.highContrast) BorderStroke(1.dp, c.outline) else null) {
+        Column(Modifier.padding(AuraSpacing.card), verticalArrangement = Arrangement.spacedBy(AuraSpacing.md)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(Modifier.size(10.dp).clip(CircleShape).background(parseHexColor(habit.color)))
+                Column(Modifier.weight(1f).padding(start = AuraSpacing.sm)) {
+                    Text(habit.name, style = AppTheme.typography.titleMedium)
+                    Text(stringResource(when(habit.recurrenceType) {
+                        RecurrenceType.DAILY -> Res.string.daily
+                        RecurrenceType.WEEKLY -> Res.string.weekly
+                        RecurrenceType.MONTHLY -> Res.string.monthly
+                    }), style = AppTheme.typography.bodyMedium, color = c.textSecondary)
                 }
-
-                // Streak with fire icon
-                if (streak > 0) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(2.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.LocalFireDepartment,
-                            contentDescription = stringResource(Res.string.habit_streak_content_description),
-                            tint = AppTheme.colors.textSecondary,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Text(
-                            text = "$streak",
-                            style = AppTheme.typography.labelLarge,
-                            color = AppTheme.colors.textPrimary
-                        )
-                    }
-                }
-
-                val todayCompleted = last7Days.lastOrNull()?.isCompleted == true
-                Checkbox(
-                    checked = todayCompleted,
-                    onCheckedChange = { _ -> onToggle(today.toString()) },  // toggle is symmetric: check=add, uncheck=remove
-                    colors = CheckboxDefaults.colors(
-                        checkedColor = habitColor,
-                        uncheckedColor = AppTheme.colors.textSecondary
-                    ),
-                    modifier = Modifier.size(20.dp)
-                )
+                IconButton(onLongClick) { Icon(Icons.Outlined.Edit, stringResource(Res.string.rd_edit)) }
             }
-
-            SevenDayGrid(
-                last7Days = last7Days,
-                habitColor = habitColor,
-                today = today,
-                onToggle = onToggle
-            )
+            val doneToday = item.last7Days.any { it.date == today && it.isCompleted }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text(stringResource(Res.string.rd_period_progress,
+                        item.currentPeriodProgress.first, item.currentPeriodProgress.second,
+                        stringResource(when(habit.recurrenceType) {
+                            RecurrenceType.DAILY -> Res.string.habit_period_day
+                            RecurrenceType.WEEKLY -> Res.string.habit_period_week
+                            RecurrenceType.MONTHLY -> Res.string.habit_period_month
+                        })), style = AppTheme.typography.labelLarge)
+                    if (item.streak > 0) Text(stringResource(Res.string.rd_streak, item.streak),
+                        style = AppTheme.typography.labelMedium, color = c.textSecondary)
+                }
+                TextButton({ onToggle(today) }, enabled = today !in pendingDates) {
+                    Icon(if (doneToday) Icons.Outlined.CheckCircle else Icons.Outlined.AddCircleOutline, null, Modifier.size(20.dp))
+                    Spacer(Modifier.width(AuraSpacing.xxs))
+                    Text(stringResource(if (doneToday) Res.string.rd_complete else Res.string.rd_mark_today))
+                }
+            }
+            LinearProgressIndicator(progress = { progress }, Modifier.fillMaxWidth(),
+                color = c.primary, trackColor = c.surfaceVariant)
+            Text(stringResource(Res.string.rd_last_seven), style = AppTheme.typography.labelMedium, color = c.textSecondary)
+            val scroll = rememberScrollState()
+            LaunchedEffect(scroll.maxValue) { if (scroll.maxValue > 0) scroll.scrollTo(scroll.maxValue) }
+            Row(Modifier.fillMaxWidth().horizontalScroll(scroll), horizontalArrangement = Arrangement.SpaceBetween) {
+                item.last7Days.forEach { day ->
+                    val date = LocalDate.parse(day.date)
+                    val fullLabel = "${auraDate(date)}, ${stringResource(if (day.isCompleted) Res.string.rd_complete else Res.string.rd_not_complete)}"
+                    Column(Modifier.width(AuraSpacing.touch).toggleable(day.isCompleted,
+                        enabled = day.date !in pendingDates, role = Role.Checkbox, onValueChange = { onToggle(day.date) })
+                        .clearAndSetSemantics {
+                            contentDescription = fullLabel
+                            role = Role.Checkbox
+                            toggleableState = if (day.isCompleted) androidx.compose.ui.state.ToggleableState.On else androidx.compose.ui.state.ToggleableState.Off
+                            if (day.date in pendingDates) disabled() else onClick { onToggle(day.date); true }
+                        }.padding(vertical = AuraSpacing.xxs),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(AuraSpacing.xs)) {
+                        Text(auraDay(date), style = AppTheme.typography.labelMedium, color = c.textSecondary)
+                        Box(Modifier.size(36.dp).clip(CircleShape)
+                            .background(if (day.isCompleted) c.primary else c.surfaceVariant)
+                            .border(if (day.date == today) 2.dp else 0.dp,
+                                if (day.date == today) c.textPrimary else androidx.compose.ui.graphics.Color.Transparent, CircleShape),
+                            contentAlignment = Alignment.Center) {
+                            if (day.date in pendingDates) CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp)
+                            else if (day.isCompleted) Icon(Icons.Outlined.Check, null, Modifier.size(18.dp), tint = c.onPrimary)
+                            else Text(date.dayOfMonth.toString(), style = AppTheme.typography.labelMedium)
+                        }
+                    }
+                }
+            }
         }
-    }
-}
-
-@Composable
-private fun SevenDayGrid(
-    last7Days: List<DayCompletion>,
-    habitColor: androidx.compose.ui.graphics.Color,
-    today: kotlinx.datetime.LocalDate,
-    onToggle: (date: String) -> Unit
-) {
-    val dayLabels = listOf(
-        stringResource(Res.string.habit_day_short_mon),
-        stringResource(Res.string.habit_day_short_tue),
-        stringResource(Res.string.habit_day_short_wed),
-        stringResource(Res.string.habit_day_short_thu),
-        stringResource(Res.string.habit_day_short_fri),
-        stringResource(Res.string.habit_day_short_sat),
-        stringResource(Res.string.habit_day_short_sun)
-    )
-
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        last7Days.forEachIndexed { index, dayCompletion ->
-            val isToday = dayCompletion.date == today.toString()
-            DayCircle(
-                dayCompletion = dayCompletion,
-                dayLabel = dayLabels.getOrElse(index) { "" },
-                habitColor = habitColor,
-                isToday = isToday,
-                onToggle = { onToggle(dayCompletion.date) }
-            )
-        }
-    }
-}
-
-@Composable
-private fun DayCircle(
-    dayCompletion: DayCompletion,
-    dayLabel: String,
-    habitColor: androidx.compose.ui.graphics.Color,
-    isToday: Boolean,
-    onToggle: () -> Unit
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(2.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .size(24.dp)
-                .clip(CircleShape)
-                .background(
-                    if (dayCompletion.isCompleted) habitColor
-                    else AppTheme.colors.background
-                )
-                .then(
-                    if (isToday) Modifier.border(2.dp, AppTheme.colors.textPrimary, CircleShape)
-                    else Modifier.border(1.dp, AppTheme.colors.textSecondary.copy(alpha = 0.3f), CircleShape)
-                )
-                .clickable(onClick = onToggle)
-        )
-        Text(
-            text = dayLabel,
-            style = AppTheme.typography.labelSmall,
-            color = AppTheme.colors.textSecondary
-        )
     }
 }

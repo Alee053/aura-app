@@ -1,0 +1,8 @@
+﻿
+com.programovil.aura.ui.AuraVisualTest:...........
+
+Time: 31.84
+
+OK (11 tests)
+
+

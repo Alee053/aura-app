@@ -1,0 +1,226 @@
+diff --git a/composeApp/src/commonMain/kotlin/com/programovil/aura/home/presentation/composable/DashboardCard.kt b/composeApp/src/commonMain/kotlin/com/programovil/aura/home/presentation/composable/DashboardCard.kt
+new file mode 100644
+--- /dev/null
++++ b/composeApp/src/commonMain/kotlin/com/programovil/aura/home/presentation/composable/DashboardCard.kt
+@@ -0,0 +1,109 @@
++package com.programovil.aura.home.presentation.composable
++
++import androidx.compose.foundation.BorderStroke
++import androidx.compose.foundation.clickable
++import androidx.compose.foundation.layout.Arrangement
++import androidx.compose.foundation.layout.Box
++import androidx.compose.foundation.layout.Column
++import androidx.compose.foundation.layout.Row
++import androidx.compose.foundation.layout.Spacer
++import androidx.compose.foundation.layout.fillMaxWidth
++import androidx.compose.foundation.layout.padding
++import androidx.compose.foundation.layout.size
++import androidx.compose.foundation.layout.width
++import androidx.compose.foundation.shape.CircleShape
++import androidx.compose.foundation.shape.RoundedCornerShape
++import androidx.compose.material3.Icon
++import androidx.compose.material3.Surface
++import androidx.compose.material3.Text
++import androidx.compose.runtime.Composable
++import androidx.compose.ui.Alignment
++import androidx.compose.ui.Modifier
++import androidx.compose.ui.draw.clip
++import androidx.compose.ui.graphics.Color
++import androidx.compose.ui.graphics.vector.ImageVector
++import androidx.compose.ui.text.TextStyle
++import androidx.compose.ui.unit.dp
++import com.programovil.aura.designsystem.theme.AppTheme
++
++@Composable
++fun DashboardCard(
++    title: String,
++    value: String,
++    subtitle: String,
++    onClick: () -> Unit,
++    modifier: Modifier = Modifier,
++    valueStyle: TextStyle = AppTheme.typography.displayLarge,
++    leadingIcon: ImageVector? = null,
++    accentColor: Color? = null
++) {
++    val accent = accentColor ?: AppTheme.colors.primary
++
++    Surface(
++        modifier = modifier
++            .fillMaxWidth()
++            .clickable(onClick = onClick),
++        color = AppTheme.colors.surface,
++        shape = RoundedCornerShape(24.dp),
++        border = BorderStroke(1.dp, AppTheme.colors.outline.copy(alpha = 0.5f)),
++        tonalElevation = 2.dp
++    ) {
++        Row(
++            modifier = Modifier.padding(20.dp),
++            verticalAlignment = Alignment.CenterVertically
++        ) {
++            Column(modifier = Modifier.weight(1f)) {
++                Text(
++                    text = title,
++                    style = AppTheme.typography.labelMedium,
++                    color = accent,
++                    letterSpacing = AppTheme.typography.labelMedium.letterSpacing
++                )
++                Spacer(modifier = Modifier.size(8.dp))
++                Text(
++                    text = value,
++                    style = valueStyle,
++                    color = AppTheme.colors.textPrimary
++                )
++                if (subtitle.isNotEmpty()) {
++                    Spacer(modifier = Modifier.size(4.dp))
++                    Text(
++                        text = subtitle,
++                        style = AppTheme.typography.labelLarge,
++                        color = AppTheme.colors.textSecondary
++                    )
++                }
++            }
++
++            leadingIcon?.let { icon ->
++                Spacer(modifier = Modifier.width(12.dp))
++                Box(
++                    modifier = Modifier
++                        .size(52.dp)
++                        .clip(CircleShape)
++                        .then(
++                            Modifier
++                                .padding(1.dp)
++                                .clip(CircleShape)
++                        ),
++                    contentAlignment = Alignment.Center
++                ) {
++                    Surface(
++                        modifier = Modifier.size(52.dp),
++                        color = accent.copy(alpha = 0.12f),
++                        shape = CircleShape
++                    ) {
++                        Box(contentAlignment = Alignment.Center) {
++                            Icon(
++                                imageVector = icon,
++                                contentDescription = null,
++                                tint = accent,
++                                modifier = Modifier.size(24.dp)
++                            )
++                        }
++                    }
++                }
++            }
++        }
++    }
++}
+diff --git a/designsystem/src/commonMain/kotlin/com/programovil/aura/designsystem/components/button/PrimaryButton.kt b/designsystem/src/commonMain/kotlin/com/programovil/aura/designsystem/components/button/PrimaryButton.kt
+new file mode 100644
+--- /dev/null
++++ b/designsystem/src/commonMain/kotlin/com/programovil/aura/designsystem/components/button/PrimaryButton.kt
+@@ -0,0 +1,51 @@
++package com.programovil.aura.designsystem.components.button
++
++import androidx.compose.foundation.layout.PaddingValues
++import androidx.compose.foundation.layout.defaultMinSize
++import androidx.compose.foundation.layout.size
++import androidx.compose.foundation.shape.RoundedCornerShape
++import androidx.compose.material3.CircularProgressIndicator
++import androidx.compose.material3.Button
++import androidx.compose.material3.ButtonDefaults
++import androidx.compose.material3.Text
++import androidx.compose.runtime.Composable
++import androidx.compose.ui.Modifier
++import androidx.compose.ui.unit.dp
++import com.programovil.aura.designsystem.theme.AppTheme
++
++@Composable
++fun PrimaryButton(
++    text: String,
++    onClick: () -> Unit,
++    modifier: Modifier = Modifier,
++    enabled: Boolean = true,
++    isLoading: Boolean = false
++) {
++    Button(
++        onClick = onClick,
++        modifier = modifier.defaultMinSize(minHeight = 52.dp),
++        enabled = enabled && !isLoading,
++        shape = RoundedCornerShape(16.dp),
++        contentPadding = PaddingValues(horizontal = 22.dp, vertical = 14.dp),
++        colors = ButtonDefaults.buttonColors(
++            containerColor = AppTheme.colors.primary,
++            contentColor = AppTheme.colors.onPrimary,
++            disabledContainerColor = AppTheme.colors.primary.copy(alpha = 0.38f),
++            disabledContentColor = AppTheme.colors.onPrimary.copy(alpha = 0.72f)
++        )
++    ) {
++        if (isLoading) {
++            CircularProgressIndicator(
++                modifier = Modifier.size(20.dp),
++                strokeWidth = 2.dp,
++                color = AppTheme.colors.onPrimary
++            )
++        } else {
++            Text(
++                text = text,
++                style = AppTheme.typography.labelLarge,
++                color = AppTheme.colors.onPrimary
++            )
++        }
++    }
++}
+diff --git a/designsystem/src/commonMain/kotlin/com/programovil/aura/designsystem/components/input/BasicInput.kt b/designsystem/src/commonMain/kotlin/com/programovil/aura/designsystem/components/input/BasicInput.kt
+new file mode 100644
+--- /dev/null
++++ b/designsystem/src/commonMain/kotlin/com/programovil/aura/designsystem/components/input/BasicInput.kt
+@@ -0,0 +1,51 @@
++package com.programovil.aura.designsystem.components.input
++
++import androidx.compose.foundation.shape.RoundedCornerShape
++import androidx.compose.foundation.text.selection.TextSelectionColors
++import androidx.compose.material3.OutlinedTextField
++import androidx.compose.material3.OutlinedTextFieldDefaults
++import androidx.compose.material3.Text
++import androidx.compose.runtime.Composable
++import androidx.compose.ui.Modifier
++import androidx.compose.ui.unit.dp
++import com.programovil.aura.designsystem.theme.AppTheme
++
++@Composable
++fun BasicInput(
++    value: String,
++    onValueChange: (String) -> Unit,
++    label: String,
++    modifier: Modifier = Modifier,
++    enabled: Boolean = true,
++    singleLine: Boolean = true
++) {
++    OutlinedTextField(
++        value = value,
++        onValueChange = onValueChange,
++        modifier = modifier,
++        enabled = enabled,
++        singleLine = singleLine,
++        label = { Text(label) },
++        textStyle = AppTheme.typography.bodyMedium.copy(
++            color = AppTheme.colors.textPrimary
++        ),
++        colors = OutlinedTextFieldDefaults.colors(
++            focusedContainerColor = AppTheme.colors.surface,
++            unfocusedContainerColor = AppTheme.colors.surfaceVariant.copy(alpha = 0.42f),
++            focusedTextColor = AppTheme.colors.textPrimary,
++            unfocusedTextColor = AppTheme.colors.textPrimary,
++            disabledTextColor = AppTheme.colors.textPrimary.copy(alpha = 0.38f),
++            focusedBorderColor = AppTheme.colors.primary,
++            unfocusedBorderColor = AppTheme.colors.outline,
++            disabledBorderColor = AppTheme.colors.textPrimary.copy(alpha = 0.12f),
++            focusedLabelColor = AppTheme.colors.primary,
++            unfocusedLabelColor = AppTheme.colors.textSecondary,
++            cursorColor = AppTheme.colors.primary,
++            selectionColors = TextSelectionColors(
++                handleColor = AppTheme.colors.primary,
++                backgroundColor = AppTheme.colors.primary.copy(alpha = 0.4f)
++            )
++        ),
++        shape = RoundedCornerShape(16.dp)
++    )
++}

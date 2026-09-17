@@ -2,70 +2,32 @@ package com.programovil.aura.settings.presentation.composable
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.*
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
-import com.programovil.aura.designsystem.theme.AppTheme
+import com.programovil.aura.designsystem.theme.*
 
 @Composable
-fun ThemeCard(
-    name: String,
-    colors: List<androidx.compose.ui.graphics.Color>,
-    isSelected: Boolean,
-    onSelect: () -> Unit
-) {
-    Surface(
-        modifier = Modifier.fillMaxWidth(),
-        color = AppTheme.colors.surface,
-        shape = RoundedCornerShape(24.dp),
-        border = BorderStroke(1.dp, AppTheme.colors.textPrimary.copy(alpha = 0.1f)),
-        onClick = onSelect
-    ) {
-        Row(
-            modifier = Modifier.padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = name,
-                    style = AppTheme.typography.bodyMedium,
-                    color = AppTheme.colors.textPrimary
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(0.7f)
-                        .height(8.dp)
-                        .background(
-                            Brush.horizontalGradient(colors),
-                            RoundedCornerShape(4.dp)
-                        )
-                )
+fun ThemeCard(name: String, colors: List<Color>, isSelected: Boolean, onSelect: () -> Unit) {
+    Surface(color = AppTheme.colors.surface, shape = AuraShapes.card,
+        border = BorderStroke(if (isSelected) 2.dp else 1.dp, if (isSelected) AppTheme.colors.primary else AppTheme.colors.outline)) {
+        Column(Modifier.fillMaxWidth().selectable(isSelected, role = Role.RadioButton, onClick = onSelect).padding(AuraSpacing.md)) {
+            Surface(shape = AuraShapes.input, color = colors.first()) {
+                Column(Modifier.fillMaxWidth().height(72.dp).padding(AuraSpacing.sm),
+                    verticalArrangement = Arrangement.spacedBy(AuraSpacing.xs)) {
+                    Box(Modifier.fillMaxWidth(.7f).height(12.dp).background(colors.last(), AuraShapes.badge))
+                    Box(Modifier.fillMaxWidth(.45f).height(6.dp).background(colors.last(), AuraShapes.badge))
+                }
             }
-            Switch(
-                checked = isSelected,
-                onCheckedChange = { if (it) onSelect() },
-                colors = SwitchDefaults.colors(
-                    checkedThumbColor = AppTheme.colors.textPrimary,
-                    checkedTrackColor = AppTheme.colors.primary,
-                    uncheckedThumbColor = AppTheme.colors.textPrimary,
-                    uncheckedTrackColor = AppTheme.colors.textPrimary.copy(alpha = 0.1f)
-                )
-            )
+            Row(Modifier.fillMaxWidth().padding(top = AuraSpacing.xs), verticalAlignment = Alignment.CenterVertically) {
+                Text(name, Modifier.weight(1f), style = AppTheme.typography.labelLarge)
+                RadioButton(isSelected, null)
+            }
         }
     }
 }

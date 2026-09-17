@@ -22,22 +22,40 @@ class AuthViewModel(
     private val _authState = MutableStateFlow<AuthState>(AuthState.Loading)
     val authState: StateFlow<AuthState> = _authState
 
+    private var signInInFlight: Boolean = false
+
     init {
-        // Rely on the listener to provide the initial state immediately
         authService.addStateListener { state ->
-            _authState.value = state
+            // Don't let the underlying auth listener overwrite an in-flight
+            // sign-in (the explicit handleSignIn result takes precedence).
+            if (!signInInFlight) {
+                _authState.value = state
+            }
         }
     }
 
     fun handleSignInResult(idToken: String?) {
+        signInInFlight = true
         _authState.value = AuthState.Loading
         authService.handleSignIn(idToken) { state ->
+            signInInFlight = false
             _authState.value = state
         }
     }
 
     fun reportAuthError(error: AuthError) {
+        signInInFlight = false
         _authState.value = AuthState.Error(error)
+    }
+
+    /**
+     * Cancelling the platform credential picker happens before Firebase is
+     * called, so it should return to the idle signed-out screen rather than
+     * leaving the session gate in Loading.
+     */
+    fun cancelSignIn() {
+        signInInFlight = false
+        _authState.value = AuthState.SignedOut
     }
 
     fun signOut() {

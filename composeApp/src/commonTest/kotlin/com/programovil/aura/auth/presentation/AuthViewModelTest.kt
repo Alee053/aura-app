@@ -81,6 +81,18 @@ class AuthViewModelTest {
     }
 
     @Test
+    fun `cancelSignIn returns to signed out without delegating to auth service`() {
+        val service = FakeAuthService()
+        val viewModel = createViewModel(service)
+
+        viewModel.cancelSignIn()
+
+        assertEquals(AuthViewModel.AuthState.SignedOut, viewModel.authState.value)
+        assertEquals(null, service.lastSignInIdToken)
+        assertEquals(0, service.signOutCount)
+    }
+
+    @Test
     fun `signOut calls the service`() {
         val service = FakeAuthService()
         val viewModel = createViewModel(service)

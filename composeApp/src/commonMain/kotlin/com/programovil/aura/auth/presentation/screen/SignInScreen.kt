@@ -1,113 +1,58 @@
 package com.programovil.aura.auth.presentation.screen
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Spa
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.*
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.programovil.aura.designsystem.components.button.PrimaryButton
-import com.programovil.aura.designsystem.theme.AppTheme
+import aura_app.composeapp.generated.resources.*
 import com.programovil.aura.auth.domain.AuthError
-import aura_app.composeapp.generated.resources.Res
-import aura_app.composeapp.generated.resources.sign_in_title
-import aura_app.composeapp.generated.resources.sign_in_subtitle
-import aura_app.composeapp.generated.resources.sign_in_button
-import aura_app.composeapp.generated.resources.auth_error_no_credential
-import aura_app.composeapp.generated.resources.auth_error_no_token
-import aura_app.composeapp.generated.resources.auth_error_unknown
-import org.jetbrains.compose.resources.stringResource
+import com.programovil.aura.designsystem.components.state.AuraInlineNotice
+import com.programovil.aura.designsystem.theme.*
+import com.programovil.aura.shared.presentation.composable.*
+import org.jetbrains.compose.resources.*
 
 @Composable
-fun authErrorMessage(error: AuthError): String = when (error) {
+fun authErrorMessage(error: AuthError): String = when(error) {
     is AuthError.NoCredential -> stringResource(Res.string.auth_error_no_credential)
     is AuthError.NoToken -> stringResource(Res.string.auth_error_no_token)
-    is AuthError.Exception -> stringResource(
-        Res.string.auth_error_unknown,
-        error.message ?: stringResource(Res.string.auth_error_no_token)
-    )
+    is AuthError.Exception -> stringResource(Res.string.rd_auth_error)
 }
-
 @Composable
-fun SignInScreen(
-    errorMessage: String?,
-    onSignInClick: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(AppTheme.colors.background)
-            .padding(24.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(CircleShape)
-                    .background(AppTheme.colors.primary.copy(alpha = 0.15f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Spa,
-                    contentDescription = null,
-                    tint = AppTheme.colors.primary,
-                    modifier = Modifier.size(40.dp)
-                )
+fun SignInScreen(errorMessage: String?, onSignInClick: () -> Unit, isLoading: Boolean = false) {
+    Box(Modifier.fillMaxSize().background(AppTheme.colors.background).safeDrawingPadding(), contentAlignment = Alignment.TopCenter) {
+        Column(Modifier.widthIn(max = AuraSpacing.editorWidth).fillMaxSize().verticalScroll(rememberScrollState())
+            .padding(AuraSpacing.lg), verticalArrangement = Arrangement.spacedBy(AuraSpacing.lg)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                AuraBrandMark(Modifier.size(32.dp))
+                Text(stringResource(Res.string.app_name_label), Modifier.padding(start = AuraSpacing.sm), style = AppTheme.typography.titleMedium)
             }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Text(
-                text = stringResource(Res.string.sign_in_title),
-                style = AppTheme.typography.headlineLarge,
-                color = AppTheme.colors.textPrimary,
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Text(
-                text = stringResource(Res.string.sign_in_subtitle),
-                style = AppTheme.typography.bodyMedium,
-                color = AppTheme.colors.textSecondary,
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(modifier = Modifier.height(48.dp))
-
-            PrimaryButton(
-                text = stringResource(Res.string.sign_in_button),
-                onClick = onSignInClick
-            )
-
-            errorMessage?.let {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = it,
-                    color = AppTheme.colors.error,
-                    style = AppTheme.typography.labelLarge,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.padding(horizontal = 32.dp)
-                )
+            Spacer(Modifier.height(AuraSpacing.xs))
+            Text(stringResource(Res.string.rd_intro_title), style = AppTheme.typography.headlineLarge)
+            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                AuraScene(4, Modifier.width(232.dp))
             }
+            Text(stringResource(Res.string.rd_intro_body), style = AppTheme.typography.bodyLarge, color = AppTheme.colors.textSecondary)
+            OutlinedButton(onSignInClick, Modifier.fillMaxWidth().heightIn(min = AuraSpacing.control), enabled = !isLoading,
+                shape = RoundedCornerShape(20.dp), border = BorderStroke(1.dp, Color(0xFF747775)),
+                colors = ButtonDefaults.outlinedButtonColors(containerColor = Color.White, contentColor = Color(0xFF1F1F1F),
+                    disabledContainerColor = Color.White, disabledContentColor = Color(0xFF1F1F1F))) {
+                if (isLoading) CircularProgressIndicator(Modifier.size(20.dp), color = Color(0xFF1F1F1F), strokeWidth = 2.dp)
+                else Image(painterResource(Res.drawable.google_g), null, Modifier.size(20.dp))
+                Spacer(Modifier.width(AuraSpacing.sm))
+                Text(stringResource(Res.string.sign_in_button),
+                    style = AppTheme.typography.labelLarge.copy(fontFamily = FontFamily.SansSerif, fontWeight = FontWeight.Medium))
+            }
+            errorMessage?.let { AuraInlineNotice(it) }
         }
     }
 }

@@ -1,217 +1,117 @@
 package com.programovil.aura.todo.presentation.screen
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.programovil.aura.designsystem.components.button.PrimaryButton
-import com.programovil.aura.designsystem.theme.AppTheme
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.*
+import aura_app.composeapp.generated.resources.*
+import com.programovil.aura.designsystem.components.header.AuraScreenHeader
+import com.programovil.aura.designsystem.components.state.*
+import com.programovil.aura.designsystem.theme.*
 import com.programovil.aura.shared.FeatureFlag
+import com.programovil.aura.shared.presentation.*
+import com.programovil.aura.shared.presentation.composable.*
 import com.programovil.aura.todo.domain.model.Todo
-import com.programovil.aura.todo.presentation.composable.TodoDialog
-import com.programovil.aura.todo.presentation.composable.TodoItem
+import com.programovil.aura.todo.presentation.composable.*
 import com.programovil.aura.todo.presentation.viewmodel.TodoViewModel
-import aura_app.composeapp.generated.resources.Res
-import aura_app.composeapp.generated.resources.add_first_todo
-import aura_app.composeapp.generated.resources.add_todo
-import aura_app.composeapp.generated.resources.completed_section
-import aura_app.composeapp.generated.resources.empty_todos
-import aura_app.composeapp.generated.resources.todos_title
 import org.jetbrains.compose.resources.stringResource
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TodoScreen(
-    viewModel: TodoViewModel,
-    featureFlags: Map<FeatureFlag, Boolean> = emptyMap(),
-    onFeatureDisabled: () -> Unit = {}
-) {
-    LaunchedEffect(featureFlags) {
-        if (featureFlags[FeatureFlag.TODOS_ENABLED] == false) {
-            onFeatureDisabled()
-        }
-    }
-
+fun TodoScreen(viewModel: TodoViewModel, featureFlags: Map<FeatureFlag, Boolean> = emptyMap(),
+    onFeatureDisabled: () -> Unit = {}) {
     val todos by viewModel.todos.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    val error by viewModel.error.collectAsState()
-
-    var showDialog by remember { mutableStateOf(false) }
-    var editingTodo by remember { mutableStateOf<Todo?>(null) }
-
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    val errorMessage = error?.asString()
-    LaunchedEffect(errorMessage) {
-        errorMessage?.let {
-            snackbarHostState.showSnackbar(it)
-            viewModel.clearError()
+    val loading by viewModel.isLoading.collectAsState()
+    val loadError by viewModel.loadError.collectAsState()
+    val operations by viewModel.operations.states.collectAsState()
+    var showEditor by rememberSaveable { mutableStateOf(false) }
+    var editingId by rememberSaveable { mutableStateOf<String?>(null) }
+    var completedExpanded by rememberSaveable { mutableStateOf(true) }
+    val editor = operations["editor"]
+    // Keep the edited entity stable while snapshots update optimistically.
+    var editingTodo by rememberSaveable(stateSaver = TodoEditorSaver) { mutableStateOf<Todo?>(null) }
+    val selected = editingTodo ?: todos.find { it.id == editingId }
+    val openNew = { viewModel.operations.clearCompleted(); editingId = null; editingTodo = null; showEditor = true }
+    ObserveToggleFeedback(operations, viewModel.operations)
+    LaunchedEffect(editor?.requestId, editor?.status) {
+        if (editor?.status == OperationStatus.Succeeded) {
+            showEditor = false; editingTodo = null; editingId = null
+            viewModel.operations.consume("editor", editor.requestId)
         }
     }
-
-    if (showDialog) {
-        TodoDialog(
-            todo = editingTodo,
-            onDismiss = {
-                showDialog = false
-                editingTodo = null
-            },
-            onSave = { title, description, dueDate ->
-                if (editingTodo != null) {
-                    viewModel.updateTodo(
-                        editingTodo!!.copy(
-                            title = title,
-                            description = description,
-                            dueDate = dueDate
-                        )
-                    )
-                } else {
-                    viewModel.addTodo(title, description, dueDate)
-                }
-            },
-            onDelete = editingTodo?.let { todo ->
-                {
-                    viewModel.deleteTodo(todo.id)
-                }
-            }
-        )
+    val pendingSnapshot = remember { mutableStateMapOf<String, Todo>() }
+    // Hold a row in its current group until the mutation result is confirmed.
+    fun toggle(todo: Todo) {
+        pendingSnapshot[todo.id] = todo
+        viewModel.toggleTodo(todo.id, !todo.isCompleted)
     }
-
-    Scaffold(
-        containerColor = AppTheme.colors.background,
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        stringResource(Res.string.todos_title),
-                        style = AppTheme.typography.headlineSmall
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = AppTheme.colors.surface,
-                    titleContentColor = AppTheme.colors.textPrimary
-                )
-            )
-        },
+    LaunchedEffect(operations) {
+        pendingSnapshot.keys.toList().forEach { id ->
+            if (operations["toggle:$id"]?.pending != true) pendingSnapshot.remove(id)
+        }
+    }
+    val visibleTodos = todos.map { pendingSnapshot[it.id] ?: it }
+    Scaffold(containerColor = AppTheme.colors.background, contentWindowInsets = WindowInsets(0,0,0,0),
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    editingTodo = null
-                    showDialog = true
-                },
-                containerColor = AppTheme.colors.primary
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(Res.string.add_todo),
-                    tint = AppTheme.colors.textPrimary
-                )
-            }
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+            if (todos.isNotEmpty()) ExtendedFloatingActionButton(onClick = openNew,
+                icon = { Icon(Icons.Outlined.Add, null) }, text = { Text(stringResource(Res.string.rd_new_task)) },
+                containerColor = AppTheme.colors.primary, contentColor = AppTheme.colors.onPrimary)
+        }
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 16.dp)
-        ) {
+        LazyColumn(Modifier.fillMaxSize().padding(padding).padding(horizontal = LocalAuraGutter.current),
+            contentPadding = PaddingValues(bottom = AuraSpacing.section + AuraSpacing.xl)) {
+            item { AuraScreenHeader(stringResource(Res.string.todos_title), stringResource(Res.string.rd_todos_intro)) }
+            loadError?.let { error -> item {
+                AuraInlineNotice(error.asString(), actionLabel = stringResource(Res.string.rd_retry), onAction = viewModel::retryLoad)
+            } }
+            operations.values.firstOrNull { it.kind == "toggle" && it.status == OperationStatus.Failed }?.let { operation ->
+                item { AuraInlineNotice(operation.error!!.asString(), actionLabel = stringResource(Res.string.rd_close),
+                    onAction = { viewModel.operations.consume(operation.target, operation.requestId) }) }
+            }
+            operations.values.firstOrNull { it.pending && it.longRunning }?.let { op ->
+                item { OperationNotice(op) }
+            }
             when {
-                isLoading -> {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = AppTheme.colors.primary)
-                    }
-                }
-                todos.isEmpty() -> {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            Text(
-                                stringResource(Res.string.empty_todos),
-                                style = AppTheme.typography.bodyMedium,
-                                color = AppTheme.colors.textSecondary
-                            )
-                            PrimaryButton(
-                                text = stringResource(Res.string.add_first_todo),
-                                onClick = {
-                                    editingTodo = null
-                                    showDialog = true
-                                }
-                            )
-                        }
-                    }
+                loading -> item { AuraSkeleton(label = stringResource(Res.string.rd_loading)) }
+                todos.isEmpty() && loadError == null -> item {
+                    AuraEmptyState(stringResource(Res.string.rd_empty_tasks), stringResource(Res.string.rd_empty_tasks_body),
+                        stringResource(Res.string.rd_new_task), openNew,
+                        illustration = { AuraScene(1, Modifier.size(AuraSpacing.control * 2)) })
                 }
                 else -> {
-                    val activeTodos = todos.filter { !it.isCompleted }
-                    val completedTodos = todos.filter { it.isCompleted }
-
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(top = 16.dp)
-                    ) {
-                        items(activeTodos, key = { it.id }) { todo ->
-                            TodoItem(
-                                todo = todo,
-                                onToggle = { viewModel.toggleTodo(todo.id, !todo.isCompleted) },
-                                onClick = {
-                                    editingTodo = todo
-                                    showDialog = true
-                                }
-                            )
+                    item { Text(stringResource(Res.string.rd_active), Modifier.padding(vertical = AuraSpacing.md),
+                        style = AppTheme.typography.labelLarge, color = AppTheme.colors.textSecondary) }
+                    items(visibleTodos.filter { !it.isCompleted }, key = { it.id }) { todo ->
+                        TodoItem(todo, { toggle(todo) }, {
+                            viewModel.operations.clearCompleted(); editingId = todo.id; editingTodo = todo; showEditor = true
+                        }, Modifier.animateItem(), operations["toggle:${todo.id}"]?.pending == true)
+                        HorizontalDivider(color = AppTheme.colors.outline)
+                    }
+                    if (visibleTodos.any { it.isCompleted }) item {
+                        TextButton({ completedExpanded = !completedExpanded }, Modifier.fillMaxWidth().padding(top = AuraSpacing.md)) {
+                            Text("${stringResource(Res.string.rd_done)} · ${visibleTodos.count { it.isCompleted }}")
                         }
-
-                        if (completedTodos.isNotEmpty()) {
-                            item {
-                                Text(
-                                    text = stringResource(Res.string.completed_section),
-                                    style = AppTheme.typography.labelLarge,
-                                    color = AppTheme.colors.textSecondary.copy(alpha = 0.6f),
-                                    modifier = Modifier.padding(vertical = 8.dp)
-                                )
-                            }
-                            items(completedTodos, key = { it.id }) { todo ->
-                                TodoItem(
-                                    todo = todo,
-                                    onToggle = { viewModel.toggleTodo(todo.id, !todo.isCompleted) },
-                                    onClick = {
-                                        editingTodo = todo
-                                        showDialog = true
-                                    }
-                                )
-                            }
-                        }
+                    }
+                    if (completedExpanded) items(visibleTodos.filter { it.isCompleted }, key = { it.id }) { todo ->
+                        TodoItem(todo, { toggle(todo) }, {
+                            viewModel.operations.clearCompleted(); editingId = todo.id; editingTodo = todo; showEditor = true
+                        }, Modifier.animateItem(), operations["toggle:${todo.id}"]?.pending == true)
+                        HorizontalDivider(color = AppTheme.colors.outline)
                     }
                 }
             }
         }
     }
+    if (showEditor) TodoDialog(selected,
+        onDismiss = { showEditor = false; editingTodo = null; editingId = null },
+        onSave = { title, description, date ->
+            if (selected == null) viewModel.addTodo(title, description, date)
+            else viewModel.updateTodo(selected.copy(title = title, description = description, dueDate = date))
+        },
+        onDelete = selected?.let { { viewModel.deleteTodo(it.id) } }, operation = editor)
 }

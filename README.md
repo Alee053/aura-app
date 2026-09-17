@@ -9,14 +9,14 @@ Aplicación de productividad (Todo + Hábitos + Dashboard + Pomodoro + Ajustes) 
 ### Implementadas
 
 - **Autenticación** — Inicio de sesión con Google y sesión persistente. Abstraído para SDKs nativos de cada plataforma (Android/iOS).
-- **Home / Dashboard** — Pantalla de inicio con tarjetas KPI y acceso rápido a todas las funciones.
+- **Home / Dashboard** — Inicio editorial con fecha contextual, tareas pendientes, progreso de hábitos y acceso rápido a Enfoque.
 - **Todo** — CRUD completo con soporte de fecha de vencimiento. Respaldado por **Cloud Firestore** para sincronización entre dispositivos.
 - **Hábitos** — Seguimiento estricto de hábitos con rachas (Hoy, Mañana, Esta semana). Respaldado por **Cloud Firestore** para sincronización entre dispositivos.
 - **Ajustes** — Selector de tema con 5 paletas (Morado, Verde, Rojo, Oscuro, Alto contraste) persistido con DataStore KMP.
 - **Notificaciones** — Programación de notificaciones locales para resúmenes diarios y recordatorios de fecha de vencimiento. Abstraído para multiplataforma.
 - **Feature Flags** — Toggles mediante Firebase Remote Config para visibilidad condicional de funciones (Todos, Hábitos, Notificaciones, Journal, Pomodoro, Premium).
-- **Navegación** — Bottom Navigation con tipos seguros (Home, Todo, Hábitos, Ajustes, Journal, Pomodoro) usando `kotlinx-serialization`.
-- **Sistema de diseño** — Módulo propio `designsystem` con tokens de tema (`AppTheme.colors`, `AppTheme.typography`), componentes reutilizables (`PrimaryButton`, `BasicInput`, `AuraHorizontalDivider`) y 5 paletas de color.
+- **Navegación** — Shell adaptable con bottom navigation en teléfonos y navigation rail en pantallas anchas; rutas tipadas (Home, Todo, Hábitos, Ajustes, Journal, Pomodoro) usando `kotlinx-serialization`.
+- **Sistema de diseño** — Módulo propio `designsystem` con tokens de tema (`AppTheme.colors`, `AppTheme.typography`), tipografía Manrope local, marca orbital, `AuraButton`, `AuraTextField`, hojas modales, estados y 5 paletas de color.
 - **Onboarding** — Flujo inicial basado en JSON por idioma, localizado dinámicamente.
 - **Journal** — Entradas de diario con sincronización en Firestore.
 - **Pomodoro** — Temporizador de enfoque con tres modos (Pomodoro / Pausa corta / Pausa larga) y persistencia del estado.

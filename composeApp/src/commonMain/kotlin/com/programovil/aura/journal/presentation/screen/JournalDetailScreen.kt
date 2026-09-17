@@ -1,168 +1,95 @@
 package com.programovil.aura.journal.presentation.screen
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
-import com.programovil.aura.designsystem.theme.AppTheme
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import aura_app.composeapp.generated.resources.*
+import com.programovil.aura.designsystem.components.button.*
+import com.programovil.aura.designsystem.components.state.*
+import com.programovil.aura.designsystem.theme.*
 import com.programovil.aura.journal.presentation.viewmodel.JournalDetailViewModel
-import aura_app.composeapp.generated.resources.Res
-import aura_app.composeapp.generated.resources.journal_back
-import aura_app.composeapp.generated.resources.journal_content_hint
-import aura_app.composeapp.generated.resources.journal_delete
-import aura_app.composeapp.generated.resources.journal_edit_entry
-import aura_app.composeapp.generated.resources.journal_new_entry
-import aura_app.composeapp.generated.resources.journal_save
-import aura_app.composeapp.generated.resources.journal_title_hint
+import com.programovil.aura.shared.presentation.*
+import com.programovil.aura.shared.presentation.composable.*
 import org.jetbrains.compose.resources.stringResource
-import androidx.compose.foundation.layout.defaultMinSize
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun JournalDetailScreen(
-    viewModel: JournalDetailViewModel,
-    onNavigateBack: () -> Unit,
-    onDelete: (() -> Unit)? = null
-) {
-    val uiState by viewModel.uiState.collectAsState()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val isNewEntry = uiState.entry == null
-
-    LaunchedEffect(uiState.isSaved) {
-        if (uiState.isSaved) onNavigateBack()
-    }
-
-    val errorMessage = uiState.error?.asString()
-    LaunchedEffect(errorMessage) {
-        errorMessage?.let {
-            snackbarHostState.showSnackbar(it)
-            viewModel.clearError()
+fun JournalDetailScreen(viewModel: JournalDetailViewModel, onNavigateBack: () -> Unit,
+    onDelete: (() -> Unit)? = null) {
+    val state by viewModel.uiState.collectAsState()
+    val operations by viewModel.operations.states.collectAsState()
+    val operation = operations["editor"]
+    val pending = operation?.pending == true
+    var discard by remember { mutableStateOf(false) }
+    var delete by remember { mutableStateOf(false) }
+    val keyboard = LocalSoftwareKeyboardController.current
+    val back = {
+        if (!pending) {
+            if (state.dirty) discard = true else { keyboard?.hide(); onNavigateBack() }
         }
     }
-
-    Scaffold(
-        containerColor = AppTheme.colors.background,
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        stringResource(
-                            if (isNewEntry) Res.string.journal_new_entry
-                            else Res.string.journal_edit_entry
-                        ),
-                        style = AppTheme.typography.headlineSmall
+    val imeVisible = WindowInsets.isImeVisible
+    AuraBackHandler { if (imeVisible) keyboard?.hide() else back() }
+    LaunchedEffect(operation?.requestId, operation?.status) {
+        if (operation?.status == OperationStatus.Succeeded) {
+            keyboard?.hide()
+            viewModel.operations.consume("editor", operation.requestId)
+            onNavigateBack()
+        }
+    }
+    Column(Modifier.fillMaxSize().imePadding().padding(horizontal = LocalAuraGutter.current)) {
+        Row(Modifier.fillMaxWidth().padding(vertical = AuraSpacing.sm), verticalAlignment = Alignment.CenterVertically) {
+            IconButton(back, enabled = !pending) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(Res.string.journal_back)) }
+            Text(stringResource(if (state.isNew) Res.string.journal_new_entry else Res.string.journal_edit_entry),
+                Modifier.weight(1f), style = AppTheme.typography.labelLarge)
+            AuraButton(stringResource(Res.string.rd_save), viewModel::saveEntry,
+                enabled = state.title.isNotBlank() && !state.isLoading && state.loadError == null,
+                loading = pending, style = AuraButtonStyle.Text)
+        }
+        Column(Modifier.fillMaxWidth().weight(1f).verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(AuraSpacing.md)) {
+            when {
+                state.isLoading -> AuraSkeleton(rows = 3, label = stringResource(Res.string.rd_loading))
+                state.loadError != null -> AuraInlineNotice(state.loadError!!.asString(),
+                    actionLabel = stringResource(Res.string.rd_retry), onAction = viewModel::retryLoad)
+                else -> {
+                    state.entry?.let { Text(auraDate(localDate(it.createdAt)),
+                        style = AppTheme.typography.bodyMedium, color = AppTheme.colors.textSecondary) }
+                    val fieldColors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent, unfocusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent, unfocusedIndicatorColor = Color.Transparent,
+                        disabledIndicatorColor = Color.Transparent
                     )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(Res.string.journal_back),
-                            tint = AppTheme.colors.textPrimary
-                        )
+                    TextField(state.title, viewModel::updateTitle,
+                        Modifier.fillMaxWidth(), readOnly = pending,
+                        placeholder = { Text(stringResource(Res.string.journal_title_hint), style = AppTheme.typography.headlineLarge) },
+                        textStyle = AppTheme.typography.headlineLarge, colors = fieldColors, maxLines = 4)
+                    TextField(state.content, viewModel::updateContent,
+                        Modifier.fillMaxWidth().heightIn(min = AuraSpacing.section * 4), readOnly = pending,
+                        placeholder = { Text(stringResource(Res.string.journal_content_hint), style = AppTheme.typography.journal) },
+                        textStyle = AppTheme.typography.journal, colors = fieldColors)
+                    if (state.dirty) Text(stringResource(Res.string.rd_unsaved),
+                        style = AppTheme.typography.labelMedium, color = AppTheme.colors.textSecondary)
+                    OperationNotice(operation)
+                    if (state.entry != null) TextButton({ delete = true }, enabled = !pending) {
+                        Icon(Icons.Outlined.Delete, null)
+                        Spacer(Modifier.width(AuraSpacing.xs))
+                        Text(stringResource(Res.string.journal_delete), color = AppTheme.colors.error)
                     }
-                },
-                actions = {
-                    if (!isNewEntry && onDelete != null) {
-                        IconButton(onClick = onDelete) {
-                            Icon(
-                                Icons.Default.Delete,
-                                contentDescription = stringResource(Res.string.journal_delete),
-                                tint = AppTheme.colors.textSecondary
-                            )
-                        }
-                    }
-                    IconButton(
-                        onClick = { viewModel.saveEntry() },
-                        enabled = uiState.title.isNotBlank()
-                    ) {
-                        Icon(
-                            Icons.Default.Check,
-                            contentDescription = stringResource(Res.string.journal_save),
-                            tint = if (uiState.title.isNotBlank()) AppTheme.colors.primary
-                            else AppTheme.colors.textSecondary
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = AppTheme.colors.surface,
-                    titleContentColor = AppTheme.colors.textPrimary
-                )
-            )
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) { padding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 16.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-            OutlinedTextField(
-                value = uiState.title,
-                onValueChange = { viewModel.updateTitle(it) },
-                label = { Text(stringResource(Res.string.journal_title_hint)) },
-                singleLine = true,
-                textStyle = AppTheme.typography.titleMedium,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = AppTheme.colors.textPrimary,
-                    unfocusedTextColor = AppTheme.colors.textPrimary,
-                    focusedBorderColor = AppTheme.colors.primary,
-                    unfocusedBorderColor = AppTheme.colors.textSecondary,
-                    focusedLabelColor = AppTheme.colors.primary,
-                    unfocusedLabelColor = AppTheme.colors.textSecondary,
-                    cursorColor = AppTheme.colors.primary
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp)
-            )
-
-            OutlinedTextField(
-                value = uiState.content,
-                onValueChange = { viewModel.updateContent(it) },
-                label = { Text(stringResource(Res.string.journal_content_hint)) },
-                textStyle = AppTheme.typography.bodyLarge,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedTextColor = AppTheme.colors.textPrimary,
-                    unfocusedTextColor = AppTheme.colors.textPrimary,
-                    focusedBorderColor = AppTheme.colors.primary,
-                    unfocusedBorderColor = AppTheme.colors.textSecondary,
-                    focusedLabelColor = AppTheme.colors.primary,
-                    unfocusedLabelColor = AppTheme.colors.textSecondary,
-                    cursorColor = AppTheme.colors.primary
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp)
-                    .defaultMinSize(minHeight = 300.dp),
-                maxLines = Int.MAX_VALUE
-            )
+                }
+            }
+            Spacer(Modifier.height(AuraSpacing.xl))
         }
     }
+    if (discard) DiscardDialog({ viewModel.clearDraft(); keyboard?.hide(); onNavigateBack() }, { discard = false })
+    if (delete) DeleteDialog({ delete = false; viewModel.deleteEntry() }, { delete = false })
 }

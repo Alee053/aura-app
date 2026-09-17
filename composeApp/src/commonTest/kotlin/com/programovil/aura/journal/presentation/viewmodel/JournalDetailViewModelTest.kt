@@ -1,5 +1,6 @@
 package com.programovil.aura.journal.presentation.viewmodel
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.programovil.aura.journal.domain.model.JournalEntry
 import com.programovil.aura.journal.domain.repository.JournalRepository
@@ -177,7 +178,64 @@ class JournalDetailViewModelTest {
         assertNull(viewModel.uiState.value.error)
     }
 
-    private fun createViewModel(entryId: String?): JournalDetailViewModel {
+    @Test
+    fun `restored draft wins over existing remote text`() = runTest(testDispatcher) {
+        repository.entriesById["j-1"] = JournalEntry("j-1", "Remote", "Remote body", 1L, 2L)
+        val savedState = SavedStateHandle(mapOf(
+            "draft:j-1:title" to "My unfinished title", "draft:j-1:content" to "My draft", "draft:j-1:dirty" to true))
+        val vm = createViewModel("j-1", savedState)
+        runCurrent()
+        assertEquals("My unfinished title", vm.uiState.value.title)
+        assertEquals("My draft", vm.uiState.value.content)
+        assertTrue(vm.uiState.value.dirty)
+        vm.retryLoad(); runCurrent()
+        assertEquals("My draft", vm.uiState.value.content)
+    }
+
+    @Test
+    fun `unknown existing entry can never silently become a new entry`() = runTest(testDispatcher) {
+        val vm = createViewModel("missing")
+        runCurrent()
+        vm.updateTitle("Recovered title")
+        vm.clearError()
+        vm.saveEntry(); runCurrent()
+        assertNotNull(vm.uiState.value.loadError)
+        assertFalse(vm.uiState.value.isNew)
+        assertTrue(repository.addCalls.isEmpty())
+    }
+
+    @Test
+    fun `load exception is recoverable and does not overwrite draft`() = runTest(testDispatcher) {
+        repository.loadFailure = IllegalStateException("offline")
+        val vm = createViewModel("j-1")
+        runCurrent()
+        assertNotNull(vm.uiState.value.loadError)
+        assertFalse(vm.uiState.value.isLoading)
+        repository.loadFailure = null
+        repository.entriesById["j-1"] = JournalEntry("j-1", "Recovered", "Body", 1L, 2L)
+        vm.retryLoad(); runCurrent()
+        assertNull(vm.uiState.value.loadError)
+        assertEquals("Recovered", vm.uiState.value.title)
+    }
+
+    @Test
+    fun `save failure retains exact whitespace and pending blocks duplicate submits`() = runTest(testDispatcher) {
+        repository.saveGate = kotlinx.coroutines.CompletableDeferred()
+        val vm = createViewModel(null)
+        vm.updateTitle("  Draft  "); vm.updateContent("  Body\n")
+        repeat(2) { vm.saveEntry() }; runCurrent()
+        assertEquals(1, repository.addCalls.size)
+        assertFalse(vm.uiState.value.isSaved)
+        vm.updateTitle("Must not replace pending draft")
+        assertEquals("  Draft  ", vm.uiState.value.title)
+        repository.saveGate!!.complete(Result.failure(IllegalStateException("offline"))); runCurrent()
+        assertEquals("  Draft  ", vm.uiState.value.title)
+        assertEquals("  Body\n", vm.uiState.value.content)
+        assertTrue(vm.uiState.value.dirty)
+        assertFalse(vm.uiState.value.isSaved)
+    }
+
+    private fun createViewModel(entryId: String?, savedState: SavedStateHandle = SavedStateHandle()): JournalDetailViewModel {
         val getUseCase = GetJournalEntryUseCase(repository)
         val addUseCase = AddJournalEntryUseCase(repository)
         val updateUseCase = UpdateJournalEntryUseCase(repository)
@@ -185,7 +243,8 @@ class JournalDetailViewModelTest {
             entryId = entryId,
             getEntryUseCase = getUseCase,
             addEntryUseCase = addUseCase,
-            updateEntryUseCase = updateUseCase
+            updateEntryUseCase = updateUseCase,
+            savedState = savedState
         )
         viewModels += viewModel
         return viewModel
@@ -197,19 +256,22 @@ private class FakeDetailJournalRepository : JournalRepository {
     val getEntryCalls: MutableList<String> = mutableListOf()
     val addCalls: MutableList<Pair<String, String>> = mutableListOf()
     val updateCalls: MutableList<JournalEntry> = mutableListOf()
+    var loadFailure: Exception? = null
+    var saveGate: kotlinx.coroutines.CompletableDeferred<Result<Unit>>? = null
     var addResult: Result<Unit> = Result.success(Unit)
     var updateResult: Result<Unit> = Result.success(Unit)
 
     override fun getEntries() = kotlinx.coroutines.flow.flowOf(Result.success(entriesById.values.toList()))
 
     override suspend fun getEntry(id: String): JournalEntry? {
+        loadFailure?.let { throw it }
         getEntryCalls += id
         return entriesById[id]
     }
 
     override suspend fun addEntry(title: String, content: String): Result<Unit> {
         addCalls += title to content
-        return addResult
+        return saveGate?.await() ?: addResult
     }
 
     override suspend fun updateEntry(entry: JournalEntry): Result<Unit> {

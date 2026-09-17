@@ -1,0 +1,127 @@
+<resources>
+    <string name="rd_loading">Loading…</string>
+    <string name="rd_retry">Try again</string>
+    <string name="rd_close">Close</string>
+    <string name="rd_save">Save</string>
+    <string name="rd_saving">Saving…</string>
+    <string name="rd_pending">The operation is still pending. Your changes are kept here.</string>
+    <string name="rd_discard_title">Discard changes?</string>
+    <string name="rd_discard_body">Your unsaved changes will be lost.</string>
+    <string name="rd_discard">Discard</string>
+    <string name="rd_keep_editing">Keep editing</string>
+    <string name="rd_delete_title">Delete this item?</string>
+    <string name="rd_delete_body">This action cannot be undone.</string>
+    <string name="rd_home_title">Your day, at your pace.</string>
+    <string name="rd_home_eyebrow">MAKE ROOM FOR WHAT MATTERS</string>
+    <string name="rd_pending_tasks">Pending tasks</string>
+    <string name="rd_tasks_hint">One thing at a time.</string>
+    <string name="rd_view_tasks">View tasks</string>
+    <string name="rd_marked_today">Marked today</string>
+    <string name="rd_streak">Streak records: %1$d</string>
+    <string name="rd_streak_help">Records from consecutive periods that met the goal, plus the current period.</string>
+    <string name="rd_view_habits">View habits</string>
+    <string name="rd_focus">Focus</string>
+    <string name="rd_focus_hint">A little space for your full attention.</string>
+    <string name="rd_open_focus">Open focus</string>
+    <string name="rd_reflect">A moment for yourself.</string>
+    <string name="rd_open_journal">Open journal</string>
+    <string name="rd_unavailable">These spaces are not available right now.</string>
+    <string name="rd_summary_error">We could not load your summary.</string>
+    <string name="rd_motivation">A thought for today</string>
+    <string name="rd_todos_intro">Make room for what matters.</string>
+    <string name="rd_habits_intro">Small steps. Lasting rhythm.</string>
+    <string name="rd_journal_intro">Put your thoughts into words.</string>
+    <string name="rd_empty_tasks">Start with one thing.</string>
+    <string name="rd_empty_tasks_body">Capture something you want to get done. You can add the details later.</string>
+    <string name="rd_empty_habits">A rhythm starts here.</string>
+    <string name="rd_empty_habits_body">Choose a small habit and make space for it.</string>
+    <string name="rd_empty_journal">Your next page is waiting.</string>
+    <string name="rd_empty_journal_body">A thought, a memory, a new idea. Start wherever you are.</string>
+    <string name="rd_new_task">New task</string>
+    <string name="rd_new_habit">New habit</string>
+    <string name="rd_write">Write an entry</string>
+    <string name="rd_active">Pending</string>
+    <string name="rd_done">Completed</string>
+    <string name="rd_today">Today</string>
+    <string name="rd_mark_today">Mark today</string>
+    <string name="rd_last_seven">Last 7 days</string>
+    <string name="rd_complete">Completed</string>
+    <string name="rd_not_complete">Not completed</string>
+    <string name="rd_edit">Edit</string>
+    <string name="rd_more">More options</string>
+    <string name="rd_frequency">Frequency</string>
+    <string name="rd_goal">Goal</string>
+    <string name="rd_decrease">Decrease goal</string>
+    <string name="rd_increase">Increase goal</string>
+    <string name="rd_color_current">Current</string>
+    <string name="rd_start">Start</string>
+    <string name="rd_pause">Pause</string>
+    <string name="rd_paused">Paused</string>
+    <string name="rd_ready">Ready when you are</string>
+    <string name="rd_running">One moment. One focus.</string>
+    <string name="rd_reset">Reset</string>
+    <string name="rd_skip">Skip</string>
+    <string name="rd_timer_change">Change this session?</string>
+    <string name="rd_timer_change_body">The current interval will end. Your session history keeps its existing behavior.</string>
+    <string name="rd_continue">Continue</string>
+    <string name="rd_sessions">Sessions: %1$d</string>
+    <string name="rd_next">Up next: %1$s</string>
+    <string name="rd_finish_title">A moment well spent.</string>
+    <string name="rd_appearance">Appearance</string>
+    <string name="rd_session">Session</string>
+    <string name="rd_theme_aura">Aura</string>
+    <string name="rd_theme_forest">Forest</string>
+    <string name="rd_theme_clay">Clay</string>
+    <string name="rd_theme_midnight">Midnight</string>
+    <string name="rd_theme_contrast">High contrast</string>
+    <string name="rd_logout_title">Sign out of Aura?</string>
+    <string name="rd_logout_body">Your saved entries will remain in your account.</string>
+    <string name="rd_permission_denied">Notifications are disabled in Android. You can enable them in the app notification settings.</string>
+    <string name="rd_time_input">Enter time</string>
+    <string name="rd_time_clock">Use clock</string>
+    <string name="rd_intro_title">Make room for what matters.</string>
+    <string name="rd_intro_body">Organize your tasks, find your focus, and make time for yourself.</string>
+    <string name="rd_auth_error">We could not sign you in. Please try again.</string>
+    <string name="rd_preparing">Preparing Aura</string>
+    <string name="rd_onboarding_page">%1$d of %2$d</string>
+    <string name="rd_not_found">This entry is not available.</string>
+    <string name="rd_unsaved">Unsaved changes</string>
+    <string name="rd_feature_hidden">This space is no longer available.</string>
+    <string name="rd_date_label">%1$d %2$s %3$d</string>
+    <string name="rd_period_progress">%1$d / %2$d · %3$s</string>
+    <string-array name="rd_months">
+        <item>January</item>
+        <item>February</item>
+        <item>March</item>
+        <item>April</item>
+        <item>May</item>
+        <item>June</item>
+        <item>July</item>
+        <item>August</item>
+        <item>September</item>
+        <item>October</item>
+        <item>November</item>
+        <item>December</item>
+    </string-array>
+    <string-array name="rd_weekdays">
+        <item>Mon</item>
+        <item>Tue</item>
+        <item>Wed</item>
+        <item>Thu</item>
+        <item>Fri</item>
+        <item>Sat</item>
+        <item>Sun</item>
+    </string-array>
+    <string-array name="rd_colors">
+        <item>Coral</item>
+        <item>Mint</item>
+        <item>Blue</item>
+        <item>Violet</item>
+        <item>Amber</item>
+        <item>Mauve</item>
+    </string-array>
+    <string name="rd_hour">Hour</string>
+    <string name="rd_minute">Minute</string>
+    <string name="rd_am">AM</string>
+    <string name="rd_pm">PM</string>
+</resources>

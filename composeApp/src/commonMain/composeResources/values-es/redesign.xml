@@ -1,0 +1,127 @@
+<resources>
+    <string name="rd_loading">Cargando…</string>
+    <string name="rd_retry">Reintentar</string>
+    <string name="rd_close">Cerrar</string>
+    <string name="rd_save">Guardar</string>
+    <string name="rd_saving">Guardando…</string>
+    <string name="rd_pending">La operación sigue pendiente. Tus cambios se conservan aquí.</string>
+    <string name="rd_discard_title">¿Descartar cambios?</string>
+    <string name="rd_discard_body">Se perderán los cambios que no hayas guardado.</string>
+    <string name="rd_discard">Descartar</string>
+    <string name="rd_keep_editing">Seguir editando</string>
+    <string name="rd_delete_title">¿Eliminar este elemento?</string>
+    <string name="rd_delete_body">Esta acción no se puede deshacer.</string>
+    <string name="rd_home_title">Tu día, a tu ritmo.</string>
+    <string name="rd_home_eyebrow">ESPACIO PARA LO IMPORTANTE</string>
+    <string name="rd_pending_tasks">Tareas pendientes</string>
+    <string name="rd_tasks_hint">Una cosa a la vez.</string>
+    <string name="rd_view_tasks">Ver tareas</string>
+    <string name="rd_marked_today">Marcados hoy</string>
+    <string name="rd_streak">Registros en racha: %1$d</string>
+    <string name="rd_streak_help">Registros de períodos consecutivos que alcanzaron la meta, más el período actual.</string>
+    <string name="rd_view_habits">Ver hábitos</string>
+    <string name="rd_focus">Enfoque</string>
+    <string name="rd_focus_hint">Un espacio para toda tu atención.</string>
+    <string name="rd_open_focus">Abrir enfoque</string>
+    <string name="rd_reflect">Un momento para ti.</string>
+    <string name="rd_open_journal">Abrir diario</string>
+    <string name="rd_unavailable">Estos espacios no están disponibles ahora.</string>
+    <string name="rd_summary_error">No pudimos cargar tu resumen.</string>
+    <string name="rd_motivation">Una idea para hoy</string>
+    <string name="rd_todos_intro">Haz espacio para lo importante.</string>
+    <string name="rd_habits_intro">Pequeños pasos. Un ritmo duradero.</string>
+    <string name="rd_journal_intro">Dale palabras a tus pensamientos.</string>
+    <string name="rd_empty_tasks">Empieza con una cosa.</string>
+    <string name="rd_empty_tasks_body">Anota algo que quieras hacer. Puedes añadir los detalles después.</string>
+    <string name="rd_empty_habits">Tu ritmo empieza aquí.</string>
+    <string name="rd_empty_habits_body">Elige un pequeño hábito y hazle espacio.</string>
+    <string name="rd_empty_journal">Tu próxima página te espera.</string>
+    <string name="rd_empty_journal_body">Un pensamiento, un recuerdo, una idea. Empieza donde estés.</string>
+    <string name="rd_new_task">Nueva tarea</string>
+    <string name="rd_new_habit">Nuevo hábito</string>
+    <string name="rd_write">Escribir</string>
+    <string name="rd_active">Pendientes</string>
+    <string name="rd_done">Completadas</string>
+    <string name="rd_today">Hoy</string>
+    <string name="rd_mark_today">Marcar hoy</string>
+    <string name="rd_last_seven">Últimos 7 días</string>
+    <string name="rd_complete">Completado</string>
+    <string name="rd_not_complete">Sin completar</string>
+    <string name="rd_edit">Editar</string>
+    <string name="rd_more">Más opciones</string>
+    <string name="rd_frequency">Frecuencia</string>
+    <string name="rd_goal">Objetivo</string>
+    <string name="rd_decrease">Reducir objetivo</string>
+    <string name="rd_increase">Aumentar objetivo</string>
+    <string name="rd_color_current">Actual</string>
+    <string name="rd_start">Iniciar</string>
+    <string name="rd_pause">Pausar</string>
+    <string name="rd_paused">En pausa</string>
+    <string name="rd_ready">Cuando tú quieras</string>
+    <string name="rd_running">Un momento. Un enfoque.</string>
+    <string name="rd_reset">Reiniciar</string>
+    <string name="rd_skip">Saltar</string>
+    <string name="rd_timer_change">¿Cambiar esta sesión?</string>
+    <string name="rd_timer_change_body">El intervalo actual terminará. El historial de sesiones conserva su comportamiento habitual.</string>
+    <string name="rd_continue">Continuar</string>
+    <string name="rd_sessions">Sesiones: %1$d</string>
+    <string name="rd_next">Después: %1$s</string>
+    <string name="rd_finish_title">Un momento para avanzar.</string>
+    <string name="rd_appearance">Apariencia</string>
+    <string name="rd_session">Sesión</string>
+    <string name="rd_theme_aura">Aura</string>
+    <string name="rd_theme_forest">Bosque</string>
+    <string name="rd_theme_clay">Arcilla</string>
+    <string name="rd_theme_midnight">Medianoche</string>
+    <string name="rd_theme_contrast">Alto contraste</string>
+    <string name="rd_logout_title">¿Cerrar sesión en Aura?</string>
+    <string name="rd_logout_body">Tus registros guardados permanecerán en tu cuenta.</string>
+    <string name="rd_permission_denied">Las notificaciones están desactivadas en Android. Puedes habilitarlas en los ajustes de notificaciones de la aplicación.</string>
+    <string name="rd_time_input">Introducir hora</string>
+    <string name="rd_time_clock">Usar reloj</string>
+    <string name="rd_intro_title">Haz espacio para lo importante.</string>
+    <string name="rd_intro_body">Organiza tus tareas, encuentra tu enfoque y haz tiempo para ti.</string>
+    <string name="rd_auth_error">No pudimos iniciar sesión. Inténtalo de nuevo.</string>
+    <string name="rd_preparing">Preparando Aura</string>
+    <string name="rd_onboarding_page">%1$d de %2$d</string>
+    <string name="rd_not_found">Esta entrada no está disponible.</string>
+    <string name="rd_unsaved">Cambios sin guardar</string>
+    <string name="rd_feature_hidden">Este espacio ya no está disponible.</string>
+    <string name="rd_date_label">%1$d %2$s %3$d</string>
+    <string name="rd_period_progress">%1$d / %2$d · %3$s</string>
+    <string-array name="rd_months">
+        <item>enero</item>
+        <item>febrero</item>
+        <item>marzo</item>
+        <item>abril</item>
+        <item>mayo</item>
+        <item>junio</item>
+        <item>julio</item>
+        <item>agosto</item>
+        <item>septiembre</item>
+        <item>octubre</item>
+        <item>noviembre</item>
+        <item>diciembre</item>
+    </string-array>
+    <string-array name="rd_weekdays">
+        <item>lun</item>
+        <item>mar</item>
+        <item>mié</item>
+        <item>jue</item>
+        <item>vie</item>
+        <item>sáb</item>
+        <item>dom</item>
+    </string-array>
+    <string-array name="rd_colors">
+        <item>Coral</item>
+        <item>Menta</item>
+        <item>Azul</item>
+        <item>Violeta</item>
+        <item>Ámbar</item>
+        <item>Malva</item>
+    </string-array>
+    <string name="rd_hour">Hora</string>
+    <string name="rd_minute">Minuto</string>
+    <string name="rd_am">a. m.</string>
+    <string name="rd_pm">p. m.</string>
+</resources>

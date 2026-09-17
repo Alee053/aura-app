@@ -104,6 +104,7 @@
     <string name="auth_error_no_credential">No Google account available. Please add one and try again.</string>
     <string name="auth_error_no_token">Could not retrieve sign-in token from Google. Please try again.</string>
     <string name="auth_error_unknown">Sign-in failed: %1$s</string>
+    <string name="auth_error_no_details">Sign-in failed with no error details. Please try again.</string>
 
     <!-- Home Screen -->
     <string name="home_dashboard_todos_title">TODOS TODAY</string>

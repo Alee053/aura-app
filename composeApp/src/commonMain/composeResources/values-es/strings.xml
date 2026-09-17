@@ -105,6 +105,7 @@
     <string name="auth_error_no_credential">No hay ninguna cuenta de Google disponible. Añade una e inténtalo de nuevo.</string>
     <string name="auth_error_no_token">No se pudo obtener el token de inicio de sesión de Google. Por favor, inténtalo de nuevo.</string>
     <string name="auth_error_unknown">Error al iniciar sesión: %1$s</string>
+    <string name="auth_error_no_details">Error al iniciar sesión sin detalles. Inténtalo de nuevo.</string>
     <!-- Home Screen -->
     <string name="home_dashboard_todos_title">TAREAS DE HOY</string>
     <string name="home_dashboard_habits_title">RACHA DE HÁBITOS</string>

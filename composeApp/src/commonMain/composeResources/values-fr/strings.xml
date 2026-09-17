@@ -105,6 +105,7 @@
     <string name="auth_error_no_credential">Aucun compte Google disponible. Veuillez en ajouter un et réessayer.</string>
     <string name="auth_error_no_token">Impossible de récupérer le jeton de connexion Google. Veuillez réessayer.</string>
     <string name="auth_error_unknown">Échec de la connexion : %1$s</string>
+    <string name="auth_error_no_details">Échec de la connexion sans détails. Veuillez réessayer.</string>
     <!-- Home Screen -->
     <string name="home_dashboard_todos_title">TÂCHES DU JOUR</string>
     <string name="home_dashboard_habits_title">SÉRIE D\'HABITUDES</string>

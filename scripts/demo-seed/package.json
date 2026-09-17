@@ -1,0 +1,14 @@
+{
+  "name": "aura-demo-seed",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Local Firebase Admin SDK tooling for Aura demo data.",
+  "scripts": {
+    "dry-run": "node seed-demo.mjs --dry-run",
+    "seed": "node seed-demo.mjs --seed"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.5.0"
+  }
+}

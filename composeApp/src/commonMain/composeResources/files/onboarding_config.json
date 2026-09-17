@@ -8,11 +8,15 @@
         "fr": "Organisez vos tâches"
       },
       "description": {
-        "es": "Crea, prioriza y completa tus tareas diarias con el botón flotante (+). Desliza para gestionar tu día.",
-        "en": "Create, prioritize, and complete your daily tasks with the floating (+) button. Swipe to manage your day.",
-        "fr": "Créez, priorisez et complétez vos tâches quotidiennes avec le bouton flottant (+)."
+        "es": "Crea, edita y completa tus tareas. Un espacio claro para lo que queda por hacer.",
+        "en": "Create, edit, and complete tasks. A clear space for what comes next.",
+        "fr": "Créez, modifiez et terminez vos tâches. Un espace clair pour la suite."
       },
-      "image_url": { "es": "", "en": "", "fr": "" }
+      "image_url": {
+        "es": "",
+        "en": "",
+        "fr": ""
+      }
     },
     {
       "id": 2,
@@ -22,11 +26,15 @@
         "fr": "Construisez des habitudes durables"
       },
       "description": {
-        "es": "Define hábitos recurrentes, registra tu progreso y mantén rachas. Usa el (+) para agregar nuevos hábitos.",
-        "en": "Set recurring habits, track your progress, and maintain streaks. Use (+) to add new habits.",
-        "fr": "Définissez des habitudes récurrentes, suivez vos progrès et maintenez vos séries."
+        "es": "Registra tus hábitos y sigue su continuidad. Disponible según tu plan.",
+        "en": "Track your habits and their continuity. Availability depends on your plan.",
+        "fr": "Suivez vos habitudes et leur continuité. Disponible selon votre offre."
       },
-      "image_url": { "es": "", "en": "", "fr": "" }
+      "image_url": {
+        "es": "",
+        "en": "",
+        "fr": ""
+      }
     },
     {
       "id": 3,
@@ -36,11 +44,15 @@
         "fr": "Réfléchissez avec votre journal"
       },
       "description": {
-        "es": "Escribe entradas de diario, captura tus pensamientos y revisa tu crecimiento personal día a día.",
-        "en": "Write journal entries, capture your thoughts, and review your personal growth day by day.",
-        "fr": "Écrivez des entrées de journal, capturez vos pensées et révisez votre croissance personnelle."
+        "es": "Guarda pensamientos, recuerdos e ideas. Tu próxima página te espera.",
+        "en": "Save thoughts, memories, and ideas. Your next page is waiting.",
+        "fr": "Gardez vos pensées, souvenirs et idées. Votre prochaine page vous attend."
       },
-      "image_url": { "es": "", "en": "", "fr": "" }
+      "image_url": {
+        "es": "",
+        "en": "",
+        "fr": ""
+      }
     },
     {
       "id": 4,
@@ -50,11 +62,15 @@
         "fr": "Tout en un coup d'œil"
       },
       "description": {
-        "es": "Tu panel principal muestra un resumen de tareas, hábitos y diario. ¡Todo listo para empezar!",
-        "en": "Your dashboard shows a summary of tasks, habits, and journal. Everything is ready to start!",
-        "fr": "Votre tableau de bord affiche un résumé des tâches, habitudes et journal. Tout est prêt !"
+        "es": "Consulta tus tareas y hábitos, y abre Enfoque para dedicarles tu atención.",
+        "en": "Review tasks and habits, then open Focus to give them your attention.",
+        "fr": "Consultez vos tâches et habitudes, puis ouvrez Concentration pour leur consacrer votre attention."
       },
-      "image_url": { "es": "", "en": "", "fr": "" }
+      "image_url": {
+        "es": "",
+        "en": "",
+        "fr": ""
+      }
     }
   ]
 }

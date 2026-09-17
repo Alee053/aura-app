@@ -1,127 +1,78 @@
 package com.programovil.aura
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Book
-import androidx.compose.material.icons.filled.Checklist
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Timer
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavDestination.Companion.hasRoute
-import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.*
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.programovil.aura.shared.presentation.AuthenticatedSessionViewModel
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.navigation.compose.rememberNavController
+import aura_app.composeapp.generated.resources.*
 import com.programovil.aura.auth.presentation.AuthViewModel
 import com.programovil.aura.auth.presentation.screen.SignInScreen
 import com.programovil.aura.auth.presentation.screen.authErrorMessage
-import com.programovil.aura.designsystem.theme.AppTheme
-import com.programovil.aura.designsystem.theme.DsTheme
-import com.programovil.aura.designsystem.theme.ThemeMode
+import com.programovil.aura.designsystem.components.overlay.*
+import com.programovil.aura.designsystem.theme.*
 import com.programovil.aura.habit.domain.usecase.GetHabitsAccessibilityUseCase
 import com.programovil.aura.navigation.AppNavHost
-import com.programovil.aura.navigation.NavRoute
 import com.programovil.aura.onboarding.data.OnboardingPreferences
 import com.programovil.aura.onboarding.presentation.screen.OnboardingScreen
-import com.programovil.aura.pomodoro.presentation.PomodoroCompletionOverlay
-import com.programovil.aura.pomodoro.presentation.PomodoroViewModel
-import com.programovil.aura.pomodoro.presentation.pomodoroNextSessionLabel
-import com.programovil.aura.shared.AppLifecycleEvents
-import com.programovil.aura.shared.FeatureFlag
-import com.programovil.aura.shared.FeatureFlagManager
-import com.programovil.aura.shared.MotivationPhraseManager
-import com.programovil.aura.shared.PomodoroLaunchEvents
+import com.programovil.aura.pomodoro.presentation.*
+import com.programovil.aura.settings.presentation.viewmodel.SettingsViewModel
+import com.programovil.aura.shared.*
+import com.programovil.aura.shared.presentation.systemAnimationsEnabled
+import com.programovil.aura.shared.presentation.ApplyAuraSystemBars
+import com.programovil.aura.shared.presentation.composable.*
 import com.programovil.aura.todo.presentation.viewmodel.TodoViewModel
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
-import aura_app.composeapp.generated.resources.Res
-import aura_app.composeapp.generated.resources.nav_home
-import aura_app.composeapp.generated.resources.nav_todos
-import aura_app.composeapp.generated.resources.nav_habits
-import aura_app.composeapp.generated.resources.nav_settings
-import aura_app.composeapp.generated.resources.nav_journal
-import aura_app.composeapp.generated.resources.nav_content_description_todos
-import aura_app.composeapp.generated.resources.nav_content_description_habits
-import aura_app.composeapp.generated.resources.nav_content_description_home
-import aura_app.composeapp.generated.resources.nav_content_description_journal
-import aura_app.composeapp.generated.resources.pomodoro_title
-import org.jetbrains.compose.resources.stringResource
-import kotlinx.coroutines.flow.collect
 
 @Composable
-@Preview
-fun App(
-    onSignInClick: () -> Unit = {}
-) {
-    val settingsViewModel = koinViewModel<com.programovil.aura.settings.presentation.viewmodel.SettingsViewModel>()
-    val settingsState by settingsViewModel.uiState.collectAsState()
-    val currentThemeMode = settingsState.themeMode
-
-    DsTheme(mode = currentThemeMode) {
-        val authViewModel: AuthViewModel = koinViewModel()
-        val authState by authViewModel.authState.collectAsState()
-
-        val onboardingPrefs: OnboardingPreferences = koinInject()
-        val isOnboardingCompleted by onboardingPrefs.isOnboardingCompleted
-            .collectAsState(initial = false)
-        var dismissedThisSession by remember { mutableStateOf(false) }
-
-        val showOnboarding = authState is AuthViewModel.AuthState.SignedIn
-            && isOnboardingCompleted.not()
-            && dismissedThisSession.not()
-
-        when {
-            authState is AuthViewModel.AuthState.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize().background(AppTheme.colors.background),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = AppTheme.colors.primary)
+fun App(onSignInClick: () -> Unit = {}, credentialRequestInFlight: Boolean = false) {
+    val settings: SettingsViewModel = koinViewModel()
+    val settingsState by settings.uiState.collectAsState()
+    val animationEnabled = systemAnimationsEnabled()
+    DsTheme(settingsState.themeMode) {
+        ApplyAuraSystemBars(AppTheme.colors.isLight)
+        CompositionLocalProvider(LocalAuraMotion provides AuraMotion(animationEnabled)) {
+            val session = viewModel { AuthenticatedSessionViewModel() }
+            val auth: AuthViewModel = koinViewModel()
+            val authState by auth.authState.collectAsState()
+            val preferences: OnboardingPreferences = koinInject()
+            val onboardingCompleted by preferences.isOnboardingCompleted.collectAsState(initial = null)
+            var sessionGeneration by rememberSaveable { mutableIntStateOf(0) }
+            var dismissed by remember { mutableStateOf(false) }
+            var attemptedLogin by remember { mutableStateOf(false) }
+            LaunchedEffect(authState) {
+                if (authState is AuthViewModel.AuthState.SignedOut || authState is AuthViewModel.AuthState.Error) {
+                    session.clearSession()
+                    sessionGeneration++
+                    dismissed = false
                 }
             }
-            authState is AuthViewModel.AuthState.SignedOut ||
-                authState is AuthViewModel.AuthState.Error -> {
-                val errorMessage = (authState as? AuthViewModel.AuthState.Error)
-                    ?.let { authErrorMessage(it.error) }
-                SignInScreen(
-                    errorMessage = errorMessage,
-                    onSignInClick = onSignInClick
-                )
-            }
-            showOnboarding -> {
-                OnboardingScreen(
-                    onSkip = { dismissedThisSession = true },
-                    onStart = { }
-                )
-            }
-            authState is AuthViewModel.AuthState.SignedIn -> {
-                AuthenticatedApp(
-                    currentThemeMode = currentThemeMode,
-                    onThemeChange = { settingsViewModel.setThemeMode(it) },
-                    onSignOut = { authViewModel.signOut() }
+            when {
+                authState is AuthViewModel.AuthState.SignedIn && onboardingCompleted == null -> SessionLoading()
+                authState is AuthViewModel.AuthState.SignedIn && onboardingCompleted == false && !dismissed ->
+                    CompositionLocalProvider(LocalViewModelStoreOwner provides session) {
+                        OnboardingScreen(onSkip = { dismissed = true }, onStart = {})
+                    }
+                authState is AuthViewModel.AuthState.SignedIn -> {
+                    // All authenticated state belongs to one session, never to a subsequent account.
+                    CompositionLocalProvider(LocalViewModelStoreOwner provides session) {
+                        key(sessionGeneration) {
+                            AuthenticatedApp(settingsState.themeMode, settings::setThemeMode, auth::signOut)
+                        }
+                    }
+                }
+                authState is AuthViewModel.AuthState.Loading && !attemptedLogin -> SessionLoading()
+                else -> SignInScreen(
+                    errorMessage = (authState as? AuthViewModel.AuthState.Error)?.let { authErrorMessage(it.error) },
+                    onSignInClick = { attemptedLogin = true; onSignInClick() },
+                    isLoading = credentialRequestInFlight || authState is AuthViewModel.AuthState.Loading
                 )
             }
         }
@@ -129,179 +80,40 @@ fun App(
 }
 
 @Composable
-fun AuthenticatedApp(
-    currentThemeMode: ThemeMode,
-    onThemeChange: (ThemeMode) -> Unit,
-    onSignOut: () -> Unit
-) {
-    val navController = rememberNavController()
-    val todoViewModel: TodoViewModel = koinViewModel()
-    val pomodoroViewModel: PomodoroViewModel = koinViewModel()
-    val pomodoroUiState by pomodoroViewModel.uiState.collectAsState()
-    val featureFlagManager: FeatureFlagManager = koinInject()
-    val featureFlags by featureFlagManager.flags.collectAsState()
-    val motivationPhraseManager: MotivationPhraseManager = koinInject()
-    val getHabitsAccessibilityUseCase: GetHabitsAccessibilityUseCase = koinInject()
-    val showHabitsAccessible: Boolean by getHabitsAccessibilityUseCase()
-        .collectAsState(initial = true)
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
-
-    LaunchedEffect(Unit) {
-        featureFlagManager.initialize()
-        motivationPhraseManager.initialize()
+private fun SessionLoading() {
+    Column(Modifier.fillMaxSize().background(AppTheme.colors.background).safeDrawingPadding(),
+        horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
+        AuraBrandMark(Modifier.size(AuraSpacing.control))
+        Spacer(Modifier.height(AuraSpacing.lg))
+        Text(stringResource(Res.string.rd_preparing), color = AppTheme.colors.textSecondary)
+        LinearProgressIndicator(Modifier.width(AuraSpacing.editorWidth / 3).padding(top = AuraSpacing.lg))
     }
+}
 
-    LaunchedEffect(Unit) {
-        pomodoroViewModel.syncTimerState()
-    }
-
-    LaunchedEffect(pomodoroViewModel) {
-        AppLifecycleEvents.foregroundEvents.collect {
-            pomodoroViewModel.syncTimerState()
+@Composable
+fun AuthenticatedApp(currentThemeMode: ThemeMode, onThemeChange: (ThemeMode) -> Unit, onSignOut: () -> Unit) {
+    val nav = rememberNavController()
+    val todo: TodoViewModel = koinViewModel()
+    val pomodoro: PomodoroViewModel = koinViewModel()
+    val timer by pomodoro.uiState.collectAsState()
+    val flagsManager: FeatureFlagManager = koinInject()
+    val flags by flagsManager.flags.collectAsState()
+    val motivation: MotivationPhraseManager = koinInject()
+    val access: GetHabitsAccessibilityUseCase = koinInject()
+    val habits by access().collectAsState(initial = false)
+    val overlays = remember { AuraOverlayRegistry() }
+    LaunchedEffect(Unit) { flagsManager.initialize(); motivation.initialize() }
+    LaunchedEffect(pomodoro) { pomodoro.syncTimerState() }
+    LaunchedEffect(pomodoro) { AppLifecycleEvents.foregroundEvents.collect { pomodoro.syncTimerState() } }
+    LaunchedEffect(pomodoro) { PomodoroLaunchEvents.events.collect { pomodoro.syncTimerState() } }
+    val showPomodoro = flags[FeatureFlag.POMODORO_ENABLED] != false
+    CompositionLocalProvider(LocalAuraOverlays provides overlays) {
+        AuraAppShell(nav, flags[FeatureFlag.TODOS_ENABLED] != false, habits,
+            showPomodoro, flags[FeatureFlag.JOURNAL_ENABLED] != false) {
+            AppNavHost(nav, todo, pomodoro, currentThemeMode, onThemeChange, onSignOut, flags, habits)
         }
-    }
-
-    LaunchedEffect(pomodoroViewModel) {
-        PomodoroLaunchEvents.events.collect {
-            pomodoroViewModel.syncTimerState()
-        }
-    }
-
-    val showTodos by remember(featureFlags) {
-        mutableStateOf(featureFlags[FeatureFlag.TODOS_ENABLED] ?: true)
-    }
-    val showJournals by remember(featureFlags) {
-        mutableStateOf(featureFlags[FeatureFlag.JOURNAL_ENABLED] ?: true)
-    }
-    val showPomodoro by remember(featureFlags) {
-        mutableStateOf(featureFlags[FeatureFlag.POMODORO_ENABLED] ?: true)
-    }
-    val pomodoroNextSessionLabel = pomodoroNextSessionLabel(
-        mode = pomodoroUiState.mode,
-        sessionsCompleted = pomodoroUiState.sessionsCompleted
-    )
-
-    val navItemColors = NavigationBarItemDefaults.colors(
-        selectedIconColor = AppTheme.colors.primary,
-        selectedTextColor = AppTheme.colors.primary,
-        unselectedIconColor = AppTheme.colors.textSecondary,
-        unselectedTextColor = AppTheme.colors.textSecondary,
-        indicatorColor = AppTheme.colors.primary.copy(alpha = 0.15f)
-    )
-
-    Scaffold(
-        containerColor = AppTheme.colors.background,
-        contentWindowInsets = WindowInsets.safeDrawing,
-        bottomBar = {
-            NavigationBar(
-                containerColor = AppTheme.colors.surface,
-                contentColor = AppTheme.colors.primary
-            ) {
-                if (showTodos) {
-                    NavigationBarItem(
-                        icon = { Icon(Icons.Default.Checklist, contentDescription = stringResource(Res.string.nav_content_description_todos)) },
-                        label = { Text(stringResource(Res.string.nav_todos)) },
-                        selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Todo>() } == true,
-                        onClick = {
-                            navController.navigate(NavRoute.Todo) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    inclusive = false
-                                }
-                                launchSingleTop = true
-                            }
-                        },
-                        colors = navItemColors
-                    )
-                }
-                if (showHabitsAccessible) {
-                    NavigationBarItem(
-                        icon = { Icon(Icons.Default.DateRange, contentDescription = stringResource(Res.string.nav_content_description_habits)) },
-                        label = { Text(stringResource(Res.string.nav_habits)) },
-                        selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Habit>() } == true,
-                        onClick = {
-                            navController.navigate(NavRoute.Habit) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    inclusive = false
-                                }
-                                launchSingleTop = true
-                            }
-                        },
-                        colors = navItemColors
-                    )
-                }
-                NavigationBarItem(
-                    icon = { Icon(Icons.Default.Home, contentDescription = stringResource(Res.string.nav_content_description_home)) },
-                    label = { Text(stringResource(Res.string.nav_home)) },
-                    selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Home>() } == true,
-                    onClick = {
-                        navController.navigate(NavRoute.Home) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                inclusive = false
-                            }
-                            launchSingleTop = true
-                        }
-                    },
-                    colors = navItemColors
-                )
-                if (showPomodoro) {
-                    NavigationBarItem(
-                        icon = { Icon(Icons.Default.Timer, contentDescription = stringResource(Res.string.pomodoro_title)) },
-                        label = { Text(stringResource(Res.string.pomodoro_title)) },
-                        selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Pomodoro>() } == true,
-                        onClick = {
-                            navController.navigate(NavRoute.Pomodoro) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    inclusive = false
-                                }
-                                launchSingleTop = true
-                            }
-                        },
-                        colors = navItemColors
-                    )
-                }
-                if (showJournals) {
-                    NavigationBarItem(
-                        icon = { Icon(Icons.Default.Book, contentDescription = stringResource(Res.string.nav_content_description_journal)) },
-                        label = { Text(stringResource(Res.string.nav_journal)) },
-                        selected = currentDestination?.hierarchy?.any { it.hasRoute<NavRoute.Journal>() } == true,
-                        onClick = {
-                            navController.navigate(NavRoute.Journal) {
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    inclusive = false
-                                }
-                                launchSingleTop = true
-                            }
-                        },
-                        colors = navItemColors
-                    )
-                }
-            }
-        }
-    ) { padding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
-            AppNavHost(
-                navController = navController,
-                todoViewModel = todoViewModel,
-                pomodoroViewModel = pomodoroViewModel,
-                currentThemeMode = currentThemeMode,
-                onThemeChange = onThemeChange,
-                onSignOut = onSignOut,
-                featureFlags = featureFlags,
-                showHabitsAccessible = showHabitsAccessible
-            )
-
-            if (showPomodoro && pomodoroUiState.showCompletionMessage) {
-                PomodoroCompletionOverlay(
-                    completedMode = pomodoroUiState.completedMode,
-                    nextSessionLabel = pomodoroNextSessionLabel,
-                    onClose = pomodoroViewModel::dismissCompletionMessage
-                )
-            }
+        if (showPomodoro && timer.showCompletionMessage && overlays.count == 0) {
+            PomodoroCompletionOverlay(timer.completedMode, pomodoroModeLabel(timer.mode), pomodoro::dismissCompletionMessage)
         }
     }
 }

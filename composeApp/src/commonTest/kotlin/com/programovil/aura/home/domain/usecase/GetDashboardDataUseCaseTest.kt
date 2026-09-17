@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 class GetDashboardDataUseCaseTest {
 
@@ -89,44 +90,22 @@ class GetDashboardDataUseCaseTest {
     }
 
     @Test
-    fun `emits zero-valued dashboard when both sources fail`() = runTest {
-        every { getTodosUseCase() } returns flowOf(Result.failure(RuntimeException("a")))
-        every { getHabitsUseCase() } returns flowOf(Result.failure(RuntimeException("b")))
-
+    fun `failed sources propagate the todo error with deterministic precedence`() = runTest {
+        val failure = RuntimeException("todo")
+        every { getTodosUseCase() } returns flowOf(Result.failure(failure))
+        every { getHabitsUseCase() } returns flowOf(Result.failure(RuntimeException("habit")))
         useCase().test {
-            val result = awaitItem().getOrNull()
-            assertEquals(
-                DashboardData(
-                    incompleteTodos = 0,
-                    completedHabitsToday = 0,
-                    totalHabitsToday = 0,
-                    currentStreak = 0
-                ),
-                result
-            )
+            assertEquals(failure, awaitItem().exceptionOrNull())
             awaitComplete()
         }
     }
 
     @Test
-    fun `emits zero values for one source and uses the other when only one fails`() = runTest {
-        val habits = listOf(
-            HabitWithStatus(
-                habit = sampleHabit("h-1", "Run"),
-                currentPeriodProgress = 1 to 1,
-                streak = 4,
-                last7Days = listOf(DayCompletion("2026-06-10", isCompleted = true))
-            )
-        )
-        every { getTodosUseCase() } returns flowOf(Result.failure(RuntimeException("a")))
-        every { getHabitsUseCase() } returns flowOf(Result.success(habits))
-
+    fun `one failed source is not misrepresented as a confirmed zero`() = runTest {
+        every { getTodosUseCase() } returns flowOf(Result.success(emptyList()))
+        every { getHabitsUseCase() } returns flowOf(Result.failure(RuntimeException("habit")))
         useCase().test {
-            val data = awaitItem().getOrNull()!!
-            assertEquals(0, data.incompleteTodos)
-            assertEquals(1, data.completedHabitsToday)
-            assertEquals(1, data.totalHabitsToday)
-            assertEquals(4, data.currentStreak)
+            assertTrue(awaitItem().isFailure)
             awaitComplete()
         }
     }

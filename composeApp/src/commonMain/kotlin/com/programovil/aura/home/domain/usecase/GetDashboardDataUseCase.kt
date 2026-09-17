@@ -13,6 +13,8 @@ class GetDashboardDataUseCase(
 ) {
     operator fun invoke(): Flow<Result<DashboardData>> {
         return combine(getTodosUseCase(), getHabitsWithStatusUseCase()) { todosResult, habitsResult ->
+            todosResult.exceptionOrNull()?.let { return@combine Result.failure(it) }
+            habitsResult.exceptionOrNull()?.let { return@combine Result.failure(it) }
             val todos = todosResult.getOrNull()
             val habits = habitsResult.getOrNull()
             val incompleteTodos = todos?.count { !it.isCompleted } ?: 0
